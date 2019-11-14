@@ -1,2 +1,2 @@
-# Earth and Space Wildfire Forecasting
-
+# Wildfire Forecasting from Satellite Imagery
+## OxAI Labs Earth and Space Project
