@@ -1,2 +1,3 @@
 /.idea/
 **/data_dir/
+/.pytest_cache/
