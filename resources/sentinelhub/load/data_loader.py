@@ -1,4 +1,3 @@
-from resources.sentinelhub.show import plot_image
 from resources.base.data_loader import DataLoader
 from sentinelhub import WcsRequest, CRS, BBox, MimeType
 
@@ -15,5 +14,5 @@ class SentinelHubDetaLoader(DataLoader):
         self.request(config).save_data()
 
     def load(self, config):
-        wcs_img = self.request(config).get_data(save_data=True)
-        plot_image(wcs_img[-1])
+        return self.request(config).get_data(save_data=True)
+
