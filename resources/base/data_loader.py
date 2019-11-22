@@ -14,4 +14,7 @@ class DataLoader(object):
         pass
 
     def data_dir(self):
-        return os.path.join(os.path.dirname(os.path.abspath(sys.modules[self.__class__.__module__].__file__)), "data_dir")
+        path = os.path.join(os.path.dirname(os.path.abspath(sys.modules[self.__class__.__module__].__file__)), "data_dir")
+        if not os.path.exists(path):
+            os.mkdir(path)
+        return path

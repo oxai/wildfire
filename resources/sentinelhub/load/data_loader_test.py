@@ -1,8 +1,8 @@
-from .data_loader import SentinelHubDetaLoader
+from .data_loader import SentinelHubDataLoader
 from ..utils import get_bbox
 from ..show import plot_image
 
-loader = SentinelHubDetaLoader()
+loader = SentinelHubDataLoader()
 
 info = {
     "layer": 'TRUE-COLOR-S2-L1C',
