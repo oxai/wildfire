@@ -46,7 +46,7 @@ class SentinelLoaderFromFpaFod(object):
                 "time": (fire_start, fire_end)
             }, subdir_with_fire)
 
-            print("With fire: {}, Start: {}, End: {}".format(len(with_fire_array), fire_start, fire_end))
+            print("With fire: {}, Start: {:%Y-%m-%d}, End: {:%Y-%m-%d}".format(len(with_fire_array), fire_start, fire_end))
 
             # download the same number of images taken before the wildfire
             before_fire_array = self.sentinel_loader.load({
@@ -54,7 +54,7 @@ class SentinelLoaderFromFpaFod(object):
                 "time": (fire_start - one_year, fire_end - one_year)
             }, subdir_before_fire)
 
-            print("Before fire: {}, Start: {}, End: {}".format(len(before_fire_array), fire_start - one_year, fire_end - one_year))
+            print("Before fire: {}, Start: {:%Y-%m-%d}, End: {:%Y-%m-%d}".format(len(before_fire_array), fire_start - one_year, fire_end - one_year))
 
             # download the same number of images taken after the wildfire
             after_fire_array = self.sentinel_loader.load({
@@ -62,7 +62,7 @@ class SentinelLoaderFromFpaFod(object):
                 "time": (fire_start + one_year, fire_end + one_year)
             }, subdir_after_fire)
 
-            print("After fire: {}, Start: {}, End: {}".format(len(after_fire_array), fire_start + one_year, fire_end + one_year))
+            print("After fire: {}, Start: {:%Y-%m-%d}, End: {:%Y-%m-%d}".format(len(after_fire_array), fire_start + one_year, fire_end + one_year))
 
             if i % 10 == 0:
                 print("Downloaded {}-th record".format(i))
