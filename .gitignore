@@ -2,3 +2,5 @@
 **/data_dir/
 /.pytest_cache/
 **/.ipynb_checkpoints/
+tags
+**/__pycache__/
