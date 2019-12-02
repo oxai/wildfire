@@ -1,17 +1,18 @@
-from resources.fpa_fod.data_loader import FpaFodDataLoader
+from resources.modis_fire.data_loader import ModisFireDataLoader
 from .data_loader import SentinelHubDataLoader
 from ..utils import get_bbox
 import pandas as pd
+from datetime import timedelta, datetime
 
 
-class SentinelLoaderFromFpaFod(object):
+class SentinelLoaderFromModis(object):
     def __init__(self, subdir="with_fire"):
-        self.fpa_fod_loader = FpaFodDataLoader()
+        self.fire_loader = ModisFireDataLoader()
         self.sentinel_loader = SentinelHubDataLoader(subdir=subdir)
 
-    def download(self, layer, loc=None, from_date=None, until_date=None, min_fire_size=0.0, max_cloud_coverage=0.0, r=3000, resx="10m", resy="10m"):
-        df = self.fpa_fod_loader.get_records(
-            loc=loc, from_date=from_date, until_date=until_date, min_fire_size=min_fire_size
+    def download(self, layer, loc=None, from_date=None, until_date=None, max_cloud_coverage=0.3, r=3000, resx="10m", resy="10m"):
+        df = self.fire_loader.get_records(
+            loc=loc, from_date=from_date, until_date=until_date
         ).reset_index()
 
         print("Found {} wildfire records...".format(len(df)))
@@ -19,8 +20,9 @@ class SentinelLoaderFromFpaFod(object):
         for i, row in df.iterrows():
             fire_lat = row["LATITUDE"]
             fire_lng = row["LONGITUDE"]
-            fire_start = row["START_DATE"]
-            fire_end = row["END_DATE"]
+            date = datetime.strptime(row["DATE"], '%Y-%m-%d')
+            fire_start = date - timedelta(days=10)
+            fire_end = date + timedelta(days=10)
 
             fire_start = fire_start if fire_start is not pd.NaT else None
             fire_end = fire_end if fire_end is not pd.NaT else None
@@ -34,7 +36,9 @@ class SentinelLoaderFromFpaFod(object):
                 "resy": resy
             }
 
-            self.sentinel_loader.download(info)
+            imgs = self.sentinel_loader.load(info)
+
+            print("Found %d images" % len(imgs))
 
             if i % 10 == 0:
                 print("Downloaded {}-th record".format(i))
