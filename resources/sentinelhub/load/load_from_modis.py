@@ -6,11 +6,11 @@ from datetime import timedelta, datetime
 
 
 class SentinelLoaderFromModis(object):
-    def __init__(self, subdir="with_fire"):
+    def __init__(self):
         self.fire_loader = ModisFireDataLoader()
-        self.sentinel_loader = SentinelHubDataLoader(subdir=subdir)
+        self.sentinel_loader = SentinelHubDataLoader()
 
-    def download(self, layer, loc=None, from_date=None, until_date=None, max_cloud_coverage=0.3, r=3000, resx="10m", resy="10m"):
+    def download(self, layer, loc=None, from_date=None, until_date=None, max_cloud_coverage=0.3, r=3000, resx="10m", resy="10m", subdir="with_fire"):
         df = self.fire_loader.get_records(
             loc=loc, from_date=from_date, until_date=until_date
         ).reset_index()
@@ -21,8 +21,8 @@ class SentinelLoaderFromModis(object):
             fire_lat = row["LATITUDE"]
             fire_lng = row["LONGITUDE"]
             date = datetime.strptime(row["DATE"], '%Y-%m-%d')
-            fire_start = date - timedelta(days=10)
-            fire_end = date + timedelta(days=10)
+            fire_start = date - timedelta(days=4)
+            fire_end = date + timedelta(days=4)
 
             fire_start = fire_start if fire_start is not pd.NaT else None
             fire_end = fire_end if fire_end is not pd.NaT else None
@@ -36,7 +36,7 @@ class SentinelLoaderFromModis(object):
                 "resy": resy
             }
 
-            imgs = self.sentinel_loader.load(info)
+            imgs = self.sentinel_loader.load(info, subdir)
 
             print("Found %d images" % len(imgs))
 

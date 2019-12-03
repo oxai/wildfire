@@ -1,7 +1,7 @@
 from resources.base.data_loader import DataLoader
 import pandas as pd
 import os
-from resources.utils.df import latlng_condition, date_in_range
+from resources.utils.df import latlng_condition, df_date_in_range
 
 
 class ModisFireDataLoader(DataLoader):
@@ -18,5 +18,5 @@ class ModisFireDataLoader(DataLoader):
 
     def get_records(self, loc=None, from_date=None, until_date=None):
         loc_cond = latlng_condition(self.df, loc)
-        date_cond = date_in_range(self.df, "DATE", from_date, until_date)
+        date_cond = df_date_in_range(self.df["DATE"], from_date, until_date)
         return self.df[loc_cond & date_cond].copy()

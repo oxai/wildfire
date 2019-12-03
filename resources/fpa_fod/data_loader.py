@@ -1,7 +1,7 @@
 from resources.base.data_loader import DataLoader
 import sqlite3, os
 import pandas as pd
-from resources.utils.df import latlng_condition, dates_overlap, date_in_range
+from resources.utils.df import latlng_condition, dates_overlap, date_in_df_range
 
 
 class FpaFodDataLoader(DataLoader):
@@ -30,6 +30,6 @@ class FpaFodDataLoader(DataLoader):
 
     def get_records_on_day(self, date, loc=None, min_fire_size=0.0):
         loc_cond = latlng_condition(self.df, loc)
-        date_cond = date_in_range(date, self.df["START_DATE"], self.df["END_DATE"])
+        date_cond = date_in_df_range(date, self.df["START_DATE"], self.df["END_DATE"])
         fire_cond = self.df["FIRE_SIZE"] >= min_fire_size
         return self.df[loc_cond & date_cond & fire_cond].copy()
