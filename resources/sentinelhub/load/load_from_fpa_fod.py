@@ -1,6 +1,6 @@
 from resources.fpa_fod.data_loader import FpaFodDataLoader
 from .data_loader import SentinelHubDataLoader
-from ..utils import get_bbox
+from ..utils import get_bbox_from_radius
 import pandas as pd
 from datetime import timedelta
 import time
@@ -34,7 +34,7 @@ class SentinelLoaderFromFpaFod(object):
 
             info = {
                 "layer": layer,
-                "bbox": get_bbox(fire_lat, fire_lng, r=r),
+                "bbox": get_bbox_from_radius(fire_lat, fire_lng, r=r),
                 "maxcc": max_cloud_coverage,
                 "resx": resx,
                 "resy": resy

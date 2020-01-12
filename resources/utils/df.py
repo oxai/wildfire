@@ -1,6 +1,3 @@
-import numpy as np
-
-
 def latlng_condition(df, loc=None, lat_key="LATITUDE", lng_key="LONGITUDE"):
     if loc is None:
         return df[lat_key].apply(lambda x: True)

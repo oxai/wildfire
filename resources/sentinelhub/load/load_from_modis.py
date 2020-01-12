@@ -1,6 +1,6 @@
 from resources.modis_fire.data_loader import ModisFireDataLoader
 from .data_loader import SentinelHubDataLoader
-from ..utils import get_bbox
+from ..utils import get_bbox_from_radius
 import pandas as pd
 from datetime import timedelta, datetime
 
@@ -29,7 +29,7 @@ class SentinelLoaderFromModis(object):
 
             info = {
                 "layer": layer,
-                "bbox": get_bbox(fire_lat, fire_lng, r=r),
+                "bbox": get_bbox_from_radius(fire_lat, fire_lng, r=r),
                 "time": (fire_start, fire_end),
                 "maxcc": max_cloud_coverage,
                 "resx": resx,
