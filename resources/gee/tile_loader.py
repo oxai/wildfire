@@ -1,12 +1,11 @@
 from resources.base.data_loader import DataLoader
-from .methods import get_ee_product, get_ee_image_from_product, get_ee_product_name, get_image_download_url_for_tile, visualise_image
+from .methods import get_ee_image_from_product, get_ee_product_name, get_image_download_url_for_tile, visualise_image
 import os, requests, zipfile
 from io import BytesIO
 from skimage import io
 from skimage.transform import resize
 from collections import namedtuple
 import shutil
-import numpy as np
 
 
 TileQuery = namedtuple("Query", "x y z date_from date_to reducer")
