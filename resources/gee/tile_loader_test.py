@@ -1,6 +1,7 @@
 import ee
-from .tile_loader import GeeTileLoader, Query
+from .tile_loader import GeeTileLoader, TileQuery
 from .methods import get_ee_product
+from skimage import io
 
 
 ee.Initialize()
@@ -13,6 +14,8 @@ ee_product = get_ee_product(
     product="raw"
 )
 
-query = Query(x=2, y=2, z=3, date_from="2019-12-01", date_to="2019-12-30", reducer="median")
+query = TileQuery(x=2, y=2, z=3, date_from="2019-12-01", date_to="2019-12-30", reducer="median")
 
-loader.load(ee_product, query)
+out = loader.visualise(ee_product, query)
+print(out)
+io.imsave("file.jpg", out)

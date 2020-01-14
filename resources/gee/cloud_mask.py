@@ -17,6 +17,18 @@ def mask_l8_sr(image):
     return image.updateMask(mask)
 
 
+def mask_l8_raw(image):
+    # Bits 3 and 5 are cloud shadow and cloud, respectively.
+    cloudShadowBitMask = (1 << 4)
+
+    # Get the pixel QA band.
+    qa = image.select('BQA')
+
+    # Both flags should be set to zero, indicating clear conditions.
+    mask = qa.bitwiseAnd(cloudShadowBitMask).eq(0)
+    return image.updateMask(mask)
+
+
 def cloud_mask_l457(image):
     """
     Derived From: https://developers.google.com/earth-engine/datasets/catalog/LANDSAT_LE07_C01_T1_SR

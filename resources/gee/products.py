@@ -11,6 +11,7 @@ EE_PRODUCTS = {
                     'min': 0.0,
                     'max': 30000.0,
                 },
+                'cloud_mask': 'mask_l8_raw',
                 'start_date': '2013-04-01',
                 'end_date': None  # to present
             },

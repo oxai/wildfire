@@ -1,8 +1,9 @@
 from django.shortcuts import render, HttpResponse
 import urllib.request
-from resources.gee.methods import get_image_collection_asset
+from resources.gee.methods import get_ee_product
+from resources.gee.tile_loader import GeeTileLoader, TileQuery
 from web import config
-import numpy as np
+from PIL import Image
 
 
 # Create your views here.
@@ -13,17 +14,21 @@ def home(request):
 # Create your views here.
 def gee_mapserver(request, z, x, y):
 
-    url = get_image_collection_asset(
+    loader = GeeTileLoader()
+
+    ee_product = get_ee_product(
         platform="landsat",
         sensor="8",
-        product="surface",
-        date_from="2019-12-01",
-        date_to="2019-12-30",
-        reducer='median'
+        product="raw"
     )
 
-    print(url.format(z=z, x=x, y=y))
-    with urllib.request.urlopen(url.format(z=z, x=x, y=y)) as response:
-        tile = response.read()
+    query = TileQuery(x=x, y=y, z=z, date_from="2019-12-01", date_to="2019-12-30", reducer="median")
 
-    return HttpResponse(tile, content_type="image/jpeg")
+    out = loader.visualise(ee_product, query)
+    out = (out * 255).astype('uint8')
+
+    out = Image.fromarray(out, 'RGB')
+
+    response = HttpResponse(content_type='image/jpg')
+    out.save(response, "JPEG")
+    return response

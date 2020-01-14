@@ -2,6 +2,7 @@ import ee
 from .products import EE_PRODUCTS
 from . import cloud_mask as cm
 from ..utils.gis import get_bbox_corners_for_tile, get_tile_pixel_scale_from_zoom
+import numpy as np
 
 
 def image_to_map_id(ee_image, vis_params=None):
@@ -36,8 +37,6 @@ def get_ee_image_from_product(ee_product, date_from, date_to, reducer='median'):
     collection = ee_product['collection']
     cloud_mask = ee_product.get('cloud_mask', None)
 
-    print(f'Image Collection Name: {collection}')
-
     ee_collection = ee.ImageCollection(collection)\
         .filter(
             ee.Filter.date(date_from, date_to)
@@ -63,18 +62,32 @@ def get_image_download_url(ee_image, bbox, scale, name=None):
     name = {'name': name} if name else {}
     geometry = ee.Geometry.Rectangle(bbox)
 
-    config = {
+    return ee_image.getDownloadURL({
         **name,
         "scale": scale,
         'crs': 'EPSG:3857',     # WGS 84 Web Mercator
         "region": geometry["coordinates"]
-    }
-
-    print(config)
-    return ee_image.getDownloadURL(config)
+    })
 
 
 def get_image_download_url_for_tile(ee_image, x_tile, y_tile, zoom, name=None):
     bbox = get_bbox_corners_for_tile(x_tile, y_tile, zoom)
     scale = get_tile_pixel_scale_from_zoom(zoom)
     return get_image_download_url(ee_image, bbox, scale, name)
+
+
+def visualise_image(ee_product, image, vis_params=None):
+    if not vis_params:
+        vis_params = ee_product.get('vis_params', None)
+    _, h, w = image.shape
+    min_val = vis_params['min']
+    max_val = vis_params['max']
+    gamma = vis_params.get('gamma', 1)
+    img = np.where(image > min_val, image, min_val)
+    img = np.where(img < max_val, img, max_val)
+    img = (img - min_val) / (max_val - min_val)
+    img = img ** (1 / gamma)
+    out = np.zeros((3, h, w))
+    for i, band in enumerate(vis_params['bands']):
+        out[i] = img[ee_product['bands'].index(band)]
+    return out
