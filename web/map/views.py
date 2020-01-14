@@ -2,6 +2,7 @@ from django.shortcuts import render, HttpResponse
 import urllib.request
 from resources.gee.methods import get_image_collection_asset
 from web import config
+import numpy as np
 
 
 # Create your views here.
@@ -21,6 +22,7 @@ def gee_mapserver(request, z, x, y):
         reducer='median'
     )
 
+    print(url.format(z=z, x=x, y=y))
     with urllib.request.urlopen(url.format(z=z, x=x, y=y)) as response:
         tile = response.read()
 

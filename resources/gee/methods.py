@@ -22,6 +22,9 @@ def get_image_collection_asset(platform, sensor, product, date_from=None, date_t
     """
     Get tile url for image collection asset.
     """
+    if not date_from or not date_to:
+        raise Exception("Too many images to handle. Define data_from and date_to")
+
     ee_product = EE_PRODUCTS[platform][sensor][product]
 
     collection = ee_product['collection']
@@ -37,9 +40,8 @@ def get_image_collection_asset(platform, sensor, product, date_from=None, date_t
 
     ee_collection = ee.ImageCollection(collection)
 
-    if date_from and date_to:
-        ee_filter_date = ee.Filter.date(date_from, date_to)
-        ee_collection = ee_collection.filter(ee_filter_date)
+    ee_filter_date = ee.Filter.date(date_from, date_to)
+    ee_collection = ee_collection.filter(ee_filter_date)
 
     if index:
         ee_collection = ee_collection.select(index)
@@ -51,6 +53,6 @@ def get_image_collection_asset(platform, sensor, product, date_from=None, date_t
 
     ee_collection = getattr(ee_collection, reducer)()
 
-    map_id_params = image_to_map_id(ee_collection, vis_params)
+    map_id_params = image_to_map_id(ee_collection, None)
 
     return tile_url_template.format(**map_id_params)

@@ -6,3 +6,4 @@ tags
 **/__pycache__/
 config.py
 privatekey.json
+db.sqlite3
