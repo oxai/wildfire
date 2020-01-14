@@ -1,5 +1,5 @@
 from sentinelhub import CRS, BBox
-from services.utils.gis import get_bbox_corners_from_radius, get_bbox_corners_for_tile
+from resources.utils.gis import get_bbox_corners_from_radius, get_bbox_corners_for_tile
 
 
 def get_bbox_from_radius(lat_c, lng_c, r=1000):
