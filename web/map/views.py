@@ -1,12 +1,12 @@
 from django.shortcuts import render, HttpResponse
 from resources.gee.methods import get_ee_product
 from resources.gee.tile_loader import GeeTileLoader, TileQuery
-from web import config
 
 
 # Create your views here.
 def home(request):
-    return render(request, 'home.html', {'mapkey': config.MAP_KEY})
+    # return render(request, 'home.html')
+    return "API Endpoint"
 
 
 # Create your views here.

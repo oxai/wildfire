@@ -2,6 +2,10 @@
 OxAI Labs Earth and Space Project
 
 ## Initial setup
+### Running Google Earth Engine
+
+
+### Using Sentinelhub
 To use Sentinel Hub, run ```pip install sentinelhub``` (if you are a Windows user first install [shapely](https://www.lfd.uci.edu/~gohlke/pythonlibs/))
 
 Download [FPA_FOD_20170508.sqlite](https://www.kaggle.com/rtatman/188-million-us-wildfires) and place it in the ```resources/fpa_fod/data_dir/``` directory.
