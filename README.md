@@ -26,6 +26,9 @@ scikit-image
 Alternatively, run
 `pip install requirements_minimum.txt`
 
+### Set up Google Earth Engine
+`earthengine authenticate`
+
 ### Running the web servers
 In one terminal, run the following to start up the Django backend server:
 ```
