@@ -21,16 +21,13 @@ class GeeTileLoader(DataLoader):
         if not os.path.exists(base_path):
             ee_image = get_ee_image_from_product(ee_product, date_from=q.date_from, date_to=q.date_to, reducer=q.reducer)
             url = get_image_download_url_for_tile(ee_image, x_tile=q.x, y_tile=q.y, zoom=q.z, name=image_id)
-
+            print(url)
             r = requests.get(url)
             z = zipfile.ZipFile(BytesIO(r.content))
             z.extractall(base_path)
 
-        imgs = []
-        for band in ee_product['bands']:
-            sub_path = os.path.join(base_path, f"{image_id}.{band}.tif")
-            img = io.imread(sub_path)
-            imgs.append(img)
+        bands = ee_product.get('bands', [ee_product['index']])
+        imgs = [io.imread(os.path.join(base_path, f"{image_id}.{band}.tif")) for band in bands]
         out = io.concatenate_images(imgs)
         out = resize(out, (out.shape[0], self.img_size, self.img_size))
         io.imsave(f"{base_path}.tif", out)
@@ -49,7 +46,7 @@ class GeeTileLoader(DataLoader):
         product_name = get_ee_product_name(ee_product)
         return f"{product_name}__{q.date_from}_{q.date_to}_{q.reducer}_{q.z}_{q.x}_{q.y}"
 
-    def visualise(self, ee_product, query: TileQuery, vis_params=None):
+    def visualise(self, ee_product, query: TileQuery, method='default'):
         image = self.load(ee_product, query)
-        out = visualise_image(ee_product, image, vis_params)
-        return out.transpose(1, 2, 0)
+        out = visualise_image(ee_product, image, method)
+        return out

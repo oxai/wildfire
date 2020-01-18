@@ -1,61 +1,71 @@
-import React, { Component } from 'react';
+import React from 'react';
 import './App.css';
 import ee from '@google/earthengine'
-import { GoogleMap, LoadScript, useGoogleMap } from '@react-google-maps/api'
+import {Loader} from 'google-maps';
+import {Button, Form, FormControl, Nav, Navbar, NavDropdown} from "react-bootstrap";
 
+let map;
 const googleMapsKey = 'AIzaSyAccl3rn73OcqenWNmTNYM8-7rfBS4xKMM'
+const loader = new Loader(googleMapsKey, {});
+loader.load().then((google) => {
+    map = new google.maps.Map(document.getElementById('map'), {
+        center: {lat: -34.397, lng: 150.644},
+        zoom: 8,
+    });
+
+    addMapLayer("landsat/8/raw/default");
+});
 
 
-function DisplayLayer(props) {
-  const map = useGoogleMap();
+const addMapLayer = (product) => {
+    const tileSource = new ee.layers.EarthEngineTileSource({
+        formatTileUrl: (x, y, z) =>
+            `/api/map/tiles/${product}/${z}/${x}/${y}`
+    });
+    const layer = new ee.layers.ImageOverlay(tileSource);
 
-  const tileSource = new ee.layers.EarthEngineTileSource({
-    formatTileUrl: (x, y, z) =>
-        `/api/map/tiles/gee/${z}/${x}/${y}`
-  });
-  const layer = new ee.layers.ImageOverlay(tileSource);
+    map.overlayMapTypes.clear();
+    map.overlayMapTypes.push(layer);
+};
 
-  React.useEffect(() => {
-    if (map) map.overlayMapTypes.push(layer);
-  }, [map]);
-  return <></>
-}
+const handleChange = (event) => {
+    addMapLayer(event.target.value)
+};
 
 
-export function MapPage(props) {
-  return (
-      <div className="App">
-        <header className="App-header">
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-              className="App-link"
-              href="https://reactjs.org"
-              target="_blank"
-              rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          <LoadScript
-              googleMapsApiKey={googleMapsKey}
-          >
-            <GoogleMap
-              id="circle-example"
-              mapContainerStyle={{
-                height: "400px",
-                width: "800px"
-              }}
-              zoom={7}
-              center={{
-                lat: -3.745,
-                lng: -38.523
-              }}
-            >
-              <DisplayLayer/>
-            </GoogleMap>
-          </LoadScript>
-        </header>
-      </div>
-  );
+export function MapPage() {
+    return (
+        <div className="App">
+            <Navbar bg="dark" variant="dark" expand="lg">
+                <Navbar.Brand href="/">OxAI Earth</Navbar.Brand>
+                <Navbar.Toggle aria-controls="basic-navbar-nav"/>
+                <Navbar.Collapse id="basic-navbar-nav">
+                    <Nav className="mr-auto">
+                        <Nav.Link href="/">Home</Nav.Link>
+                        <Nav.Link href="https://oxai.org">Society</Nav.Link>
+                    </Nav>
+                    <Form inline>
+                        <FormControl type="text" placeholder="Enter location" className="mr-sm-2"/>
+                        <Button variant="dark">Search</Button>
+                    </Form>
+                    <Form inline className="ml-5">
+                        <Form.Control as="select" onChange={handleChange}>
+                            <option value="landsat/8/raw/default">Landsat 8 Raw Scenes</option>
+                            <option value="landsat/8/raw/nbr">Landsat 8 NBR (Raw)</option>
+                            <option value="landsat/8/surface/default">Landsat 8 Surface</option>
+                            <option value="landsat/8/surface/nbr">Landsat 8 NBR (Surface)</option>
+                            <option value="landsat/8/ndvi/default">Landsat 8 NDVI</option>
+                            <option value="modis/terra/snow/default">MODIS Terra Snow</option>
+                            <option value="modis/terra/temperature/default">MODIS Terra Temperature</option>
+                            <option value="sentinel/2/l1c/default">Sentinel 2 Level-1C</option>
+                            <option value="sentinel/2/l1c/default">Sentinel 2 Level-1C NBR</option>
+                        </Form.Control>
+                    </Form>
+                </Navbar.Collapse>
+            </Navbar>
+            <div id="map" style={{
+                flex: 1
+            }}/>
+        </div>
+    );
 }
