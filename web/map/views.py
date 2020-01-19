@@ -6,7 +6,7 @@ from resources.gee.tile_loader import GeeTileLoader, TileQuery
 # Create your views here.
 def home(request):
     # return render(request, 'home.html')
-    return "API Endpoint"
+    return HttpResponse("API Endpoint")
 
 
 # Create your views here.

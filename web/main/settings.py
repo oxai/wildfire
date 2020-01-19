@@ -12,10 +12,10 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 import ee
-# from web import config
+from web import config
 
-# ee.Initialize(config.EE_CREDENTIALS)
-ee.Initialize()
+ee.Initialize(config.EE_CREDENTIALS)
+# ee.Initialize()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -24,8 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = config.DJANGO_SECRET
-SECRET_KEY = 'o2z0-n&jk6tndxua+y5mde6d#9&)1rotjgz@#)kbjav24qot5+'
+SECRET_KEY = config.DJANGO_SECRET
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
