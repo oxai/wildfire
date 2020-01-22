@@ -1,9 +1,10 @@
 import ee
 import requests, zipfile, io
 from .methods import get_image_download_url_for_tile, get_ee_image_from_product, get_map_tile_url, get_ee_product, get_ee_product_name
+from .config import EE_CREDENTIALS
 
 
-ee.Initialize()
+ee.Initialize(EE_CREDENTIALS)
 
 ee_product = get_ee_product(
     platform="landsat",

@@ -24,10 +24,16 @@ scikit-image
 `
 
 Alternatively, run
-`pip install requirements_minimum.txt`
+`pip install -r requirements_minimum.txt`
 
-### Set up Google Earth Engine
-Place `privatekey.json` at `web/privatekey.json`, which contains the server login credentials (do not commit to git!).
+#### Install Node.js
+The frontend React framework is developed in Node.js. Download and install the latest stable version from https://nodejs.org/en/download/.
+
+#### Set up Google Earth Engine
+Download `gee_key.json` from Google Drive and place it at `resources/gee/gee_key.json`, which contains Google Earth Engine server login credentials (do not commit to git!).
+
+#### Set up Django
+Download `app_key.json` from Google Drive and place it at `web/app_key.json`, which contains Django secret key (do not commit to git!).
 
 ### Running the web servers
 In one terminal, run the following to start up the Django backend server:
@@ -40,11 +46,18 @@ In another terminal, run the following to start up a development server for Reac
 
 ```
 cd web/frontend
-npm install   # just for the first run
+npm install   # just after updating your branch
 npm start
 ```
 
 Navigate to http://localhost:3000/
+
+#### Errors
+If you are encountering errors on Mac such as
+```
+Attempting to bind to HOST environment variable
+```
+[this medium article](https://medium.com/@choy/fixing-create-react-app-when-npm-fails-to-start-because-your-host-environment-variable-is-being-4c8a9fa0b461) might help you solve the problem. Set your `HOST` variable to `localhost` in bash.
 
 ### Using Sentinelhub
 Please refer to `/resources/sentinelhub/README.md`

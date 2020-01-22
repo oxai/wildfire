@@ -2,9 +2,10 @@ import ee
 from .tile_loader import GeeTileLoader, TileQuery
 from .methods import get_ee_product
 from skimage import io
+from .config import EE_CREDENTIALS
 
 
-ee.Initialize()
+ee.Initialize(EE_CREDENTIALS)
 
 loader = GeeTileLoader()
 
