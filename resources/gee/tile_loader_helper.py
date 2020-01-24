@@ -3,6 +3,7 @@ from .methods import get_image_download_url_for_tile
 from collections import namedtuple
 from io import BytesIO
 from skimage import io
+from tifffile import imsave
 from skimage.transform import resize
 import shutil
 
@@ -21,5 +22,5 @@ def save_gee_tile(base_path, ee_image, bands, q: TileQuery, image_id, img_size):
     imgs = [io.imread(os.path.join(base_path, f"{image_id}.{band}.tif")) for band in bands]
     out = io.concatenate_images(imgs)
     out = resize(out, (out.shape[0], img_size, img_size))
-    io.imsave(f"{base_path}.tif", out)
+    imsave(f"{base_path}.tif", out)
     shutil.rmtree(base_path)

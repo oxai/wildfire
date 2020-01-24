@@ -4,6 +4,19 @@ from .vis_handler import vis_s2_nbr, vis_l8_nbr
 EE_PRODUCTS = {
     'modis': {
         'terra': {
+            'surface': {
+                'display': 'Surface Reflectance Daily Global 1km / 500m',
+                'collection': 'MODIS/006/MOD09GA',
+                'index': None,
+                'bands': ['sur_refl_b01', 'sur_refl_b04', 'sur_refl_b03'],
+                'vis_params': {
+                  'min': -100.0,
+                  'max': 8000.0,
+                  'bands': ['sur_refl_b01', 'sur_refl_b04', 'sur_refl_b03'],
+                },
+                'start_date': '2000-02-24',
+                'end_date': None  # to present
+            },
             'snow': {
                 'display': 'Snow Cover Daily Global 500m',
                 'collection': 'MODIS/006/MOD10A1',
