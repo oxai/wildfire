@@ -31,6 +31,8 @@ class GEELoaderFromFpaFod(object):
 
             fire_start = fire_start if fire_start is not pd.NaT else None
             fire_end = fire_end if fire_end is not pd.NaT else None
+            if fire_end:
+                fire_end = fire_end + timedelta(days=1)
 
             x, y = deg2tile(fire_lat, fire_lng, zoom)
             query = TileQuery(x=x, y=y, z=zoom, date_from=f"{fire_start:%Y-%m-%d}", date_to=f"{fire_end:%Y-%m-%d}", reducer="median")
