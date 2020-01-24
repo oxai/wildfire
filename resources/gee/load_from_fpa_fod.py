@@ -12,7 +12,7 @@ class GEELoaderFromFpaFod(object):
         self.fpa_fod_loader = FpaFodDataLoader()
         self.image_loader = GeeTileLoader()
 
-    def download(self, ee_product, loc=None, from_date=None, until_date=None, min_fire_size=0.0,
+    def download(self, ee_product, loc=None, from_date=None, until_date=None, min_fire_size=0.0, zoom=13,
                  subdir_with_fire="with_fire", subdir_before_fire="before_fire", subdir_after_fire="after_fire"):
 
         one_year = timedelta(days=365)
@@ -32,7 +32,6 @@ class GEELoaderFromFpaFod(object):
             fire_start = fire_start if fire_start is not pd.NaT else None
             fire_end = fire_end if fire_end is not pd.NaT else None
 
-            zoom = 13
             x, y = deg2tile(fire_lat, fire_lng, zoom)
             query = TileQuery(x=x, y=y, z=zoom, date_from=f"{fire_start:%Y-%m-%d}", date_to=f"{fire_end:%Y-%m-%d}", reducer="median")
 
