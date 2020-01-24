@@ -1,3 +1,6 @@
+from .vis_handler import vis_s2_nbr, vis_l8_nbr
+
+
 EE_PRODUCTS = {
     'modis': {
         'terra': {
@@ -45,7 +48,7 @@ EE_PRODUCTS = {
                     'max': 0.3,
                     'bands': ['B4', 'B3', 'B2'],
                     'handler': {
-                        'nbr': 'vis_s2_nbr'
+                        'nbr': vis_s2_nbr
                     }
                 },
                 'cloud_mask': 'mask_s2_clouds'
@@ -170,7 +173,7 @@ EE_PRODUCTS = {
                     'min': 0.0,
                     'max': 30000.0,
                     'handler': {
-                        'nbr': 'vis_l8_nbr'
+                        'nbr': vis_l8_nbr
                     }
                 },
                 'cloud_mask': 'mask_l8_raw',
@@ -188,7 +191,7 @@ EE_PRODUCTS = {
                     'max': 3000,
                     'gamma': 1.4,
                     'handler': {
-                        'nbr': 'vis_l8_nbr'
+                        'nbr': vis_l8_nbr
                     }
                 },
                 'cloud_mask': 'mask_l8_sr',

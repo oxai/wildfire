@@ -1,8 +1,6 @@
 import ee
 from .products import EE_PRODUCTS
 from . import cloud_mask as cm
-from . import vis_handler
-from .vis_handler import default_vis_handler
 from ..utils.gis import get_bbox_corners_for_tile, get_tile_pixel_scale_from_zoom
 
 
@@ -76,13 +74,3 @@ def get_image_download_url_for_tile(ee_image, x_tile, y_tile, zoom, name=None):
     scale = get_tile_pixel_scale_from_zoom(zoom)
     return get_image_download_url(ee_image, bbox, scale, name)
 
-
-def visualise_image(ee_product, image, method='default'):
-    vis_params = ee_product['vis_params']
-    if method == 'default':
-        return default_vis_handler(ee_product, image, vis_params)
-    handler_name = vis_params['handler'][method]
-    handler = getattr(vis_handler, handler_name, None)
-    if not handler:
-        raise Exception(f"No definition provided for visualizer: {handler_name}")
-    return handler(ee_product, image, vis_params)

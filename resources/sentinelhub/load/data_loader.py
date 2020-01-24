@@ -7,12 +7,6 @@ class SentinelHubDataLoader(DataLoader):
     def __init__(self):
         super().__init__()
 
-    def data_subdir(self, subdir):
-        path = os.path.join(self.data_dir(), subdir)
-        if not os.path.exists(path):
-            os.mkdir(path)
-        return path
-
     def request(self, config, subdir):
         request = WmsRequest if "width" in config else WcsRequest
         return request(data_folder=self.data_subdir(subdir), image_format=MimeType.TIFF_d32f, **config)

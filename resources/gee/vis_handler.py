@@ -4,6 +4,13 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 
 
+def get_vis_handler(ee_product, method='default'):
+    vis_params = ee_product['vis_params']
+    if method == 'default':
+        return vis_default
+    return vis_params['handler'][method]
+
+
 def get_band(ee_product, image, band):
     return image[ee_product['bands'].index(band)]
 
@@ -50,8 +57,8 @@ def apply_palette(image, palette):
 
 
 def normalise_image(image, vis_params):
-    min_val = vis_params['min']
-    max_val = vis_params['max']
+    min_val = vis_params.get('min', 0)
+    max_val = vis_params.get('max', 1)
     gamma = vis_params.get('gamma', 1)
     img = np.where(image > min_val, image, min_val)
     img = np.where(img < max_val, img, max_val)
@@ -65,7 +72,7 @@ def array_to_image(image):
     return Image.fromarray(image, 'RGBA')
 
 
-def default_vis_handler(ee_product, image, vis_params):
+def vis_default(ee_product, image, vis_params):
     image = normalise_image(image, vis_params)
     bands = vis_params.get('bands', None)
     if bands:
