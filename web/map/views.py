@@ -1,6 +1,6 @@
 from django.shortcuts import render, HttpResponse
 from resources.gee.methods import get_ee_product
-from resources.gee.tile_loader import GeeTileLoader, TileQuery
+from resources.gee.tile_loader import GeeProductTileLoader, TileQuery
 
 
 # Create your views here.
@@ -12,7 +12,7 @@ def home(request):
 # Create your views here.
 def gee_mapserver(request, platform, sensor, product, method, z, x, y):
 
-    loader = GeeTileLoader()
+    loader = GeeProductTileLoader()
 
     ee_product = get_ee_product(
         platform=platform,

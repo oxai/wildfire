@@ -1,5 +1,5 @@
 import ee
-from .tile_loader import GeeTileLoader, TileQuery
+from .tile_loader import GeeProductTileLoader, TileQuery
 from .methods import get_ee_product
 from .config import EE_CREDENTIALS
 import matplotlib.pyplot as plt
@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 ee.Initialize(EE_CREDENTIALS)
 
-loader = GeeTileLoader()
+loader = GeeProductTileLoader()
 
 ee_product = get_ee_product(
     platform="modis",

@@ -1,5 +1,5 @@
 from resources.fpa_fod.data_loader import FpaFodDataLoader
-from .tile_loader import GeeTileLoader
+from .tile_loader import GeeProductTileLoader
 import pandas as pd
 from datetime import timedelta
 from .tile_loader_helper import TileQuery
@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 class GEELoaderFromFpaFod(object):
     def __init__(self):
         self.fpa_fod_loader = FpaFodDataLoader()
-        self.image_loader = GeeTileLoader()
+        self.image_loader = GeeProductTileLoader()
 
     def download(self, ee_product, loc=None, from_date=None, until_date=None, min_fire_size=0.0, zoom=13,
                  subdir_with_fire="with_fire", subdir_before_fire="before_fire", subdir_after_fire="after_fire"):

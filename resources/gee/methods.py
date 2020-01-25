@@ -26,7 +26,7 @@ def get_ee_product_name(ee_product):
     return ee_product['collection'].replace('/', '-')
 
 
-def get_ee_image_from_product(ee_product, date_from, date_to, reducer='median'):
+def get_ee_collection_from_product(ee_product, date_from, date_to):
     """
     Get tile url for image collection asset.
     """
@@ -46,9 +46,22 @@ def get_ee_image_from_product(ee_product, date_from, date_to, reducer='median'):
         if cloud_mask_func:
             ee_collection = ee_collection.map(cloud_mask_func)
 
-    ee_image = getattr(ee_collection, reducer)()
+    return ee_collection
 
+
+def get_ee_image_from_product(ee_product, date_from, date_to, reducer='median'):
+    ee_collection = get_ee_collection_from_product(ee_product, date_from, date_to)
+    ee_image = getattr(ee_collection, reducer)()
     return ee_image
+
+
+def get_ee_image_list_from_collection(ee_collection):
+    ee_images = ee_collection.toList(ee_collection.size())
+    out = []
+    for i in range(ee_collection.size().getInfo()):
+        image = ee_images.get(i)
+        out.append(ee.Image(image))
+    return out
 
 
 def get_map_tile_url(ee_image, vis_params=None):
