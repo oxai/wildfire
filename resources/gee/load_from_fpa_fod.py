@@ -1,3 +1,4 @@
+import sys
 from resources.fpa_fod.data_loader import FpaFodDataLoader
 from .tile_loader import GeeProductTileLoader
 import pandas as pd
@@ -13,7 +14,7 @@ class GEELoaderFromFpaFod(object):
         self.image_loader = GeeProductTileLoader()
 
     def download(self, ee_product, loc=None, from_date=None, until_date=None, min_fire_size=0.0, zoom=13,
-                 subdir_with_fire="with_fire", subdir_before_fire="before_fire", subdir_after_fire="after_fire"):
+                 subdir_with_fire="with_fire", subdir_before_fire="before_fire", subdir_after_fire="after_fire", display=True):
 
         one_year = timedelta(days=365)
 
@@ -38,13 +39,22 @@ class GEELoaderFromFpaFod(object):
             query = TileQuery(x=x, y=y, z=zoom, date_from=f"{fire_start:%Y-%m-%d}", date_to=f"{fire_end:%Y-%m-%d}", reducer="median")
 
             # download images that contain wildfire
-            self.image_loader.load(ee_product, query, subdir=subdir_with_fire)
+            try:
+                self.image_loader.load(ee_product, query, subdir=subdir_with_fire)
+                print("Downloaded {}-th record".format(i))
+            except KeyboardInterrupt: sys.exit()
+            except:
+                try: 
+                    time.sleep(1) # Sometimes request works on second try
+                    self.image_loader.load(ee_product, query, subdir=subdir_with_fire)
+                    print(f"Downloaded {i}-th record on second try")
+                except: print(f"Failed to download {i}th record"); continue
 
             print(f"With fire - Start: {fire_start:%Y-%m-%d}, End: {fire_end:%Y-%m-%d}")
 
-            if i % 10 == 0:
-                print("Downloaded {}-th record".format(i))
+            if display and i % 10 == 0:
                 out = self.image_loader.visualise(ee_product, query)
                 print(out)
+                print(f'Displaying {i}th downloaded image. To download without diplaying, pass "display=False".')
                 plt.imshow(out)
                 plt.show()
