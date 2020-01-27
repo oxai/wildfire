@@ -1,5 +1,7 @@
 /.idea/
-**/data_dir/
+**/data_dir/*
+!**/data_dir/examples/
+!**/data_dir/examples/*
 /.pytest_cache/
 **/.ipynb_checkpoints/
 tags
