@@ -2,6 +2,12 @@ import ee
 from .products import EE_PRODUCTS
 from . import cloud_mask as cm
 from ..utils.gis import get_bbox_corners_for_tile, get_tile_pixel_scale_from_zoom
+from datetime import datetime
+from collections import namedtuple
+
+
+TileDateRangeQuery = namedtuple("Query", "x y z date_from date_to reducer")
+TileDateQuery = namedtuple("Query", "x y z date")
 
 
 def image_to_map_id(ee_image, vis_params=None):
@@ -26,20 +32,23 @@ def get_ee_product_name(ee_product):
     return ee_product['collection'].replace('/', '-')
 
 
-def get_ee_collection_from_product(ee_product, date_from, date_to):
+def get_ee_collection_from_product(ee_product, q: TileDateRangeQuery):
     """
     Get tile url for image collection asset.
     """
-    if not date_from or not date_to:
+    if not q.date_from or not q.date_to:
         raise Exception("Too many images to handle. Define data_from and date_to")
 
     collection = ee_product['collection']
     cloud_mask = ee_product.get('cloud_mask', None)
 
+    geometry = ee.Geometry.Rectangle(get_bbox_corners_for_tile(q.x, q.y, q.z))
+
     ee_collection = ee.ImageCollection(collection)\
         .filter(
-            ee.Filter.date(date_from, date_to)
-        )
+            ee.Filter.date(q.date_from, q.date_to)
+        )\
+        .filterBounds(geometry)
 
     if cloud_mask:
         cloud_mask_func = getattr(cm, cloud_mask, None)
@@ -49,19 +58,20 @@ def get_ee_collection_from_product(ee_product, date_from, date_to):
     return ee_collection
 
 
-def get_ee_image_from_product(ee_product, date_from, date_to, reducer='median'):
-    ee_collection = get_ee_collection_from_product(ee_product, date_from, date_to)
-    ee_image = getattr(ee_collection, reducer)()
+def get_ee_image_from_product(ee_product, q: TileDateRangeQuery):
+    ee_collection = get_ee_collection_from_product(ee_product, q)
+    ee_image = getattr(ee_collection, q.reducer)()
     return ee_image
 
 
 def get_ee_image_list_from_collection(ee_collection):
     ee_images = ee_collection.toList(ee_collection.size())
-    out = []
-    for i in range(ee_collection.size().getInfo()):
-        image = ee_images.get(i)
-        out.append(ee.Image(image))
-    return out
+    return [ee.Image(ee_images.get(i)) for i in range(ee_collection.size().getInfo())]
+
+
+def get_ee_image_date(ee_image):
+    timestamp = ee_image.get("system:time_start").getInfo()
+    return datetime.fromtimestamp(timestamp / 1000).strftime("%Y-%m-%d")
 
 
 def get_map_tile_url(ee_image, vis_params=None):

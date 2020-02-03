@@ -11,14 +11,14 @@ class SentinelLoaderFromFpaFod(object):
         self.fpa_fod_loader = FpaFodDataLoader()
         self.sentinel_loader = SentinelHubDataLoader()
 
-    def download(self, layer, loc=None, from_date=None, until_date=None, min_fire_size=0.0, max_cloud_coverage=0.3,
+    def download(self, layer, bbox=None, from_date=None, until_date=None, min_fire_size=0.0, max_cloud_coverage=0.3,
                  r=3000, resx="10m", resy="10m",
                  subdir_with_fire="with_fire", subdir_before_fire="before_fire", subdir_after_fire="after_fire"):
 
         one_year = timedelta(days=365)
 
         df = self.fpa_fod_loader.get_records(
-            loc=loc, from_date=from_date, until_date=until_date, min_fire_size=min_fire_size
+            bbox=bbox, from_date=from_date, until_date=until_date, min_fire_size=min_fire_size
         ).reset_index()
 
         print("Found {} wildfire records...".format(len(df)))

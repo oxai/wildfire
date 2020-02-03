@@ -1,13 +1,13 @@
-def latlng_condition(df, loc=None, lat_key="LATITUDE", lng_key="LONGITUDE"):
-    if loc is None:
+def latlng_condition(df, bbox=None, lat_key="LATITUDE", lng_key="LONGITUDE"):
+    if bbox is None:
         return df[lat_key].apply(lambda x: True)
     df_lat = df[lat_key]
     df_lng = df[lng_key]
-    lat, lng, delta = [loc[k] for k in ["lat", "lng", "delta"]]
-    lat_cond = (df_lat > lat - delta) & (df_lat < lat + delta)
-    lng_cond = (df_lng > lng - delta) & (df_lng < lng + delta) |\
-               (df_lng - 360 > lng - delta) & (df_lng - 360 < lng + delta) |\
-               (df_lng + 360 > lng - delta) & (df_lng + 360 < lng + delta)
+    lng_left, lat_lower, lng_right, lat_upper = bbox
+    lat_cond = (df_lat > lat_lower) & (df_lat < lat_upper)
+    lng_cond = (df_lng > lng_left) & (df_lng < lng_right) |\
+               (df_lng - 360 > lng_left) & (df_lng - 360 < lng_right) |\
+               (df_lng + 360 > lng_left) & (df_lng + 360 < lng_right)
     return lat_cond & lng_cond
 
 

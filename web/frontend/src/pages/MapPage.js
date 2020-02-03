@@ -58,7 +58,8 @@ export function MapPage() {
                             <option value="modis/terra/snow/default">MODIS Terra Snow</option>
                             <option value="modis/terra/temperature/default">MODIS Terra Temperature</option>
                             <option value="sentinel/2/l1c/default">Sentinel 2 Level-1C</option>
-                            <option value="sentinel/2/l1c/default">Sentinel 2 Level-1C NBR</option>
+                            <option value="sentinel/2/l1c/vis_fire">Sentinel 2 Level-1C Visualise fire</option>
+                            <option value="sentinel/2/l1c/nbr">Sentinel 2 Level-1C NBR</option>
                         </Form.Control>
                     </Form>
                 </Navbar.Collapse>

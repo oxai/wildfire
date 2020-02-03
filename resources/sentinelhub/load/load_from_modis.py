@@ -10,9 +10,9 @@ class SentinelLoaderFromModis(object):
         self.fire_loader = ModisFireDataLoader()
         self.sentinel_loader = SentinelHubDataLoader()
 
-    def download(self, layer, loc=None, from_date=None, until_date=None, max_cloud_coverage=0.3, r=3000, resx="10m", resy="10m", subdir="with_fire"):
+    def download(self, layer, bbox=None, from_date=None, until_date=None, max_cloud_coverage=0.3, r=3000, resx="10m", resy="10m", subdir="with_fire"):
         df = self.fire_loader.get_records(
-            loc=loc, from_date=from_date, until_date=until_date
+            bbox=bbox, from_date=from_date, until_date=until_date
         ).reset_index()
 
         print("Found {} wildfire records...".format(len(df)))

@@ -22,14 +22,14 @@ class FpaFodDataLoader(DataLoader):
         df = df.drop(columns=["DISCOVERY_DATE", "CONT_DATE"])
         return df
 
-    def get_records(self, loc=None, from_date=None, until_date=None, min_fire_size=0.0):
-        loc_cond = latlng_condition(self.df, loc)
+    def get_records(self, bbox=None, from_date=None, until_date=None, min_fire_size=0.0):
+        loc_cond = latlng_condition(self.df, bbox)
         date_cond = dates_overlap(self.df, from_date, until_date)
         fire_cond = self.df["FIRE_SIZE"] >= min_fire_size
         return self.df[loc_cond & date_cond & fire_cond].copy()
 
-    def get_records_on_day(self, date, loc=None, min_fire_size=0.0):
-        loc_cond = latlng_condition(self.df, loc)
+    def get_records_on_day(self, date, bbox=None, min_fire_size=0.0):
+        loc_cond = latlng_condition(self.df, bbox)
         date_cond = date_in_df_range(date, self.df["START_DATE"], self.df["END_DATE"])
         fire_cond = self.df["FIRE_SIZE"] >= min_fire_size
         return self.df[loc_cond & date_cond & fire_cond].copy()

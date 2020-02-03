@@ -16,7 +16,7 @@ class ModisFireDataLoader(DataLoader):
         }, inplace=True)
         print(self.df.head())
 
-    def get_records(self, loc=None, from_date=None, until_date=None):
-        loc_cond = latlng_condition(self.df, loc)
+    def get_records(self, bbox=None, from_date=None, until_date=None):
+        loc_cond = latlng_condition(self.df, bbox)
         date_cond = df_date_in_range(self.df["DATE"], from_date, until_date)
         return self.df[loc_cond & date_cond].copy()

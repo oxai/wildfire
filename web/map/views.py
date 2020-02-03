@@ -1,6 +1,6 @@
 from django.shortcuts import render, HttpResponse
 from resources.gee.methods import get_ee_product
-from resources.gee.tile_loader import GeeProductTileLoader, TileQuery
+from resources.gee.tile_loader import GeeProductTileLoader, TileDateRangeQuery
 
 
 # Create your views here.
@@ -20,7 +20,7 @@ def gee_mapserver(request, platform, sensor, product, method, z, x, y):
         product=product
     )
 
-    query = TileQuery(x=x, y=y, z=z, date_from="2019-12-01", date_to="2019-12-30", reducer="median")
+    query = TileDateRangeQuery(x=x, y=y, z=z, date_from="2019-12-01", date_to="2019-12-30", reducer="median")
 
     out = loader.visualise(ee_product, query, method=method, subdir="map")
 

@@ -1,4 +1,4 @@
-from .vis_handler import vis_s2_nbr, vis_l8_nbr
+from .vis_handler import vis_s2_nbr, vis_l8_nbr, vis_s2_fire
 
 
 EE_PRODUCTS = {
@@ -55,13 +55,14 @@ EE_PRODUCTS = {
                 'display': 'Surface Reflectance',
                 'collection': 'COPERNICUS/S2',
                 'index': None,
-                'bands': ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B9', 'B10', 'B11', 'B12'],
+                'bands': ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B9', 'B10', 'B11', 'B12', 'cloud_mask'],
                 'vis_params': {
                     'min': 0.0,
                     'max': 0.3,
                     'bands': ['B4', 'B3', 'B2'],
                     'handler': {
-                        'nbr': vis_s2_nbr
+                        'nbr': vis_s2_nbr,
+                        'vis_fire': vis_s2_fire
                     }
                 },
                 'cloud_mask': 'mask_s2_clouds'
@@ -137,7 +138,7 @@ EE_PRODUCTS = {
                 'collection': 'LANDSAT/LE07/C01/T1_SR',
                 'index': None,
                 'vis_params': {
-                    'bands': ['B3', 'B2', 'B1'],
+                    'bands': ['B3', 'B2', 'B1', 'cloud_mask'],
                     'min': 0,
                     'max': 3000,
                     'gamma': 1.4,
@@ -180,13 +181,13 @@ EE_PRODUCTS = {
                 'display': 'Landsat 8 Raw Scenes',
                 'collection': 'LANDSAT/LC08/C01/T1',
                 'index': None,
-                'bands': ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B9', 'B10', 'B11'],
+                'bands': ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B9', 'B10', 'B11', 'cloud_mask'],
                 'vis_params': {
                     'bands': ['B4', 'B3', 'B2'],
                     'min': 0.0,
                     'max': 30000.0,
                     'handler': {
-                        'nbr': vis_l8_nbr
+                        'nbr': vis_l8_nbr,
                     }
                 },
                 'cloud_mask': 'mask_l8_raw',
@@ -197,7 +198,7 @@ EE_PRODUCTS = {
                 'display': 'Surface Reflectance',
                 'collection': 'LANDSAT/LC08/C01/T1_SR',
                 'index': None,
-                'bands': ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B10', 'B11'],
+                'bands': ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B10', 'B11', 'cloud_mask'],
                 'vis_params': {
                     'bands': ['B4', 'B3', 'B2'],
                     'min': 0,
