@@ -1,6 +1,5 @@
 import os, requests, zipfile
 
-from .tile_loader import GeeProductTileSeriesLoader
 from .methods import get_image_download_url_for_tile
 from io import BytesIO
 from skimage import io
@@ -11,6 +10,7 @@ from .methods import TileDateRangeQuery
 from resources.utils.gis import deg2tile
 import matplotlib.pyplot as plt
 import sys
+import pandas as pd
 
 
 def save_gee_tile(base_path, ee_image, bands, q: TileDateRangeQuery, image_id, img_size):
@@ -30,8 +30,7 @@ def save_gee_tile(base_path, ee_image, bands, q: TileDateRangeQuery, image_id, i
     shutil.rmtree(base_path)
 
 
-def download_from_df(df, ee_product, zoom, subdir, display=False):
-    image_loader = GeeProductTileSeriesLoader()
+def download_from_df(image_loader, df, ee_product, zoom, subdir, display=False):
     for i, record in df.iterrows():
         lat = record["LATITUDE"]
         lng = record["LONGITUDE"]
@@ -45,7 +44,7 @@ def download_from_df(df, ee_product, zoom, subdir, display=False):
         query = TileDateRangeQuery(x=x, y=y, z=zoom, date_from=start_date, date_to=end_date,
                                    reducer="median")
 
-        print(f"Downloading {i}th record. (x, y) = ({x}, {y}), {start_date} to s{end_date}")
+        print(f"Downloading {i}th record. (x, y) = ({x}, {y}), {start_date} to {end_date}")
 
         # download images that contain wildfire
         try:
@@ -53,7 +52,7 @@ def download_from_df(df, ee_product, zoom, subdir, display=False):
         except KeyboardInterrupt:
             sys.exit()
 
-        print(f"Downloaded {i}th record. (x, y) = ({x}, {y}), {start_date} to s{end_date}")
+        print(f"Downloaded {i}th record. (x, y) = ({x}, {y}), {start_date} to {end_date}")
 
         if display and i % 10 == 0:
             out = image_loader.visualise(ee_product, query)

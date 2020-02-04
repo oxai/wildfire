@@ -21,7 +21,7 @@ def dates_overlap(df, from_date=None, until_date=None, start_date_key="START_DAT
     return started_before_until_date & ended_after_from_date
 
 
-def date_in_df_range(date, start_date, end_date):
+def date_in_range(date, start_date, end_date):
     return (date >= start_date) & (date <= end_date)
 
 
