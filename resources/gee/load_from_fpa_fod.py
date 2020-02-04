@@ -38,4 +38,4 @@ if __name__ == "__main__":
 
     loader = GEELoaderFromFpaFod()
     loader.download(ee_product, bbox=args.bbox, from_date=args.from_date, until_date=args.until_date,
-                    n_samples=args.n_samples, subdir=subdir, min_fire_size=args.min_fire_size, display=False)
+                    n_samples=args.n_samples, subdir=subdir, pos_examples=not args.neg, min_fire_size=args.min_fire_size, display=False)
