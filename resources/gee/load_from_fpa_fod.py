@@ -1,41 +1,41 @@
 from resources.fpa_fod.data_loader import FpaFodDataLoader
-from .tile_loader import GeeProductTileSeriesLoader
-from .tile_loader_helper import download_from_df, get_arguments
 import ee
+
+from resources.gee.load_from_fpa_fod_helper import download_from_df, get_arguments
 from .config import EE_CREDENTIALS
 
 
 class GEELoaderFromFpaFod(object):
     def __init__(self):
         self.fpa_fod_loader = FpaFodDataLoader()
-        self.image_loader = GeeProductTileSeriesLoader()
 
-    def download(self, ee_product, bbox, from_date, until_date, n_samples, min_fire_size=0.0, zoom=13,
-                 subdir_with_fire="with_fire", subdir_no_fire="no_fire", display=True):
+    def download(self, ee_product, bbox, from_date, until_date, n_samples, subdir, pos_examples=True,
+                 min_fire_size=0.0, zoom=13, display=True):
 
-        df = self.fpa_fod_loader.get_records(
-            bbox=bbox, from_date=from_date, until_date=until_date, min_fire_size=min_fire_size
-        ).reset_index()
+        if pos_examples:
+            df = self.fpa_fod_loader.get_records(
+                bbox=bbox, from_date=from_date, until_date=until_date, min_fire_size=min_fire_size
+            ).reset_index()
 
-        print(f"Found {len(df)} wildfire records. Downloading {min(len(df), n_samples)} samples...")
+            print(f"Found {len(df)} wildfire records. Downloading {min(len(df), n_samples)} records...")
 
-        download_from_df(self.image_loader, df[:n_samples], ee_product, zoom, subdir=subdir_with_fire, display=display)
+            download_from_df(df[:n_samples], ee_product, zoom, subdir=subdir, display=display)
 
-        df = self.fpa_fod_loader.get_neg_examples(
-            bbox, from_date=from_date, until_date=until_date, n_samples=n_samples
-        )
+        else:
+            df = self.fpa_fod_loader.get_neg_examples(
+                bbox, from_date=from_date, until_date=until_date, n_samples=n_samples
+            )
 
-        print(f"Downloading {n_samples} negative samples...")
+            print(f"Downloading {n_samples} negative samples...")
 
-        download_from_df(self.image_loader, df, ee_product, zoom, subdir=subdir_no_fire, display=display)
+            download_from_df(df, ee_product, zoom, subdir=subdir, display=display)
 
 
 if __name__ == "__main__":
     ee.Initialize(EE_CREDENTIALS)
 
-    args, ee_product, subdir_with_fire, subdir_no_fire = get_arguments()
+    args, ee_product, subdir = get_arguments()
 
     loader = GEELoaderFromFpaFod()
     loader.download(ee_product, bbox=args.bbox, from_date=args.from_date, until_date=args.until_date,
-                    n_samples=args.n_samples, min_fire_size=args.min_fire_size, display=False,
-                    subdir_with_fire=subdir_with_fire, subdir_no_fire=subdir_no_fire)
+                    n_samples=args.n_samples, subdir=subdir, min_fire_size=args.min_fire_size, display=False)
