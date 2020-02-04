@@ -77,7 +77,7 @@ def get_parser():
                         help="search records in this region: "
                              "[lng_left, lat_lower, lng_right, lat_upper]")
     parser.add_argument('--n_samples', '-n', type=int, help="number of samples", default=100)
-    parser.add_argument('--min_fire_size', type=float, help="fire size threshold", default=1000)
+    parser.add_argument('--min_fire_size', '-fs', type=float, help="fire size threshold", default=1000)
     parser.add_argument('--subdir_with_fire', help="directory to save images with fire", default=None)
     parser.add_argument('--subdir_no_fire', help="directory to save images without fire", default=None)
     return parser
