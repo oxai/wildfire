@@ -1,7 +1,7 @@
 from resources.base.data_loader import DataLoader
 import sqlite3, os
 import pandas as pd
-from datetime import timedelta, datetime
+from datetime import timedelta
 import numpy as np
 from resources.utils.df import latlng_condition, dates_overlap, date_in_range
 import pickle
@@ -72,7 +72,10 @@ class FpaFodDataLoader(DataLoader):
             is_positive = any(date_cond & loc_cond)
 
             if not is_positive:
-                data.append({"LATITUDE": lat, "LONGITUDE": lng, "START_DATE": date - delta, "END_DATE": date + delta})
+                data.append({
+                    "LATITUDE": lat, "LONGITUDE": lng,
+                    "START_DATE": np.datetime64(date - delta), "END_DATE": np.datetime64(date + delta)
+                })
 
         df = pd.DataFrame(data)
         with open(path, "wb") as f:
