@@ -1,8 +1,8 @@
-import sys
 from resources.fpa_fod.data_loader import FpaFodDataLoader
 from .tile_loader import GeeProductTileSeriesLoader
-from datetime import timedelta
-from .tile_loader_helper import download_from_df
+from .tile_loader_helper import download_from_df, get_arguments
+import ee
+from .config import EE_CREDENTIALS
 
 
 class GEELoaderFromFpaFod(object):
@@ -19,7 +19,7 @@ class GEELoaderFromFpaFod(object):
 
         print(f"Found {len(df)} wildfire records. Downloading {min(len(df), n_samples)} samples...")
 
-        download_from_df(self.image_loader, df[:n_samples], ee_product, zoom, subdir=subdir_with_fire, display=False)
+        download_from_df(self.image_loader, df[:n_samples], ee_product, zoom, subdir=subdir_with_fire, display=display)
 
         df = self.fpa_fod_loader.get_neg_examples(
             bbox, from_date=from_date, until_date=until_date, n_samples=n_samples
@@ -27,4 +27,15 @@ class GEELoaderFromFpaFod(object):
 
         print(f"Downloading {n_samples} negative samples...")
 
-        download_from_df(self.image_loader, df, ee_product, zoom, subdir=subdir_no_fire, display=False)
+        download_from_df(self.image_loader, df, ee_product, zoom, subdir=subdir_no_fire, display=display)
+
+
+if __name__ == "__main__":
+    ee.Initialize(EE_CREDENTIALS)
+
+    args, ee_product, subdir_with_fire, subdir_no_fire = get_arguments()
+
+    loader = GEELoaderFromFpaFod()
+    loader.download(ee_product, bbox=args.bbox, from_date=args.from_date, until_date=args.until_date,
+                    n_samples=args.n_samples, min_fire_size=args.min_fire_size, display=False,
+                    subdir_with_fire=subdir_with_fire, subdir_no_fire=subdir_no_fire)

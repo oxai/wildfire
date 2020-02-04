@@ -1,6 +1,7 @@
+import argparse
 import os, requests, zipfile
 
-from .methods import get_image_download_url_for_tile
+from .methods import get_image_download_url_for_tile, get_ee_product
 from io import BytesIO
 from skimage import io
 from tifffile import imsave
@@ -60,3 +61,42 @@ def download_from_df(image_loader, df, ee_product, zoom, subdir, display=False):
             print(f'Displaying {i}th downloaded image. To download without diplaying, pass "display=False".')
             plt.imshow(out)
             plt.show()
+
+
+def get_parser():
+    parser = argparse.ArgumentParser(description="Parse inputs")
+    parser.add_argument('platform', help="satellite category ('landsat', 'sentinel', 'modis', etc.)")
+    parser.add_argument('sensor', help="sensor type (landsat '8', sentinel '2', modis 'terra', etc.)")
+    parser.add_argument('product', help="product name ('surface', 'ndvi', 'snow', 'temperature', etc.)")
+    parser.add_argument('--from_date', help="search records after this date: yyyy-mm-dd",
+                        default='2015-01-01')
+    parser.add_argument('--until_date', help="search records before this date: yyyy-mm-dd",
+                        default='2015-12-31')
+    parser.add_argument('--bbox', '-b', metavar=('lng_left', 'lat_lower', 'lng_right', 'lat_upper'), type=float, nargs=4,
+                        default=[-120, 30, -85, 45],
+                        help="search records in this region: "
+                             "[lng_left, lat_lower, lng_right, lat_upper]")
+    parser.add_argument('--n_samples', '-n', type=int, help="number of samples", default=100)
+    parser.add_argument('--min_fire_size', type=float, help="fire size threshold", default=1000)
+    parser.add_argument('--subdir_with_fire', help="directory to save images with fire", default=None)
+    parser.add_argument('--subdir_no_fire', help="directory to save images without fire", default=None)
+    return parser
+
+
+def get_arguments():
+    parser = get_parser()
+    args = parser.parse_args()
+
+    ee_product = get_ee_product(
+        platform=args.platform,
+        sensor=args.sensor,
+        product=args.product
+    )
+
+    dir_name_base = f"{args.platform}-{args.sensor}_{args.from_date}_{args.until_date}"
+    subdir_with_fire = args.subdir_with_fire
+    subdir_with_fire = subdir_with_fire if subdir_with_fire else f"{dir_name_base}_w_fire"
+    subdir_no_fire = args.subdir_no_fire
+    subdir_no_fire = subdir_no_fire if subdir_no_fire else f"{dir_name_base}_no_fire"
+
+    return args, ee_product, subdir_with_fire, subdir_no_fire
