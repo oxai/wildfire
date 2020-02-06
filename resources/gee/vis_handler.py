@@ -4,6 +4,14 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 
 
+def visualise_image_from_ee_product(image: np.ndarray, ee_product, vis_params=None, method='default'):
+    handler = get_vis_handler(ee_product, method=method)
+    if not vis_params:
+        vis_params = ee_product.get('vis_params', {})
+    out = handler(ee_product, image, vis_params)
+    return out
+
+
 def get_vis_handler(ee_product, method='default'):
     vis_params = ee_product['vis_params']
     if method == 'default':

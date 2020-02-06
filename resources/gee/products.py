@@ -29,6 +29,19 @@ EE_PRODUCTS = {
                 'start_date': '2000-02-24',
                 'end_date': None  # to present
             },
+            'fire': {
+                'display': 'Terra Thermal Anomalies & Fire Daily Global 1km',
+                'collection': 'MODIS/006/MOD14A1',
+                "bands": ['MaxFRP', 'FireMask'],
+                'index': None,
+                'vis_params': {
+                    "min": 0.0,
+                    "max": 6000.0,
+                    "bands": ['MaxFRP', 'FireMask', 'FireMask'],
+                },
+                'start_date': '2000-02-18',
+                'end_date': None  # to present
+            },
             'temperature': {
                 'display': 'Land Surface Temperature and Emissivity Daily Global 1km',
                 'collection': 'MODIS/006/MOD11A1',

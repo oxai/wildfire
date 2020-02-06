@@ -92,8 +92,9 @@ def get_image_download_url(ee_image, bbox, scale, name=None):
     })
 
 
-def get_image_download_url_for_tile(ee_image, x_tile, y_tile, zoom, name=None):
+def get_image_download_url_for_tile(ee_image, x_tile, y_tile, zoom, tile_size, name=None):
     bbox = get_bbox_corners_for_tile(x_tile, y_tile, zoom)
-    scale = get_tile_pixel_scale_from_zoom(zoom)
+    scale = get_tile_pixel_scale_from_zoom(zoom, tile_size)
+    print(f"Downloading image tile of size {tile_size}x{tile_size} pixels with {scale:.2f} m resolution")
     return get_image_download_url(ee_image, bbox, scale, name)
 

@@ -10,7 +10,7 @@ class GEELoaderFromFpaFod(object):
         self.fpa_fod_loader = FpaFodDataLoader()
 
     def download(self, ee_product, bbox, from_date, until_date, n_samples, subdir, pos_examples=True,
-                 min_fire_size=0.0, zoom=13, display=True):
+                 min_fire_size=0.0, zoom=13, img_size=256, display=True):
 
         if pos_examples:
             df = self.fpa_fod_loader.get_records(
@@ -19,7 +19,7 @@ class GEELoaderFromFpaFod(object):
 
             print(f"Found {len(df)} wildfire records. Downloading {min(len(df), n_samples)} records...")
 
-            download_from_df(df[:n_samples], ee_product, zoom, subdir=subdir, display=display)
+            download_from_df(df[:n_samples], ee_product, zoom, subdir=subdir, img_size=img_size, display=display)
 
         else:
             df = self.fpa_fod_loader.get_neg_examples(
@@ -28,7 +28,7 @@ class GEELoaderFromFpaFod(object):
 
             print(f"Downloading {n_samples} negative samples...")
 
-            download_from_df(df, ee_product, zoom, subdir=subdir, display=display)
+            download_from_df(df, ee_product, zoom, subdir=subdir, img_size=img_size, display=display)
 
 
 if __name__ == "__main__":
@@ -38,4 +38,5 @@ if __name__ == "__main__":
 
     loader = GEELoaderFromFpaFod()
     loader.download(ee_product, bbox=args.bbox, from_date=args.from_date, until_date=args.until_date,
-                    n_samples=args.n_samples, subdir=subdir, pos_examples=not args.neg, min_fire_size=args.min_fire_size, display=False)
+                    n_samples=args.n_samples, subdir=subdir, pos_examples=not args.neg,
+                    zoom=args.zoom, img_size=args.img_size, min_fire_size=args.min_fire_size, display=args.display)

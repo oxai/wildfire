@@ -1,5 +1,6 @@
 import argparse
 from resources.gee.methods import TileDateRangeQuery
+from resources.gee.vis_handler import visualise_image_from_ee_product
 from .tile_loader import GeeProductTileSeriesLoader
 from resources.utils.gis import deg2tile
 import matplotlib.pyplot as plt
@@ -9,8 +10,8 @@ from resources.gee.methods import get_ee_product
 from datetime import timedelta
 
 
-def download_from_df(df, ee_product, zoom, subdir, display=False):
-    image_loader = GeeProductTileSeriesLoader()
+def download_from_df(df, ee_product, zoom, subdir, img_size=256, display=False):
+    image_loader = GeeProductTileSeriesLoader(img_size=img_size)
     for i, record in df.iterrows():
         lat = record["LATITUDE"]
         lng = record["LONGITUDE"]
@@ -28,18 +29,17 @@ def download_from_df(df, ee_product, zoom, subdir, display=False):
 
         # download images that contain wildfire
         try:
-            image_loader.load(ee_product, query, subdir=subdir)
+            out = image_loader.load(ee_product, query, subdir=subdir)
         except KeyboardInterrupt:
             sys.exit()
 
-        print(f"Downloaded {i+1}th record. (x, y) = ({x}, {y}), {start_date:%Y-%m-%d} to {end_date:%Y-%m-%d}")
-
-        if display and i % 10 == 0:
-            out = image_loader.visualise(ee_product, query)
-            print(out)
-            print(f'Displaying {i+1}th downloaded image. To download without diplaying, pass "display=False".')
-            plt.imshow(out)
-            plt.show()
+        if display:
+            images = [img for img in out if img is not None]
+            if images:
+                image = visualise_image_from_ee_product(images[0], ee_product)
+                print(f'Displaying {i+1}th downloaded image')
+                plt.imshow(image)
+                plt.show()
 
 
 def get_parser():
@@ -47,7 +47,12 @@ def get_parser():
     parser.add_argument('platform', help="satellite category ('landsat', 'sentinel', 'modis', etc.)")
     parser.add_argument('sensor', help="sensor type (landsat '8', sentinel '2', modis 'terra', etc.)")
     parser.add_argument('product', help="product name ('surface', 'ndvi', 'snow', 'temperature', etc.)")
+    parser.add_argument('--zoom', '-z', type=int,
+                        help="zoom level (default=13: tile width 4888 m at equator)", default=13)
+    parser.add_argument('--img_size', '-sz', type=int,
+                        help="tile size in pixels (default=256: standard size for map display)", default=256)
     parser.add_argument('--neg', action='store_true', help="store negative examples")
+    parser.add_argument('--display', action='store_true', help="display downloaded images")
     parser.add_argument('--from_date', help="search records after this date: yyyy-mm-dd",
                         default='2015-01-01')
     parser.add_argument('--until_date', help="search records before this date: yyyy-mm-dd",
@@ -74,7 +79,8 @@ def get_arguments():
 
     subdir = args.subdir
     if not subdir:
-        dir_name_base = f"{args.platform}-{args.sensor}_{args.from_date}_{args.until_date}"
+        dir_name_base = f"{args.platform}-{args.sensor}_{args.from_date}_{args.until_date}" \
+                        f"_{args.zoom}_{args.img_size}x{args.img_size}"
         subdir = dir_name_base + ("_no_fire" if args.neg else "_w_fire")
 
     return args, ee_product, subdir

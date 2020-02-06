@@ -55,6 +55,7 @@ export function MapPage() {
                             <option value="landsat/8/surface/default">Landsat 8 Surface</option>
                             <option value="landsat/8/surface/nbr">Landsat 8 NBR (Surface)</option>
                             <option value="landsat/8/ndvi/default">Landsat 8 NDVI</option>
+                            <option value="modis/terra/fire/default">MODIS Active Fire</option>
                             <option value="modis/terra/snow/default">MODIS Terra Snow</option>
                             <option value="modis/terra/temperature/default">MODIS Terra Temperature</option>
                             <option value="sentinel/2/l1c/default">Sentinel 2 Level-1C</option>

@@ -54,16 +54,8 @@ class GeeProductTileLoader(DataLoader):
 
     def image_id(self, ee_product, q: TileDateRangeQuery):
         product_name = get_ee_product_name(ee_product)
-        return f"{product_name}__{q.date_from}_{q.date_to}_{q.reducer}_{q.z}_{q.x}_{q.y}"
-
-    def visualise(self, ee_product, query: TileDateRangeQuery, handler=None, vis_params=None, method='default', subdir="tmp"):
-        image = self.load(ee_product, query, subdir=subdir)
-        if not handler:
-            handler = get_vis_handler(ee_product, method=method)
-        if not vis_params:
-            vis_params = ee_product.get('vis_params', {})
-        out = handler(ee_product, image, vis_params)
-        return out
+        sz = self.image_loader.img_size
+        return f"{product_name}__{q.date_from}_{q.date_to}_{q.reducer}_{q.z}_{q.x}_{q.y}_{sz}x{sz}"
 
 
 class GeeProductTileSeriesLoader(GeeProductTileLoader):
@@ -94,4 +86,5 @@ class GeeProductTileSeriesLoader(GeeProductTileLoader):
 
     def image_id(self, ee_product, q: TileDateRangeQuery):
         product_name = get_ee_product_name(ee_product)
-        return f"{product_name}__{q.date_from}_{q.z}_{q.x}_{q.y}"
+        sz = self.image_loader.img_size
+        return f"{product_name}__{q.date_from}_{q.z}_{q.x}_{q.y}_{sz}x{sz}"
