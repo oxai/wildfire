@@ -12,11 +12,13 @@ class ModisFireDataLoader(DataLoader):
         self.df.rename(columns={
             'latitude': 'LATITUDE',
             'longitude': 'LONGITUDE',
-            'acq_date': 'DATE'
+            'acq_date': 'DATE',
+            'confidence': 'CONFIDENCE'
         }, inplace=True)
         print(self.df.head())
 
-    def get_records(self, bbox=None, from_date=None, until_date=None):
+    def get_records(self, bbox=None, from_date=None, until_date=None, confidence_thresh=0):
         loc_cond = latlng_condition(self.df, bbox)
         date_cond = df_date_in_range(self.df["DATE"], from_date, until_date)
-        return self.df[loc_cond & date_cond].copy()
+        conf_cond = self.df["CONFIDENCE"] >= confidence_thresh
+        return self.df[loc_cond & date_cond & conf_cond].copy()
