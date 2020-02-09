@@ -16,7 +16,7 @@ export class MapPage extends React.Component {
     constructor(props) {
         super(props);
 
-        const date = [2015, 11, 1];
+        const date = [2019, 11, 1];
 
         this.state = {
             map: new SatelliteMap(),
@@ -30,10 +30,7 @@ export class MapPage extends React.Component {
 
     componentDidMount() {
         this.state.map.load(10, -160, 3)
-            .then(() => this.setState({
-                ...this.state,
-                map: this.state.map
-            }));
+            .then(this.loadMarkers);
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -47,18 +44,25 @@ export class MapPage extends React.Component {
                 map.addMapLayer(layer, from_str, until_str);
             }
             if (dateChanged) {
-                map.clearMarkers()
-                axios.get(`/api/map/fpa_fod/${from_str}/${until_str}/10`)
-                    .then((locs) => {
-                        locs.data.map((loc) => map.addMarker(loc.lat, loc.lng, "red", 0.5))
-                    });
-                axios.get(`/api/map/modis_fire/${from_str}/${until_str}/10`)
-                    .then((locs) => {
-                        locs.data.map((loc) => map.addMarker(loc.lat, loc.lng, "green", 0.5))
-                    });
+                this.loadMarkers();
             }
         }
     }
+
+    loadMarkers = () => {
+        const {map, from, until} = this.state;
+        const from_str = from.format('YYYY-MM-DD');
+        const until_str = until.format('YYYY-MM-DD');
+        map.clearMarkers();
+        axios.get(`/api/map/fpa_fod/${from_str}/${until_str}/10`)
+            .then((locs) => {
+                locs.data.map((loc) => map.addMarker(loc.lat, loc.lng, "red", 0.5))
+            });
+        axios.get(`/api/map/modis_fire/${from_str}/${until_str}/10`)
+            .then((locs) => {
+                locs.data.map((loc) => map.addMarker(loc.lat, loc.lng, "green", 0.5))
+            });
+    };
 
     handleDuration = (duration) => {
         this.setState({
@@ -157,7 +161,19 @@ export class MapPage extends React.Component {
                             <ToggleButton value={"week"} variant="secondary">1 week</ToggleButton>
                             <ToggleButton value={"month"} variant="secondary">1 month</ToggleButton>
                         </ToggleButtonGroup>
-
+                        <ul style={{
+                            textAlign: "left",
+                            marginTop: 15,
+                            listStyle: "url('/static/red_dot.png')"
+                        }}>
+                            <li>FPA FOD Fire Dataset</li>
+                        </ul>
+                        <ul style={{
+                            textAlign: "left",
+                            listStyle: "url('/static/green_dot.png')"
+                        }}>
+                            <li>MODIS Fire Archive</li>
+                        </ul>
                     </div>
                     <div id="map" style={{
                         flex: 1
