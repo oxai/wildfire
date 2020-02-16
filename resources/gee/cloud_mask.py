@@ -2,7 +2,7 @@ import ee
 
 
 def add_mask(image, mask):
-    return image.updateMask(mask).addBands(mask).copyProperties(image, ["system:time_start"])
+    return image.addBands(mask).copyProperties(image, ["system:time_start"])
 
 
 def mask_l8_sr(image):

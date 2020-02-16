@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from resources.fpa_fod.data_loader import FpaFodDataLoader
 from resources.gee.methods import get_ee_product
 from resources.gee.tile_loader import GeeProductTileLoader, TileDateRangeQuery
-from resources.gee.vis_handler import visualise_image_from_ee_product
+from resources.gee.vis_handler import visualise_image_from_ee_product, get_empty_image
 from resources.modis_fire.data_loader import ModisFireDataLoader
 
 
@@ -20,6 +20,7 @@ def home(request):
 
 # Create your views here.
 def gee_mapserver(request, platform, sensor, product, method, z, x, y, from_date, until_date):
+    print(f"Received map tile request: {platform} {sensor} {product}, x: {x}, y: {y}, zoom: {z}", {from_date} - {until_date})
 
     ee_product = get_ee_product(
         platform=platform,
@@ -30,7 +31,10 @@ def gee_mapserver(request, platform, sensor, product, method, z, x, y, from_date
     query = TileDateRangeQuery(x=x, y=y, z=z, date_from=from_date, date_to=until_date, reducer="median")
 
     out = gee_loader.load(ee_product, query, subdir="map")
-    image = visualise_image_from_ee_product(out, ee_product, method=method)
+    if out is None:
+        image = get_empty_image()
+    else:
+        image = visualise_image_from_ee_product(out, ee_product, method=method)
 
     response = HttpResponse(content_type='image/png')
     image.save(response, "PNG")

@@ -18,6 +18,9 @@ class GeeImageTileLoader(DataLoader):
     def save(self, image_id, ee_image, bands, query: TileDateRangeQuery, subdir="tmp", n_trials=3, sleep=1):
         base_path = os.path.join(self.data_subdir(subdir), image_id)
         if not os.path.exists(base_path+".tif"):
+            # if not ee_image.bandNames().getInfo():
+            #     print("No bands in image")
+            #     return None
             for i in range(n_trials):
                 try:
                     save_gee_tile(base_path, ee_image, bands, query, image_id, self.img_size)
@@ -27,7 +30,7 @@ class GeeImageTileLoader(DataLoader):
                     print(e)
                     if i == n_trials - 1:
                         print(f"Failed to download record ({i+1} attempt{'s' if i else ''}). Image Id: {image_id}")
-                        break
+                        return None
                     time.sleep(sleep * 2**i)  # Sometimes request works on second try
         return base_path+".tif"
 
@@ -50,7 +53,7 @@ class GeeProductTileLoader(DataLoader):
 
     def load(self, ee_product, query: TileDateRangeQuery, subdir="tmp"):
         path = self.save(ee_product, query, subdir=subdir)
-        return imread(path)
+        return imread(path) if path else None
 
     def image_id(self, ee_product, q: TileDateRangeQuery):
         product_name = get_ee_product_name(ee_product)

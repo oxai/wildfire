@@ -4,6 +4,11 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 
 
+def get_empty_image(shape=(256, 256, 4)):
+    image = np.zeros(shape, dtype='uint8')
+    return Image.fromarray(image, 'RGBA')
+
+
 def visualise_image_from_ee_product(image: np.ndarray, ee_product, vis_params=None, method='default'):
     handler = get_vis_handler(ee_product, method=method)
     if not vis_params:
@@ -97,7 +102,13 @@ def vis_default(ee_product, image, vis_params):
     else:
         palette = vis_params.get('palette', None)
         out = apply_palette(image, palette)
-    out[-1] = np.where(image[0] > 0, 1, 0)
+    if vis_params.get('alpha', True):
+        if 'cloud_mask' in bands:
+            out[-1] = get_band(ee_product, image, 'cloud_mask')
+        else:
+            out[-1] = np.where(image.sum(axis=0) > 0, 1, 0)
+    else:
+        out[-1] = 1
     return array_to_image(out)
 
 
