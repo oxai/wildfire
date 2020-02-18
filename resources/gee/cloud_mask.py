@@ -63,4 +63,4 @@ def mask_s2_clouds(image):
     # Both flags should be set to zero, indicating clear conditions.
     mask = qa.bitwiseAnd(cloudBitMask).eq(0).And(qa.bitwiseAnd(cirrusBitMask).eq(0))
 
-    return add_mask(image.divide(10000), mask)
+    return image.divide(10000).addBands(mask).copyProperties(image, ["system:time_start"])

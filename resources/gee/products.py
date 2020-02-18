@@ -1,5 +1,4 @@
-from .vis_handler import vis_s2_nbr, vis_l8_nbr, vis_s2_fire
-
+from .vis_handler import vis_s2_nbr, vis_l8_nbr, vis_s2_fire, vis_s2_firethresh
 
 EE_PRODUCTS = {
     'modis': {
@@ -75,7 +74,8 @@ EE_PRODUCTS = {
                     'bands': ['B4', 'B3', 'B2'],
                     'handler': {
                         'nbr': vis_s2_nbr,
-                        'vis_fire': vis_s2_fire
+                        'vis_fire': vis_s2_fire,
+                        'fire_thresh': vis_s2_firethresh
                     }
                 },
                 'cloud_mask': 'mask_s2_clouds'

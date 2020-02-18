@@ -122,73 +122,73 @@ def vis_nbr(nir, swir, alpha):
 
 
 def vis_s2_nbr(ee_product, image, vis_params):
-    NIR = get_band(ee_product, image, 'B8')
-    SWIR = get_band(ee_product, image, 'B12')
-    return vis_nbr(NIR, SWIR, np.where(NIR > 0, 1, 0))
+    NIR, SWIR, mask = get_bands(ee_product, image, ['B8', 'B12', 'cloud_mask'])
+    return vis_nbr(NIR, SWIR, mask)
 
 
 def vis_l8_nbr(ee_product, image, vis_params):
-    NIR = get_band(ee_product, image, 'B5')
-    SWIR = get_band(ee_product, image, 'B7')
-    return vis_nbr(NIR, SWIR, np.where(NIR > 0, 1, 0))
+    NIR, SWIR, mask = get_bands(ee_product, image, ['B5', 'B7', 'cloud_mask'])
+    return vis_nbr(NIR, SWIR, mask)
 
 
 # Functions to visualize wildfire, adapted from https://pierre-markuse.net/2017/08/07/visualizing-wildfires-sentinel-2-imagery-eo-browser/
 def stretch(val, minval, maxval): return (val - minval) / (maxval - minval)
 
 
-def vis_natural_colors(ee_product, image, vis_params):
-    B2, B3, B4 = get_bands(ee_product, image, ['B2', 'B3', 'B4'])
-    return [stretch(3.1 * B4, 0.05, 0.9), stretch(3 * B3, 0.05, 0.9), stretch(3.0 * B2, 0.05, 0.9)];
+# def vis_natural_colors(B2, B3, B4):
+#     return [stretch(3.1 * B4, 0.05, 0.9), stretch(3 * B3, 0.05, 0.9), stretch(3.0 * B2, 0.05, 0.9)];
+#
+#
+# def vis_enhanced_natural_colors(B2, B3, B4, B5, B8):
+#     return [stretch((3.1 * B4 + 0.1 * B5), 0.05, 0.9), stretch((3 * B3 + 0.15 * B8), 0.05, 0.9),
+#             stretch(3 * B2, 0.05, 0.9)];
+#
+#
+# def vis_nirswir_color(B2, B8, B12):
+#     return [stretch(2.6 * B12, 0.05, 0.9), stretch(1.9 * B8, 0.05, 0.9), stretch(2.7 * B2, 0.05, 0.9)]
+#
+#
+# def vis_panband(B8):
+#     return [stretch(B8, 0.01, 0.99), stretch(B8, 0.01, 0.99), stretch(B8, 0.01, 0.99)]
+#
+#
+# def vis_pan_tinted_green(B8):
+#     return [B8 * 0.2, B8, B8 * 0.2]
 
 
-def vis_enhanced_natural_colors(ee_product, image, vis_params):
-    B2, B3, B4, B5, B8 = get_bands(ee_product, image, ['B2', 'B3', 'B4', 'B5', 'B8'])
-    return [stretch((3.1 * B4 + 0.1 * B5), 0.05, 0.9), stretch((3 * B3 + 0.15 * B8), 0.05, 0.9),
-            stretch(3 * B2, 0.05, 0.9)];
-
-
-def vis_nirswir_color(ee_product, image, vis_params):
-    B2, B8, B12 = get_bands(ee_product, image, ['B2', 'B8', 'B12'])
-    return [stretch(2.6 * B12, 0.05, 0.9), stretch(1.9 * B8, 0.05, 0.9), stretch(2.7 * B2, 0.05, 0.9)]
-
-
-def vis_panband(ee_product, image, vis_params):
-    B8 = get_band(ee_product, image, 'B8')
-    return [stretch(B8, 0.01, 0.99), stretch(B8, 0.01, 0.99), stretch(B8, 0.01, 0.99)]
-
-
-def vis_natural_nirswirmix(ee_product, image, vis_params):
-    B2, B3, B4, B8, B12 = get_bands(ee_product, image, ['B2', 'B3', 'B4', 'B8', 'B12'])
+def vis_natural_nirswirmix(B2, B3, B4, B8, B12):
     return [stretch((2.1 * B4 + 0.5 * B12), 0.01, 0.99), stretch((2.2 * B3 + 0.5 * B8), 0.01, 0.99),
             stretch(3.2 * B2, 0.01, 0.99)]
 
 
-def vis_pan_tinted_green(ee_product, image, vis_params):
-    B8 = get_band(ee_product, image, 'B8')
-    return [B8 * 0.2, B8, B8 * 0.2]
+def get_fire_levels(B2, B3, B4, B8, B12):
+    R = stretch((2.1 * B4 + 0.5 * B12), 0.01, 0.99) + 1.1
+    G = stretch((2.2 * B3 + 0.5 * B8), 0.01, 0.99)
+    B = stretch(2.1 * B2, 0.01, 0.99)
+    return [R, G, B], [R, G + 0.5, B]
 
 
-def vis_fire10vl(ee_product, image, vis_params):
-    B2, B3, B4, B8, B12 = get_bands(ee_product, image, ['B2', 'B3', 'B4', 'B8', 'B12'])
-    return [stretch((2.1 * B4 + 0.5 * B12), 0.01, 0.99) + 1.1, stretch((2.2 * B3 + 0.5 * B8), 0.01, 0.99),
-            stretch(2.1 * B2, 0.01, 0.99)]
-
-
-def vis_fire20vl(ee_product, image, vis_params):
-    B2, B3, B4, B8, B12 = get_bands(ee_product, image, ['B2', 'B3', 'B4', 'B8', 'B12'])
-    return [stretch((2.1 * B4 + 0.5 * B12), 0.01, 0.99) + 1.1, stretch((2.2 * B3 + 0.5 * B8), 0.01, 0.99) + 0.5,
-            stretch(2.1 * B2, 0.01, 0.99)]
+def get_fire_indicator(B11, B12, sensitivity=1.0):
+    # Increase sensitivity for more possible fires and more wrong indications
+    return (B11 + B12) * sensitivity
 
 
 def vis_s2_fire(ee_product, image, vis_params):
-    sensitivity = 1.0  # Increase sensitivity for more possible fires and more wrong indications
-    B11, B12 = get_bands(ee_product, image, ['B11', 'B12'])
-    some_fire_bool = (B11 + B12) > (1.0 / sensitivity)
-    lots_fire_bool = (B11 + B12) > (2.0 / sensitivity)
-    some_fire_array = vis_fire10vl(ee_product, image, vis_params)
-    lots_fire_array = vis_fire20vl(ee_product, image, vis_params)
-    no_fire_array = vis_natural_nirswirmix(ee_product, image, vis_params)
-    fire_array = np.where(lots_fire_bool, lots_fire_array, some_fire_array)
-    combined_array = np.where(some_fire_bool, fire_array, no_fire_array)
+    B2, B3, B4, B8, B11, B12 = get_bands(ee_product, image, ['B2', 'B3', 'B4', 'B8', 'B11', 'B12'])
+    fire_index = get_fire_indicator(B11, B12)
+    some_fire_array, lots_fire_array = get_fire_levels(B2, B3, B4, B8, B12)
+
+    no_fire_array = vis_natural_nirswirmix(B2, B3, B4, B8, B12)
+
+    combined_array = np.where(fire_index > 1.0, some_fire_array, no_fire_array)
+    combined_array = np.where(fire_index > 2.0, lots_fire_array, combined_array)
     return array_to_image(combined_array)
+
+
+def vis_s2_firethresh(ee_product, image, vis_params):
+    B11, B12, mask = get_bands(ee_product, image, ['B11', 'B12', 'cloud_mask'])
+    out = apply_palette((B11 + B12) / 4, [
+        'black', 'red', 'yellow'
+    ])
+    out[-1] = mask
+    return array_to_image(out)

@@ -1,6 +1,7 @@
 import argparse
 from resources.gee.methods import TileDateRangeQuery
 from resources.gee.vis_handler import visualise_image_from_ee_product
+from resources.manual_fire.data_loader import ManualFireDataLoader
 from resources.modis_fire.data_loader import ModisFireDataLoader
 from .tile_loader import GeeProductTileSeriesLoader
 from resources.utils.gis import deg2tile
@@ -20,7 +21,8 @@ def get_parser():
     parser.add_argument('platform', help="satellite category ('landsat', 'sentinel', 'modis', etc.)")
     parser.add_argument('sensor', help="sensor type (landsat '8', sentinel '2', modis 'terra', etc.)")
     parser.add_argument('product', help="product name ('surface', 'ndvi', 'snow', 'temperature', etc.)")
-    parser.add_argument('fire_record', help="fire records that has latitude, longitude and time (fpa_fod or modis)")
+    parser.add_argument('fire_record',
+                        help="fire records that has latitude, longitude and time (fpa_fod / modis / manual)")
     parser.add_argument('--zoom', '-z', type=int,
                         help="zoom level (default=13: tile width 4888 m at equator)", default=13)
     parser.add_argument('--img_size', '-sz', type=int,
@@ -58,8 +60,14 @@ def get_arguments():
                         f"{args.from_date}_{args.until_date}_{args.zoom}_{args.img_size}x{args.img_size}"
         subdir = dir_name_base + ("_no_fire" if args.neg else "_w_fire")
 
-    assert args.fire_record in ["fpa_fod", "modis"]
-    fire_loader = FpaFodDataLoader() if args.fire_record == "fpa_fod" else ModisFireDataLoader()
+    fire_record = args.fire_record
+    if fire_record == "fpa_fod":
+        fire_loader = FpaFodDataLoader()
+    elif fire_record == "modis":
+        fire_loader = ModisFireDataLoader()
+    else:
+        assert fire_record == "manual", "fire_record does not match any options"
+        fire_loader = ManualFireDataLoader()
 
     return args, ee_product, subdir, fire_loader
 
