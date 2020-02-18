@@ -1,6 +1,6 @@
 def latlng_condition(df, bbox=None, lat_key="LATITUDE", lng_key="LONGITUDE"):
     if bbox is None:
-        return df[lat_key].apply(lambda x: True)
+        return df.apply(lambda x: True, axis=1)
     df_lat = df[lat_key]
     df_lng = df[lng_key]
     lng_left, lat_lower, lng_right, lat_upper = bbox
@@ -13,10 +13,10 @@ def latlng_condition(df, bbox=None, lat_key="LATITUDE", lng_key="LONGITUDE"):
 
 def dates_overlap(df, from_date=None, until_date=None, start_date_key="START_DATE", end_date_key="END_DATE"):
     started_before_until_date =\
-        df[start_date_key].apply(lambda x: True) if until_date is None \
+        df.apply(lambda x: True, axis=1) if until_date is None \
         else df[start_date_key] <= until_date
     ended_after_from_date = \
-        df[end_date_key].apply(lambda x: True) if from_date is None \
+        df.apply(lambda x: True, axis=1) if from_date is None \
         else df[end_date_key] >= from_date
     return started_before_until_date & ended_after_from_date
 

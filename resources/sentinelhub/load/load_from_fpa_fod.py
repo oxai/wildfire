@@ -17,7 +17,7 @@ class SentinelLoaderFromFpaFod(object):
 
         one_year = timedelta(days=365)
 
-        df = self.fpa_fod_loader.get_records(
+        df = self.fpa_fod_loader.get_records_in_range(
             bbox=bbox, from_date=from_date, until_date=until_date, min_fire_size=min_fire_size
         ).reset_index()
 

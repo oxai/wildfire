@@ -1,24 +1,21 @@
-from resources.base.data_loader import DataLoader
 import pandas as pd
 import os
-from resources.utils.df import latlng_condition, df_date_in_range
+from resources.base.fire_loader import FireLoader
 
 
-class ModisFireDataLoader(DataLoader):
+class ModisFireDataLoader(FireLoader):
 
     def __init__(self, filename="fire_archive_M6_87061.csv"):
-        super().__init__()
-        self.df = pd.read_csv(os.path.join(self.data_dir(), filename))
-        self.df.rename(columns={
+        super().__init__(filename)
+
+    def load(self, filename):
+        df = pd.read_csv(os.path.join(self.data_dir(), filename))
+        df.rename(columns={
             'latitude': 'LATITUDE',
             'longitude': 'LONGITUDE',
             'acq_date': 'DATE',
             'confidence': 'CONFIDENCE'
         }, inplace=True)
-        print(self.df.head())
-
-    def get_records(self, bbox=None, from_date=None, until_date=None, confidence_thresh=0):
-        loc_cond = latlng_condition(self.df, bbox)
-        date_cond = df_date_in_range(self.df["DATE"], from_date, until_date)
-        conf_cond = self.df["CONFIDENCE"] >= confidence_thresh
-        return self.df[loc_cond & date_cond & conf_cond].copy()
+        df["DATE"] = pd.to_datetime(df["DATE"])
+        print(df.head())
+        return df
