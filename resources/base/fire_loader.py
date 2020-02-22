@@ -24,11 +24,11 @@ class FireLoader(DataLoader):
         raise NotImplementedError
 
     def get_records_in_range(self, bbox=None, from_date=None, until_date=None, min_fire_size=0.0, confidence_thresh=0.0):
-        path = os.path.join(self.data_dir(), f"{bbox}_{from_date}_{until_date}_{min_fire_size}.pk")
-        if os.path.exists(path):
-            with open(path, "rb") as f:
-                df = pickle.load(f)
-            return df
+        # path = os.path.join(self.data_dir(), f"{bbox}_{from_date}_{until_date}_{min_fire_size}_{confidence_thresh}.pk")
+        # if os.path.exists(path):
+        #     with open(path, "rb") as f:
+        #         df = pickle.load(f)
+        #     return df
         loc_cond = latlng_condition(self.df, bbox)
         date_cond = \
             dates_overlap(self.df, from_date, until_date) if self.date_range_known \
@@ -40,8 +40,8 @@ class FireLoader(DataLoader):
             self.df["CONFIDENCE"] >= confidence_thresh if "CONFIDENCE" in self.df \
             else self.df.apply(lambda x: True, axis=1)
         df = self.df[loc_cond & date_cond & fire_cond & conf_cond].copy()
-        with open(path, "wb") as f:
-            pickle.dump(df, f)
+        # with open(path, "wb") as f:
+        #     pickle.dump(df, f)
         return df
 
     def get_records_on_date(self, date, bbox=None, min_fire_size=0.0, confidence_thresh=0.0):

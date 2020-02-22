@@ -4,7 +4,7 @@ import ee
 
 from resources.gee.config import EE_CREDENTIALS
 from resources.gee.methods import get_ee_product
-from resources.gee.vis_handler import vis_s2_fire, vis_s2_firethresh, vis_s2_nbr
+from resources.gee.vis_handler import vis_s2_fire, vis_s2_firethresh, vis_s2_nbr, vis_default
 import matplotlib.pyplot as plt
 
 data_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data_dir")
@@ -29,7 +29,7 @@ for root, dirs, files in os.walk(
         plt.imshow(out)
 
         plt.figure(1)
-        out = vis_s2_nbr(ee_product, image, {})
+        out = vis_default(ee_product, image, ee_product['vis_params'])
         plt.imshow(out)
 
         plt.figure(2)

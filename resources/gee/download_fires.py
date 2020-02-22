@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 import sys
 import pandas as pd
 from resources.gee.methods import get_ee_product
-from datetime import timedelta
 from resources.fpa_fod.data_loader import FpaFodDataLoader
 import ee
 from .config import EE_CREDENTIALS
