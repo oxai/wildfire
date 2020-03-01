@@ -19,21 +19,20 @@ ee_product = get_ee_product(
 
 
 for root, dirs, files in os.walk(
-        os.path.join(data_dir, "sentinel-2_l1c_manual_2019-01-01_2019-12-31_13_256x256_w_fire"), topdown=False
+        os.path.join(data_dir, "sentinel-2_l1c_fpa_fod_2015-08-01_2015-12-31_13_256x256_w_fire"), topdown=False
 ):
+
     for name in files:
+        fig, axs = plt.subplots(1, 3)
+        
         image = imread(os.path.join(root, name))
-
-        plt.figure(0)
         out = vis_s2_fire(ee_product, image, {})
-        plt.imshow(out)
+        axs[0].imshow(out)
 
-        plt.figure(1)
         out = vis_default(ee_product, image, ee_product['vis_params'])
-        plt.imshow(out)
+        axs[1].imshow(out)
 
-        plt.figure(2)
         out = vis_s2_firethresh(ee_product, image, {})
-        plt.imshow(out)
+        axs[2].imshow(out)
 
         plt.show()

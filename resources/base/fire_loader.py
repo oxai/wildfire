@@ -12,7 +12,7 @@ class FireLoader(DataLoader):
     def __init__(self, *args, **kwargs):
         super().__init__()
         self.df = self.load(*args, **kwargs)
-        self.date_range_known = "START_DATE" in self.df or "END_DATE" in self.df
+        self.date_range_known = "START_DATE" in self.df.keys() or "END_DATE" in self.df.keys()
 
     def load(self, *args, **kwargs):
         """
@@ -34,10 +34,10 @@ class FireLoader(DataLoader):
             dates_overlap(self.df, from_date, until_date) if self.date_range_known \
             else df_date_in_range(self.df["DATE"], from_date, until_date)
         fire_cond = \
-            self.df["FIRE_SIZE"] >= min_fire_size if "FIRE_SIZE" in self.df \
+            self.df["FIRE_SIZE"] >= min_fire_size if "FIRE_SIZE" in self.df.keys() \
             else self.df.apply(lambda x: True, axis=1)
         conf_cond = \
-            self.df["CONFIDENCE"] >= confidence_thresh if "CONFIDENCE" in self.df \
+            self.df["CONFIDENCE"] >= confidence_thresh if "CONFIDENCE" in self.df.keys() \
             else self.df.apply(lambda x: True, axis=1)
         df = self.df[loc_cond & date_cond & fire_cond & conf_cond].copy()
         # with open(path, "wb") as f:
@@ -50,10 +50,10 @@ class FireLoader(DataLoader):
             date_in_range(date, self.df["START_DATE"], self.df["END_DATE"]) if self.date_range_known \
             else self.df["DATE"] == date
         fire_cond = \
-            self.df["FIRE_SIZE"] >= min_fire_size if "FIRE_SIZE" in self.df \
+            self.df["FIRE_SIZE"] >= min_fire_size if "FIRE_SIZE" in self.df.keys() \
             else self.df["index"].apply(lambda x: True)
         conf_cond = \
-            self.df["CONFIDENCE"] >= confidence_thresh if "CONFIDENCE" in self.df \
+            self.df["CONFIDENCE"] >= confidence_thresh if "CONFIDENCE" in self.df.keys() \
             else self.df["index"].apply(lambda x: True)
         return self.df[loc_cond & date_cond & fire_cond & conf_cond].copy()
 
