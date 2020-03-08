@@ -1,5 +1,4 @@
-from weather import get_wwo_weather
-
+from resources.weather.weather import get_wwo_weather
 
 lat = 34.06
 lon = -188.82
