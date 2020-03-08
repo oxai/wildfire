@@ -11,6 +11,7 @@ import pandas as pd
 from resources.gee.methods import get_ee_product
 from resources.fpa_fod.data_loader import FpaFodDataLoader
 import ee
+import numpy as np
 from .config import EE_CREDENTIALS
 from datetime import timedelta
 
@@ -23,16 +24,18 @@ def get_parser():
     parser.add_argument('fire_record',
                         help="fire records that has latitude, longitude and time (fpa_fod / modis / manual)")
     parser.add_argument('--zoom', '-z', type=int,
-                        help="zoom level (default=13: tile width 4888 m at equator)", default=13)
+                        help="zoom level (default=13: tile width 4888 m at equator)", default=None)
     parser.add_argument('--img_size', '-sz', type=int,
-                        help="tile size in pixels (default=256: standard size for map display)", default=256)
+                        help="tile size in pixels (default=256: standard size for map display). Should be of size 2^N.",
+                        default=256)
     parser.add_argument('--neg', action='store_true', help="store negative examples")
     parser.add_argument('--display', action='store_true', help="display downloaded images")
     parser.add_argument('--from_date', '-from', help="search records after this date: yyyy-mm-dd",
                         default='2015-01-01')
     parser.add_argument('--until_date', '-until', help="search records before this date: yyyy-mm-dd",
                         default='2015-12-31')
-    parser.add_argument('--bbox', '-b', metavar=('lng_left', 'lat_lower', 'lng_right', 'lat_upper'), type=float, nargs=4,
+    parser.add_argument('--bbox', '-b', metavar=('lng_left', 'lat_lower', 'lng_right', 'lat_upper'), type=float,
+                        nargs=4,
                         default=[-120, 30, -85, 45],
                         help="search records in this region: "
                              "[lng_left, lat_lower, lng_right, lat_upper]")
@@ -73,10 +76,10 @@ def get_arguments():
 
 def download_fire_images(fire_loader, ee_product, bbox, from_date, until_date, n_samples, subdir, pos_examples=True,
                          min_fire_size=0.0, confidence=0.0, zoom=13, img_size=256, display=True):
-
     if pos_examples:
         df = fire_loader.get_records_in_range(
-            bbox=bbox, from_date=from_date, until_date=until_date, min_fire_size=min_fire_size, confidence_thresh=confidence
+            bbox=bbox, from_date=from_date, until_date=until_date, min_fire_size=min_fire_size,
+            confidence_thresh=confidence
         ).reset_index()
 
         print(f"Found {len(df)} wildfire records. Downloading {min(len(df), n_samples)} records...")
@@ -113,7 +116,7 @@ def download_from_df(df, ee_product, zoom, subdir, img_size=256, display=False, 
         query = TileDateRangeQuery(x=x, y=y, z=zoom, date_from=start_date, date_to=end_date + timedelta(days=1),
                                    reducer="median")
 
-        print(f"Downloading {i+1}th record. (x, y) = ({x}, {y}), {start_date:%Y-%m-%d} to {end_date:%Y-%m-%d}")
+        print(f"Downloading {i + 1}th record. (x, y) = ({x}, {y}), {start_date:%Y-%m-%d} to {end_date:%Y-%m-%d}")
 
         # download images that contain wildfire
         try:
@@ -125,22 +128,27 @@ def download_from_df(df, ee_product, zoom, subdir, img_size=256, display=False, 
             images = [img for img in out if img is not None]
             if images:
                 image = visualise_image_from_ee_product(images[0], ee_product)
-                print(f'Displaying {i+1}th downloaded image')
+                print(f'Displaying {i + 1}th downloaded image')
                 plt.imshow(image)
                 plt.show()
+
 
 """
 how to run the script:
 positive example:
->> python -m resources.gee.download_fires landsat 8 surface fpa_fod -n 1000 -fs 10.0 -c 0.0 -sz 16 -z 17
+>> python -m resources.gee.download_fires landsat 8 surface fpa_fod -n 1000 -fs 10.0 -c 0.0 -sz 16
 negative example:
->> python -m resources.gee.download_fires landsat 8 surface fpa_fod -n 1000 --neg -sz 16 -z 17
+>> python -m resources.gee.download_fires landsat 8 surface fpa_fod -n 1000 --neg -sz 16
 """
 if __name__ == "__main__":
     ee.Initialize(EE_CREDENTIALS)
 
     args, ee_product, subdir, fire_loader = get_arguments()
 
+    zoom = args.zoom
+    if zoom is None:
+        zoom = 21 - int(np.log(args.img_size) / np.log(2))
+
     download_fire_images(fire_loader, ee_product, bbox=args.bbox, from_date=args.from_date, until_date=args.until_date,
                          n_samples=args.n_samples, subdir=subdir, pos_examples=not args.neg,
-                         zoom=args.zoom, img_size=args.img_size, min_fire_size=args.min_fire_size, display=args.display)
+                         zoom=zoom, img_size=args.img_size, min_fire_size=args.min_fire_size, display=args.display)
