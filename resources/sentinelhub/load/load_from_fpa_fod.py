@@ -1,6 +1,6 @@
 from resources.fpa_fod.data_loader import FpaFodDataLoader
 from .data_loader import SentinelHubDataLoader
-from ..utils import get_bbox
+from ..utils import get_bbox_from_radius
 import pandas as pd
 from datetime import timedelta
 import time
@@ -11,14 +11,14 @@ class SentinelLoaderFromFpaFod(object):
         self.fpa_fod_loader = FpaFodDataLoader()
         self.sentinel_loader = SentinelHubDataLoader()
 
-    def download(self, layer, loc=None, from_date=None, until_date=None, min_fire_size=0.0, max_cloud_coverage=0.3,
+    def download(self, layer, bbox=None, from_date=None, until_date=None, min_fire_size=0.0, max_cloud_coverage=0.3,
                  r=3000, resx="10m", resy="10m",
                  subdir_with_fire="with_fire", subdir_before_fire="before_fire", subdir_after_fire="after_fire"):
 
         one_year = timedelta(days=365)
 
-        df = self.fpa_fod_loader.get_records(
-            loc=loc, from_date=from_date, until_date=until_date, min_fire_size=min_fire_size
+        df = self.fpa_fod_loader.get_records_in_range(
+            bbox=bbox, from_date=from_date, until_date=until_date, min_fire_size=min_fire_size
         ).reset_index()
 
         print("Found {} wildfire records...".format(len(df)))
@@ -34,7 +34,7 @@ class SentinelLoaderFromFpaFod(object):
 
             info = {
                 "layer": layer,
-                "bbox": get_bbox(fire_lat, fire_lng, r=r),
+                "bbox": get_bbox_from_radius(fire_lat, fire_lng, r=r),
                 "maxcc": max_cloud_coverage,
                 "resx": resx,
                 "resy": resy

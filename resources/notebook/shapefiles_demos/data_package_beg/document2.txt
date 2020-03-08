@@ -1,0 +1,5 @@
+ID,X,Y,Z,Desc
+1,1,1,1,Point1
+2,1,2,1,Point2
+3,2,2,2,Point3
+4,2,1,2,Point4

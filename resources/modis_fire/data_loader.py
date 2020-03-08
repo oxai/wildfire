@@ -1,22 +1,25 @@
-from resources.base.data_loader import DataLoader
 import pandas as pd
 import os
-from resources.utils.df import latlng_condition, df_date_in_range
+from resources.base.fire_loader import FireLoader
 
 
-class ModisFireDataLoader(DataLoader):
+class ModisFireDataLoader(FireLoader):
 
-    def __init__(self, filename="fire_archive_M6_87061.csv"):
-        super().__init__()
-        self.df = pd.read_csv(os.path.join(self.data_dir(), filename))
-        self.df.rename(columns={
+    def __init__(self, filenames=None):
+        if filenames is None:
+            filenames = [
+                "fire_archive_M6_87061.csv",
+                # "fire_archive_M6_2019-01-01_2019-12-31.csv"
+            ]
+        super().__init__(filenames)
+
+    def load(self, filenames):
+        df = pd.concat([pd.read_csv(os.path.join(self.data_dir(), f)) for f in filenames], axis=0)
+        df.rename(columns={
             'latitude': 'LATITUDE',
             'longitude': 'LONGITUDE',
-            'acq_date': 'DATE'
+            'confidence': 'CONFIDENCE'
         }, inplace=True)
-        print(self.df.head())
-
-    def get_records(self, loc=None, from_date=None, until_date=None):
-        loc_cond = latlng_condition(self.df, loc)
-        date_cond = df_date_in_range(self.df["DATE"], from_date, until_date)
-        return self.df[loc_cond & date_cond].copy()
+        df["DATE"] = pd.to_datetime(df["acq_date"])
+        print(df.head())
+        return df

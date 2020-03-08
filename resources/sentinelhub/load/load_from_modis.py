@@ -1,6 +1,6 @@
 from resources.modis_fire.data_loader import ModisFireDataLoader
 from .data_loader import SentinelHubDataLoader
-from ..utils import get_bbox
+from ..utils import get_bbox_from_radius
 import pandas as pd
 from datetime import timedelta, datetime
 
@@ -10,9 +10,9 @@ class SentinelLoaderFromModis(object):
         self.fire_loader = ModisFireDataLoader()
         self.sentinel_loader = SentinelHubDataLoader()
 
-    def download(self, layer, loc=None, from_date=None, until_date=None, max_cloud_coverage=0.3, r=3000, resx="10m", resy="10m", subdir="with_fire"):
-        df = self.fire_loader.get_records(
-            loc=loc, from_date=from_date, until_date=until_date
+    def download(self, layer, bbox=None, from_date=None, until_date=None, max_cloud_coverage=0.3, r=3000, resx="10m", resy="10m", subdir="with_fire"):
+        df = self.fire_loader.get_records_in_range(
+            bbox=bbox, from_date=from_date, until_date=until_date
         ).reset_index()
 
         print("Found {} wildfire records...".format(len(df)))
@@ -29,7 +29,7 @@ class SentinelLoaderFromModis(object):
 
             info = {
                 "layer": layer,
-                "bbox": get_bbox(fire_lat, fire_lng, r=r),
+                "bbox": get_bbox_from_radius(fire_lat, fire_lng, r=r),
                 "time": (fire_start, fire_end),
                 "maxcc": max_cloud_coverage,
                 "resx": resx,
