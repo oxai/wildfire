@@ -13,12 +13,12 @@ def get_arguments():
         product=args.product
     )
 
+    zoom = args.zoom if args.zoom else 13
+
     subdir = args.subdir
     if not subdir:
         dir_name_base = f"{args.platform}-{args.sensor}_{args.product}_globfire_" \
-                        f"{args.from_date}_{args.until_date}_{args.zoom}"
+                        f"{args.from_date}_{args.until_date}_{zoom}"
         subdir = dir_name_base + ("_no_fire" if args.neg else "_w_fire")
-
-    zoom = args.zoom if args.zoom else 13
 
     return args, ee_product, subdir, zoom

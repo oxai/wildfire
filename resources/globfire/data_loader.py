@@ -10,6 +10,7 @@ from resources.gee.methods import get_ee_product_name, get_ee_collection_from_pr
     get_ee_image_list_from_collection, get_ee_image_date
 from resources.gee.tile_loader_helper import save_ee_image
 from resources.globfire.data_loader_helper import get_arguments
+import pickle
 
 
 class GlobFireDataLoader(DataLoader):
@@ -21,6 +22,11 @@ class GlobFireDataLoader(DataLoader):
         self.load()
 
     def load(self):
+        pickle_path = os.path.join(self.data_dir(), "data.pk")
+        if os.path.exists(pickle_path):
+            with open(pickle_path, "rb") as f:
+                self.final, self.active = pickle.load(f)
+                return
         for root, dirs, files in os.walk(self.shp_dir):
             for file in files:
                 if ".shp" in file:
@@ -39,6 +45,8 @@ class GlobFireDataLoader(DataLoader):
 
                     self.final[key] = final_area
                     self.active[key] = active_area
+        with open(pickle_path, "wb") as f:
+            pickle.dump((self.final, self.active), f)
 
     def download(self, ee_product, duration: int, subdir="tmp", zoom=13):
         for _, final in self.final.items():
