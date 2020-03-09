@@ -1,21 +1,89 @@
-import sqlite3, os
+import ee
+import geopandas as gpd
 import pandas as pd
-from resources.base.fire_loader import FireLoader
+import os
+import time
+from datetime import datetime, timedelta
+from resources.base.data_loader import DataLoader
+from resources.gee.config import EE_CREDENTIALS
+from resources.gee.methods import get_ee_product_name, get_ee_collection_from_product, \
+    get_ee_image_list_from_collection, get_ee_image_date
+from resources.gee.tile_loader_helper import save_ee_image
+from resources.globfire.data_loader_helper import get_arguments
 
 
-class GlobFireDataLoader(FireLoader):
-
-    def __init__(self, filename="FPA_FOD_20170508.sqlite"):
-        self.cnx = sqlite3.connect(os.path.join(self.data_dir(), filename))
-        super().__init__()
+class GlobFireDataLoader(DataLoader):
+    def __init__(self, subdir="MODIS_BA_GLOBAL"):
+        super(GlobFireDataLoader, self).__init__()
+        self.shp_dir = self.data_subdir(subdir)
+        self.final = {}
+        self.active = {}
+        self.load()
 
     def load(self):
-        # Extract relevant info
-        df = pd.read_sql_query(
-            "SELECT LATITUDE, LONGITUDE, DISCOVERY_DATE, CONT_DATE, FIRE_SIZE FROM 'Fires'", self.cnx
-        )
-        # Create usable dates
-        df['START_DATE'] = pd.to_datetime(df['DISCOVERY_DATE'] - pd.Timestamp(0).to_julian_date(), unit='D')
-        df['END_DATE'] = pd.to_datetime(df['CONT_DATE'] - pd.Timestamp(0).to_julian_date(), unit='D')
-        df = df.drop(columns=["DISCOVERY_DATE", "CONT_DATE"])
-        return df
+        for root, dirs, files in os.walk(self.shp_dir):
+            for file in files:
+                if ".shp" in file:
+                    year = int(file[-8:-4])
+                    month = int(file.split('_')[-2])
+                    key = f'{year}-{month}'
+                    path = os.path.join(root, file)
+                    shp = gpd.read_file(path)
+
+                    active_area = shp[shp["Type"] == "ActiveArea"].drop(columns=['FDate'])\
+                        .rename(columns={'IDate': 'Date'}).dissolve(by=['Id', 'Date'])
+                    final_area = shp[shp["Type"] == "FinalArea"]
+                    final_area = final_area.assign(period=final_area.apply(
+                        lambda x: datetime.strptime(x['FDate'], '%Y-%m-%d') - datetime.strptime(x['IDate'], '%Y-%m-%d'),
+                        axis=1))
+
+                    self.final[key] = final_area
+                    self.active[key] = active_area
+
+    def download(self, ee_product, duration: int, subdir="tmp", zoom=13):
+        for _, final in self.final.items():
+            df = final[final['period'] >= timedelta(days=duration)].reset_index()
+            for _, record in df.iterrows():
+                bbox = record['geometry'].bounds
+                id = record['Id']
+                ignition_date = record['IDate']
+                finish_date = record['FDate']
+                ee_collection = get_ee_collection_from_product(ee_product, bbox, ignition_date, finish_date)
+                ee_images = get_ee_image_list_from_collection(ee_collection)
+                dates = [get_ee_image_date(ee_image) for ee_image in ee_images]
+                print(f"Fire id: {id}, number of images: {len(dates)}")
+                for date in dates:
+                    ee_image = ee_collection.median()
+                    bands = ee_product.get('bands', [ee_product['index']])
+                    image_id = self.image_id(id, ee_product, date)
+                    self.save(image_id, ee_image, bands, bbox, subdir=subdir, zoom=zoom)
+
+    def save(self, image_id, ee_image, bands, bbox, subdir="tmp", zoom=13, n_trials=3, sleep=1):
+        base_path = os.path.join(self.data_subdir(subdir), image_id)
+        if not os.path.exists(base_path + ".tif"):
+            for i in range(n_trials):
+                try:
+                    save_ee_image(base_path, ee_image, bands, image_id, bbox, zoom=zoom)
+                    print(f"Downloaded record ({i + 1} attempt{'s' if i else ''}). Image Id: {image_id}")
+                    break
+                except Exception as e:
+                    print(e)
+                    if i == n_trials - 1:
+                        print(f"Failed to download record ({i + 1} attempt{'s' if i else ''}). Image Id: {image_id}")
+                        return None
+                    time.sleep(sleep * 2 ** i)  # Sometimes request works on second try
+
+    def image_id(self, globfire_id, ee_product, date: str):
+        product_name = get_ee_product_name(ee_product)
+        return f"{globfire_id}__{product_name}__{date}"
+
+
+if __name__ == "__main__":
+    args, ee_product, subdir, zoom = get_arguments()
+
+    print("Initializing Google Earth Engine...")
+    ee.Initialize(EE_CREDENTIALS)
+
+    print("Loading GlobFire...")
+    loader = GlobFireDataLoader()
+    loader.download(ee_product, args.duration, subdir, zoom)
