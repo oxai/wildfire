@@ -60,7 +60,7 @@ class GlobFireDataLoader(DataLoader):
                 ee_images = get_ee_image_list_from_collection(ee_collection)
                 dates = [get_ee_image_date(ee_image) for ee_image in ee_images]
                 print(f"Fire id: {id}, number of images: {len(dates)}")
-                for date in dates:
+                for date in dates[5:-5:5]:
                     ee_image = ee_collection.median()
                     bands = ee_product.get('bands', [ee_product['index']])
                     image_id = self.image_id(id, ee_product, date)
