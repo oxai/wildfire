@@ -65,7 +65,7 @@ class GlobFireDataLoader(DataLoader):
                 ee_image = ee_collection.median()
                 bands = ee_product.get('bands', [ee_product['index']])
                 image_id = self.image_id(id, ee_product, date)
-                self.save(image_id, ee_image, bands, bbox, subdir=subdir, zoom=zoom)
+                self.save(image_id, ee_image, bands, bbox, save_dir=save_dir, subdir=subdir, zoom=zoom)
 
     def save(self, image_id, ee_image, bands, bbox, save_dir=None, subdir="tmp", zoom=13, n_trials=3, sleep=1):
         save_dir = self.data_subdir(subdir) if save_dir is None else os.path.join(save_dir, subdir)
