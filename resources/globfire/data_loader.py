@@ -71,7 +71,7 @@ class GlobFireDataLoader(DataLoader):
                 ee_image = ee_collection.filter(
                     ee.Filter.date(
                         date,
-                        (date.strptime("%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
+                        (datetime.strptime(date, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
                     )
                 ).median()
                 bands = ee_product.get('bands', [ee_product['index']])
