@@ -57,12 +57,23 @@ class GlobFireDataLoader(DataLoader):
                 ignition_date = record['IDate']
                 finish_date = record['FDate']
                 ee_collection = get_ee_collection_from_product(ee_product, bbox, ignition_date, finish_date)
-                ee_images = get_ee_image_list_from_collection(ee_collection)
-                dates = [get_ee_image_date(ee_image) for ee_image in ee_images]
-                print(f"Fire id: {id}, number of images: {len(dates)}")
+
+                ee_images = ee_collection.toList(ee_collection.size())
+                size = ee_collection.size().getInfo()
+                if size == 0:
+                    continue
+                ee_image = ee.Image(ee_images.get(size // 2))
+                date = get_ee_image_date(ee_image)
+                # ee_images = get_ee_image_list_from_collection(ee_collection)
+                # dates = [get_ee_image_date(ee_image) for ee_image in ee_images]
+                # print(f"Fire id: {id}, number of images: {len(dates)}")
                 # for date in dates[5:-5:5]:
-                date = dates[len(dates) // 2]
-                ee_image = ee_collection.median()
+                ee_image = ee_collection.filter(
+                    ee.Filter.date(
+                        date,
+                        (date.strptime("%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
+                    )
+                ).median()
                 bands = ee_product.get('bands', [ee_product['index']])
                 image_id = self.image_id(id, ee_product, date)
                 self.save(image_id, ee_image, bands, bbox, save_dir=save_dir, subdir=subdir, zoom=zoom)
