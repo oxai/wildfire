@@ -96,4 +96,5 @@ if __name__ == "__main__":
 
     print("Loading GlobFire...")
     loader = GlobFireDataLoader()
+    print('Loaded GlobFire')
     loader.download(ee_product, args.duration, args.dir, subdir, zoom)
