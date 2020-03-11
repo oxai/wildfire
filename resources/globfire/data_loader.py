@@ -48,7 +48,7 @@ class GlobFireDataLoader(DataLoader):
         with open(pickle_path, "wb") as f:
             pickle.dump((self.final, self.active), f)
 
-    def download(self, ee_product, duration: int, subdir="tmp", zoom=13):
+    def download(self, ee_product, duration: int, save_dir=None, subdir="tmp", zoom=13):
         for _, final in self.final.items():
             df = final[final['period'] >= timedelta(days=duration)].reset_index()
             for _, record in df.iterrows():
@@ -60,14 +60,16 @@ class GlobFireDataLoader(DataLoader):
                 ee_images = get_ee_image_list_from_collection(ee_collection)
                 dates = [get_ee_image_date(ee_image) for ee_image in ee_images]
                 print(f"Fire id: {id}, number of images: {len(dates)}")
-                for date in dates[5:-5:5]:
-                    ee_image = ee_collection.median()
-                    bands = ee_product.get('bands', [ee_product['index']])
-                    image_id = self.image_id(id, ee_product, date)
-                    self.save(image_id, ee_image, bands, bbox, subdir=subdir, zoom=zoom)
+                # for date in dates[5:-5:5]:
+                date = dates[len(dates) // 2]
+                ee_image = ee_collection.median()
+                bands = ee_product.get('bands', [ee_product['index']])
+                image_id = self.image_id(id, ee_product, date)
+                self.save(image_id, ee_image, bands, bbox, subdir=subdir, zoom=zoom)
 
-    def save(self, image_id, ee_image, bands, bbox, subdir="tmp", zoom=13, n_trials=3, sleep=1):
-        base_path = os.path.join(self.data_subdir(subdir), image_id)
+    def save(self, image_id, ee_image, bands, bbox, save_dir=None, subdir="tmp", zoom=13, n_trials=3, sleep=1):
+        save_dir = self.data_subdir(subdir) if save_dir is None else os.path.join(save_dir, subdir)
+        base_path = os.path.join(save_dir, image_id)
         if not os.path.exists(base_path + ".tif"):
             for i in range(n_trials):
                 try:
@@ -94,4 +96,4 @@ if __name__ == "__main__":
 
     print("Loading GlobFire...")
     loader = GlobFireDataLoader()
-    loader.download(ee_product, args.duration, subdir, zoom)
+    loader.download(ee_product, args.duration, args.dir, subdir, zoom)

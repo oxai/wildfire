@@ -32,6 +32,7 @@ def get_parser(globfire=False):
                         default='2015-01-01')
     parser.add_argument('--until_date', '-u', help="search records before this date: yyyy-mm-dd",
                         default='2019-12-31')
+    parser.add_argument('--dir', help="directory to save images", default=None)
     parser.add_argument('--subdir', help="directory to save images", default=None)
     parser.add_argument('--neg', action='store_true', help="store negative examples")
 
