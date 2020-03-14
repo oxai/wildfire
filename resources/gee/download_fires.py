@@ -43,6 +43,8 @@ def get_parser(globfire=False):
         parser.add_argument('--max_period', '-max', type=int,
                             help="maximum duration of the fire in days",
                             default=np.inf)
+        parser.add_argument('--limit_sample', '-lim', action='store_true',
+                            help="only download images in the middle of the duration of a fire")
     else:
         parser.add_argument('--img_size', '-sz', type=int,
                             help="tile size in pixels (default=256: standard size for map display). Should be of size 2^N.",

@@ -48,7 +48,7 @@ class GlobFireDataLoader(DataLoader):
         with open(pickle_path, "wb") as f:
             pickle.dump((self.final, self.active), f)
 
-    def download(self, ee_product, min_period: int, max_period: int, save_dir=None, subdir="tmp", zoom=13):
+    def download(self, ee_product, min_period: int, max_period: int, save_dir=None, subdir="tmp", zoom=13, limit_sample=False):
         for _, final in self.final.items():
             df = final[
                 final.apply(lambda x: timedelta(days=min_period) <= x['period'] <= timedelta(days=max_period), axis=1)
@@ -61,6 +61,10 @@ class GlobFireDataLoader(DataLoader):
 
                 dates = pd.date_range(ignition_date, finish_date)
                 print(f"Fire id: {id}, number of images: {len(dates)}")
+                if limit_sample:
+                    centre = len(dates) // 2
+                    dates = dates[centre - 3 : centre + 3]
+
                 for date in dates:
                     from_date = date
                     until_date = (date + timedelta(days=1))
@@ -103,4 +107,4 @@ if __name__ == "__main__":
     print("Loading GlobFire...")
     loader = GlobFireDataLoader()
     print('Loaded GlobFire')
-    loader.download(ee_product, args.min_period, args.max_period, args.dir, subdir, zoom)
+    loader.download(ee_product, args.min_period, args.max_period, args.dir, subdir, zoom, args.limit_sample)
