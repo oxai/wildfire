@@ -51,7 +51,7 @@ class GlobFireDataLoader(DataLoader):
     def download(self, ee_product, min_period: int, max_period: int, save_dir=None, subdir="tmp", zoom=13):
         for _, final in self.final.items():
             df = final[
-                final.apply(lambda x: timedelta(days=min_period) <= x['period'] <= timedelta(days=min_period), axis=1)
+                final.apply(lambda x: timedelta(days=min_period) <= x['period'] <= timedelta(days=max_period), axis=1)
             ].reset_index()
             for _, record in df.iterrows():
                 bbox = record['geometry'].bounds
