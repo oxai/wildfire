@@ -60,7 +60,7 @@ class GlobFireDataLoader(DataLoader):
                 finish_date = record['FDate']
 
                 dates = pd.date_range(ignition_date, finish_date)
-                print(f"Fire id: {id}, number of images: {len(dates)}")
+                print(f"Fire id: {id}, number of days: {len(dates)}")
                 if limit_sample:
                     centre = len(dates) // 2
                     dates = dates[centre-2:centre+2]
