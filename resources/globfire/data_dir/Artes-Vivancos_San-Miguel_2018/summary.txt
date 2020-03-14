@@ -1,0 +1,20 @@
+/* DATA DESCRIPTION:
+Citation:	Artés Vivancos, Tomàs; San-Miguel-Ayanz, Jesús (2018): Global Wildfire Database for GWIS. PANGAEA, https://doi.org/10.1594/PANGAEA.895835, 
+	Supplement to: Artés Vivancos, Tomàs; Oom, Duarte; de Rigo, Daniele; Houston Durrant, Tracy; Maianti, Pieralberto; Libertá, Giorgio; San-Miguel-Ayanz, Jesús (2019): A global wildfire dataset for the analysis of fire regimes and fire behaviour. Scientific Data, 6(1), https://doi.org/10.1038/s41597-019-0312-2
+Abstract:	Global Wildfire Database for GWIS. An individual fire event focused database. Post processing of MCD64A1 providing geometries of final fire perimeters including initial and final date and the corresponding daily active areas for each fire.
+	The data has been produced from MCD64A1 (global burnt areas MODIS). 
+	1) Two dumps of PostgreSQL tables. The first dump contains the final fire events (fire id, initial date, final date and a multipolygon geometry). The second one has the daily active areas of each fire (fire id, burnt date, multipolygon geometry).
+	Requires to create a user "User1" and the schema "nasa_modis_ba".
+	2) ESRI Shapefiles with the same information (splitted by months and year):
+	There is an additional field, called FireType which makes reference to the final perimeter of the fire. This field could be:
+	FinalArea: Makes reference to the final perimeter of the fire event.
+	ActiveArea: Daily active areas for a given fire.
+Coverage:	DATE/TIME START: 2000-11-01T00:00:00 * DATE/TIME END: 2018-06-30T00:00:00
+Comment:	This dataset uses MCD64A1 Collection 6 MODIS Burned Area Product v6.
+License:	Creative Commons Attribution-ShareAlike 4.0 International (CC-BY-SA-4.0)
+Size:	2 datasets
+*/
+/* TABULAR SUMMARY OF DATASETS LISTED IN THIS COLLECTION: */
+Filename	Citation of child dataset
+ESRI-GIS_GWIS_wildfire.tab	Artés Vivancos, Tomàs; San-Miguel-Ayanz, Jesús (2018): Global Wildfire Database for GWIS - ESRI Shapefiles in monthly resolution. https://doi.org/10.1594/PANGAEA.895898
+PostgreSQL_GWIS_wildfire.tab	Artés Vivancos, Tomàs; San-Miguel-Ayanz, Jesús (2018): Global Wildfire Database for GWIS - PostgreSQL dumps. https://doi.org/10.1594/PANGAEA.895833

@@ -1,0 +1,15 @@
+/* DATA DESCRIPTION:
+Citation:	Artés Vivancos, Tomàs; San-Miguel-Ayanz, Jesús (2018): Global Wildfire Database for GWIS - PostgreSQL dumps. PANGAEA, https://doi.org/10.1594/PANGAEA.895833, 
+	In supplement to: Artés Vivancos, Tomàs; Oom, Duarte; de Rigo, Daniele; Houston Durrant, Tracy; Maianti, Pieralberto; Libertá, Giorgio; San-Miguel-Ayanz, Jesús (2019): A global wildfire dataset for the analysis of fire regimes and fire behaviour. Scientific Data, 6(1), https://doi.org/10.1038/s41597-019-0312-2
+Parameter(s):	File content (Content) * PI: Artés Vivancos, Tomàs (https://orcid.org/0000-0002-4105-5468, artes.tomas@gmail.com)
+	File format (File format) * PI: Artés Vivancos, Tomàs (https://orcid.org/0000-0002-4105-5468, artes.tomas@gmail.com)
+	File size [kByte] (File size) * PI: Artés Vivancos, Tomàs (https://orcid.org/0000-0002-4105-5468, artes.tomas@gmail.com)
+	File name (File name) * PI: Artés Vivancos, Tomàs (https://orcid.org/0000-0002-4105-5468, artes.tomas@gmail.com)
+	Uniform resource locator/link to file (URL file) * PI: Artés Vivancos, Tomàs (https://orcid.org/0000-0002-4105-5468, artes.tomas@gmail.com)
+License:	Creative Commons Attribution-ShareAlike 4.0 International (CC-BY-SA-4.0)
+Size:	15 data points
+*/
+Content	File format	File size [kByte]	File name	URL file
+MODIS GWIS daily active areas of each fire (fire id, burnt date, multipolygon geometry)	zipped SQL database	2305479.050	MODIS_GWIS_Active_FireEvents.zip	http://hs.pangaea.de/Maps/MCD64A1_burnt-areas/MODIS_GWIS_Active_FireEvents.zip
+MODIS GWIS final fire events (fire id, initial date, final date and a multipolygon geometry)	zipped SQL database	1037599.152	MODIS_GWIS_Final_FireEvents.zip	http://hs.pangaea.de/Maps/MCD64A1_burnt-areas/MODIS_GWIS_Final_FireEvents.zip
+README	TXT	0.309	Readme.txt	http://hs.pangaea.de/Maps/MCD64A1_burnt-areas/Readme.txt

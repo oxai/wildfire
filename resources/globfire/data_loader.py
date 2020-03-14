@@ -63,7 +63,7 @@ class GlobFireDataLoader(DataLoader):
                 print(f"Fire id: {id}, number of images: {len(dates)}")
                 if limit_sample:
                     centre = len(dates) // 2
-                    dates = dates[centre - 3 : centre + 3]
+                    dates = dates[centre-2:centre+2]
 
                 for date in dates:
                     from_date = date

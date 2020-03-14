@@ -1,8 +1,13 @@
-/.idea/
+.idea
 **/data_dir/*
 !**/data_dir/examples/
 !**/data_dir/examples/*
-/.pytest_cache/
+!resources/globfire/data_dir/Artes-Vivancos_San-Miguel_2018/
+!resources/globfire/data_dir/Artes-Vivancos_San-Miguel_2018/**
+!resources/globfire/data_dir/MODIS_BA_GLOBAL/
+resources/globfire/data_dir/MODIS_BA_GLOBAL/**
+!resources/globfire/data_dir/MODIS_BA_GLOBAL/.gitkeep
+.pytest_cache
 **/.ipynb_checkpoints/
 tags
 **/__pycache__/
