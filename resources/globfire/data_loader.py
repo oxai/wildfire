@@ -48,35 +48,39 @@ class GlobFireDataLoader(DataLoader):
         with open(pickle_path, "wb") as f:
             pickle.dump((self.final, self.active), f)
 
-    def download(self, ee_product, duration: int, save_dir=None, subdir="tmp", zoom=13):
+    def download(self, ee_product, min_period: int, max_period: int, save_dir=None, subdir="tmp", zoom=13):
         for _, final in self.final.items():
-            df = final[final['period'] >= timedelta(days=duration)].reset_index()
+            df = final[
+                final.apply(lambda x: timedelta(days=min_period) <= x['period'] <= timedelta(days=min_period), axis=1)
+            ].reset_index()
             for _, record in df.iterrows():
                 bbox = record['geometry'].bounds
                 id = record['Id']
                 ignition_date = record['IDate']
                 finish_date = record['FDate']
-                ee_collection = get_ee_collection_from_product(ee_product, bbox, ignition_date, finish_date)
 
-                ee_images = ee_collection.toList(ee_collection.size())
-                size = ee_collection.size().getInfo()
-                if size == 0:
-                    continue
-                ee_image = ee.Image(ee_images.get(size // 2))
-                date = get_ee_image_date(ee_image)
+                # ee_images = ee_collection.toList(ee_collection.size())
+                # size = ee_collection.size().getInfo()
+                # if size == 0:
+                #     continue
+                # ee_image = ee.Image(ee_images.get(size // 2))
+                # date = get_ee_image_date(ee_image)
                 # ee_images = get_ee_image_list_from_collection(ee_collection)
                 # dates = [get_ee_image_date(ee_image) for ee_image in ee_images]
                 # print(f"Fire id: {id}, number of images: {len(dates)}")
-                # for date in dates[5:-5:5]:
-                ee_image = ee_collection.filter(
-                    ee.Filter.date(
-                        date,
-                        (datetime.strptime(date, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
-                    )
-                ).median()
-                bands = ee_product.get('bands', [ee_product['index']])
-                image_id = self.image_id(id, ee_product, date)
-                self.save(image_id, ee_image, bands, bbox, save_dir=save_dir, subdir=subdir, zoom=zoom)
+                dates = pd.date_range(ignition_date, finish_date)
+                centre = len(dates)//2
+                for date in dates[centre-3:centre+3]:
+                    from_date = date
+                    until_date = (date + timedelta(days=1))
+                    ee_collection_for_date = get_ee_collection_from_product(ee_product, bbox, from_date, until_date)
+                    n_images = ee_collection_for_date.size().getInfo()
+                    if n_images == 0:
+                        continue
+                    ee_image = ee_collection_for_date.median()
+                    bands = ee_product.get('bands', [ee_product['index']])
+                    image_id = self.image_id(id, ee_product, date.strftime("%Y-%m-%d"))
+                    self.save(image_id, ee_image, bands, bbox, save_dir=save_dir, subdir=subdir, zoom=zoom)
 
     def save(self, image_id, ee_image, bands, bbox, save_dir=None, subdir="tmp", zoom=13, n_trials=3, sleep=1):
         save_dir = self.data_subdir(subdir) if save_dir is None else os.path.join(save_dir, subdir)
@@ -108,4 +112,4 @@ if __name__ == "__main__":
     print("Loading GlobFire...")
     loader = GlobFireDataLoader()
     print('Loaded GlobFire')
-    loader.download(ee_product, args.duration, args.dir, subdir, zoom)
+    loader.download(ee_product, args.min_period, args.max_period, args.dir, subdir, zoom)

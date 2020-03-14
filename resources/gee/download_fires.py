@@ -37,9 +37,12 @@ def get_parser(globfire=False):
     parser.add_argument('--neg', action='store_true', help="store negative examples")
 
     if globfire:
-        parser.add_argument('--duration', '-d', type=int,
-                            help="threshold of the duration of the fire in days",
+        parser.add_argument('--min_period', '-min', type=int,
+                            help="minimum duration of the fire in days",
                             default=30)
+        parser.add_argument('--max_period', '-max', type=int,
+                            help="maximum duration of the fire in days",
+                            default=np.inf)
     else:
         parser.add_argument('--img_size', '-sz', type=int,
                             help="tile size in pixels (default=256: standard size for map display). Should be of size 2^N.",
