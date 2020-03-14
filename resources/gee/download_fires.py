@@ -39,10 +39,10 @@ def get_parser(globfire=False):
     if globfire:
         parser.add_argument('--min_period', '-min', type=int,
                             help="minimum duration of the fire in days",
-                            default=30)
+                            default=0)
         parser.add_argument('--max_period', '-max', type=int,
                             help="maximum duration of the fire in days",
-                            default=np.inf)
+                            default=1e9)
         parser.add_argument('--limit_sample', '-lim', action='store_true',
                             help="only download images in the middle of the duration of a fire")
     else:
