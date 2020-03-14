@@ -59,18 +59,9 @@ class GlobFireDataLoader(DataLoader):
                 ignition_date = record['IDate']
                 finish_date = record['FDate']
 
-                # ee_images = ee_collection.toList(ee_collection.size())
-                # size = ee_collection.size().getInfo()
-                # if size == 0:
-                #     continue
-                # ee_image = ee.Image(ee_images.get(size // 2))
-                # date = get_ee_image_date(ee_image)
-                # ee_images = get_ee_image_list_from_collection(ee_collection)
-                # dates = [get_ee_image_date(ee_image) for ee_image in ee_images]
-                # print(f"Fire id: {id}, number of images: {len(dates)}")
                 dates = pd.date_range(ignition_date, finish_date)
-                centre = len(dates)//2
-                for date in dates[centre-3:centre+3]:
+                print(f"Fire id: {id}, number of images: {len(dates)}")
+                for date in dates:
                     from_date = date
                     until_date = (date + timedelta(days=1))
                     ee_collection_for_date = get_ee_collection_from_product(ee_product, bbox, from_date, until_date)
