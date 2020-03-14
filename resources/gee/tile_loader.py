@@ -1,6 +1,7 @@
 from resources.base.data_loader import DataLoader
-from .methods import get_ee_image_from_product, get_ee_product_name, get_ee_collection_from_product, get_ee_image_date, \
-    get_ee_image_list_from_collection
+from resources.utils.gis import get_bbox_corners_for_tile
+from .methods import get_ee_product_name, get_ee_image_date, \
+    get_ee_image_list_from_collection, get_ee_image_for_tile, get_ee_collection_for_tile
 import os
 from tifffile import imread
 from .tile_loader_helper import TileDateRangeQuery, save_gee_tile
@@ -47,7 +48,7 @@ class GeeProductTileLoader(DataLoader):
 
     def save(self, ee_product, query: TileDateRangeQuery, subdir="tmp", n_trials=3, sleep=1):
         image_id = self.image_id(ee_product, query)
-        ee_image = get_ee_image_from_product(ee_product, query)
+        ee_image = get_ee_image_for_tile(ee_product, query)
         bands = ee_product.get('bands', [ee_product['index']])
         return self.image_loader.save(image_id, ee_image, bands, query, subdir=subdir, n_trials=n_trials, sleep=sleep)
 
@@ -67,7 +68,7 @@ class GeeProductTileSeriesLoader(GeeProductTileLoader):
 
     def save(self, ee_product, q: TileDateRangeQuery, subdir="tmp", n_trials=3, sleep=1):
         paths = []
-        ee_collection = get_ee_collection_from_product(ee_product, q)
+        ee_collection = get_ee_collection_for_tile(ee_product, q)
         ee_images = get_ee_image_list_from_collection(ee_collection)
         dates = [get_ee_image_date(ee_image) for ee_image in ee_images]
         for date in pd.date_range(q.date_from, q.date_to):

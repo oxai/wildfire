@@ -16,33 +16,48 @@ from .config import EE_CREDENTIALS
 from datetime import timedelta
 
 
-def get_parser():
+def get_parser(globfire=False):
     parser = argparse.ArgumentParser(description="Parse inputs")
     parser.add_argument('platform', help="satellite category ('landsat', 'sentinel', 'modis', etc.)")
     parser.add_argument('sensor', help="sensor type (landsat '8', sentinel '2', modis 'terra', etc.)")
     parser.add_argument('product', help="product name ('surface', 'ndvi', 'snow', 'temperature', etc.)")
-    parser.add_argument('fire_record',
-                        help="fire records that has latitude, longitude and time (fpa_fod / modis / manual)")
+
+    if not globfire:
+        parser.add_argument('fire_record',
+                            help="fire records that has latitude, longitude and time (fpa_fod / modis / manual)")
+
     parser.add_argument('--zoom', '-z', type=int,
-                        help="zoom level (default=13: tile width 4888 m at equator)", default=None)
-    parser.add_argument('--img_size', '-sz', type=int,
-                        help="tile size in pixels (default=256: standard size for map display). Should be of size 2^N.",
-                        default=256)
-    parser.add_argument('--neg', action='store_true', help="store negative examples")
-    parser.add_argument('--display', action='store_true', help="display downloaded images")
-    parser.add_argument('--from_date', '-from', help="search records after this date: yyyy-mm-dd",
+                        help="zoom level (default: automatically evaluated to make scale~=20 m / pixel)", default=None)
+    parser.add_argument('--from_date', '-f', help="search records after this date: yyyy-mm-dd",
                         default='2015-01-01')
-    parser.add_argument('--until_date', '-until', help="search records before this date: yyyy-mm-dd",
-                        default='2015-12-31')
-    parser.add_argument('--bbox', '-b', metavar=('lng_left', 'lat_lower', 'lng_right', 'lat_upper'), type=float,
-                        nargs=4,
-                        default=[-120, 30, -85, 45],
-                        help="search records in this region: "
-                             "[lng_left, lat_lower, lng_right, lat_upper]")
-    parser.add_argument('--n_samples', '-n', type=int, help="number of samples", default=100)
-    parser.add_argument('--min_fire_size', '-fs', type=float, help="fire size threshold", default=0)
-    parser.add_argument('--confidence', '-c', type=float, help="confidence", default=0)
+    parser.add_argument('--until_date', '-u', help="search records before this date: yyyy-mm-dd",
+                        default='2019-12-31')
+    parser.add_argument('--dir', help="directory to save images", default=None)
     parser.add_argument('--subdir', help="directory to save images", default=None)
+    parser.add_argument('--neg', action='store_true', help="store negative examples")
+
+    if globfire:
+        parser.add_argument('--min_period', '-min', type=int,
+                            help="minimum duration of the fire in days",
+                            default=30)
+        parser.add_argument('--max_period', '-max', type=int,
+                            help="maximum duration of the fire in days",
+                            default=np.inf)
+        parser.add_argument('--limit_sample', '-lim', action='store_true',
+                            help="only download images in the middle of the duration of a fire")
+    else:
+        parser.add_argument('--img_size', '-sz', type=int,
+                            help="tile size in pixels (default=256: standard size for map display). Should be of size 2^N.",
+                            default=256)
+        parser.add_argument('--display', action='store_true', help="display downloaded images")
+        parser.add_argument('--bbox', '-b', metavar=('lng_left', 'lat_lower', 'lng_right', 'lat_upper'), type=float,
+                            nargs=4,
+                            default=[-120, 30, -85, 45],
+                            help="search records in this region: "
+                                 "[lng_left, lat_lower, lng_right, lat_upper]")
+        parser.add_argument('--n_samples', '-n', type=int, help="number of samples", default=100)
+        parser.add_argument('--min_fire_size', '-fs', type=float, help="fire size threshold", default=0)
+        parser.add_argument('--confidence', '-c', type=float, help="confidence", default=0)
     return parser
 
 
