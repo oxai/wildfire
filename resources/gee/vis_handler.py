@@ -86,7 +86,7 @@ def normalise_image(image, vis_params):
 
 def array_to_image(image):
     if image.shape[0] == 3:
-        image = np.concatenate([image, np.ones((1, 256, 256))], axis=0)
+        image = np.concatenate([image, np.ones((1, image.shape[1], image.shape[2]))], axis=0)
     image = (image.clip(0, 1) * 255).astype('uint8').transpose(1, 2, 0)
     return Image.fromarray(image, 'RGBA')
 

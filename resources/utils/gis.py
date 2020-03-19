@@ -54,7 +54,7 @@ def get_bbox_corners_from_radius(lat_c, lng_c, r=1000):
     return [X - dX, Y - dY, X + dX, Y + dY]
 
 
-def get_tile_pixel_scale_from_zoom(zoom, tile_size):
+def get_tile_pixel_scale_from_zoom(zoom, tile_size=256):
     R = 6378137
     L = 2 * np.pi * R
     return L * 0.5 ** zoom / tile_size

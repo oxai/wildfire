@@ -34,21 +34,18 @@ def get_ee_product_name(ee_product):
     return ee_product['collection'].replace('/', '-')
 
 
-def get_ee_collection_from_product(ee_product, q: TileDateRangeQuery):
+def get_ee_collection_from_product(ee_product, bbox: tuple or list, from_date: str, until_date: str):
     """
     Get tile url for image collection asset.
     """
-    if not q.date_from or not q.date_to:
-        raise Exception("Too many images to handle. Define data_from and date_to")
-
     collection = ee_product['collection']
     cloud_mask = ee_product.get('cloud_mask', None)
 
-    geometry = ee.Geometry.Rectangle(get_bbox_corners_for_tile(q.x, q.y, q.z))
+    geometry = ee.Geometry.Rectangle(bbox)
 
     ee_collection = ee.ImageCollection(collection)\
         .filter(
-            ee.Filter.date(q.date_from, q.date_to)
+            ee.Filter.date(from_date, until_date)
         )\
         .filterBounds(geometry)
 
@@ -60,8 +57,13 @@ def get_ee_collection_from_product(ee_product, q: TileDateRangeQuery):
     return ee_collection
 
 
-def get_ee_image_from_product(ee_product, q: TileDateRangeQuery):
-    ee_collection = get_ee_collection_from_product(ee_product, q)
+def get_ee_collection_for_tile(ee_product, q: TileDateRangeQuery):
+    bbox = get_bbox_corners_for_tile(x_tile=q.x, y_tile=q.y, zoom=q.z)
+    return get_ee_collection_from_product(ee_product, bbox, q.date_from, q.date_to)
+
+
+def get_ee_image_for_tile(ee_product, q: TileDateRangeQuery):
+    ee_collection = get_ee_collection_for_tile(ee_product, q)
     ee_image = getattr(ee_collection, q.reducer)()
     return ee_image
 
