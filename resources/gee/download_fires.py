@@ -71,7 +71,13 @@ def get_arguments():
 
     return args, ee_product, subdir, fire_loader
 
-
+# fire_loader :: instance of the class "base/fire_loader.py"
+# ee_product :: a dictionary (from get_ee_product())
+# bbox :: a 4-tuple/list of lng_left, lat_lower, lng_right, lat_upper
+# from_date :: string of YYYY/MM/DD
+# until_date :: as above
+# n_samples :: integer
+# sub_dir :: string - where to save the images
 def download_fire_images(fire_loader, ee_product, bbox, from_date, until_date, n_samples, subdir, pos_examples=True,
                          min_fire_size=0.0, confidence=0.0, zoom=13, img_size=256, display=True):
 

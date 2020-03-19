@@ -23,7 +23,9 @@ def image_to_map_id(ee_image, vis_params=None):
     }
     return map_id_params
 
-
+# platform :: string - keys from products.py
+# sensor :: as above
+# product :: as above
 def get_ee_product(platform, sensor, product):
     return EE_PRODUCTS[platform][sensor][product]
 
