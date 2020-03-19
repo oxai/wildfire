@@ -12,7 +12,7 @@ class FireLoader(DataLoader):
     def __init__(self, *args, **kwargs):
         super().__init__()
         self.df = self.load(*args, **kwargs)
-        self.date_range_known = "START_DATE" in self.df or "END_DATE" in self.df
+        self.date_range_known = "START_DATE" in self.df.keys() or "END_DATE" in self.df.keys()
 
     def load(self, *args, **kwargs):
         """
@@ -24,24 +24,24 @@ class FireLoader(DataLoader):
         raise NotImplementedError
 
     def get_records_in_range(self, bbox=None, from_date=None, until_date=None, min_fire_size=0.0, confidence_thresh=0.0):
-        path = os.path.join(self.data_dir(), f"{bbox}_{from_date}_{until_date}_{min_fire_size}.pk")
-        if os.path.exists(path):
-            with open(path, "rb") as f:
-                df = pickle.load(f)
-            return df
+        # path = os.path.join(self.data_dir(), f"{bbox}_{from_date}_{until_date}_{min_fire_size}_{confidence_thresh}.pk")
+        # if os.path.exists(path):
+        #     with open(path, "rb") as f:
+        #         df = pickle.load(f)
+        #     return df
         loc_cond = latlng_condition(self.df, bbox)
         date_cond = \
             dates_overlap(self.df, from_date, until_date) if self.date_range_known \
             else df_date_in_range(self.df["DATE"], from_date, until_date)
         fire_cond = \
-            self.df["FIRE_SIZE"] >= min_fire_size if "FIRE_SIZE" in self.df \
+            self.df["FIRE_SIZE"] >= min_fire_size if "FIRE_SIZE" in self.df.keys() \
             else self.df.apply(lambda x: True, axis=1)
         conf_cond = \
-            self.df["CONFIDENCE"] >= confidence_thresh if "CONFIDENCE" in self.df \
+            self.df["CONFIDENCE"] >= confidence_thresh if "CONFIDENCE" in self.df.keys() \
             else self.df.apply(lambda x: True, axis=1)
         df = self.df[loc_cond & date_cond & fire_cond & conf_cond].copy()
-        with open(path, "wb") as f:
-            pickle.dump(df, f)
+        # with open(path, "wb") as f:
+        #     pickle.dump(df, f)
         return df
 
     def get_records_on_date(self, date, bbox=None, min_fire_size=0.0, confidence_thresh=0.0):
@@ -50,10 +50,10 @@ class FireLoader(DataLoader):
             date_in_range(date, self.df["START_DATE"], self.df["END_DATE"]) if self.date_range_known \
             else self.df["DATE"] == date
         fire_cond = \
-            self.df["FIRE_SIZE"] >= min_fire_size if "FIRE_SIZE" in self.df \
+            self.df["FIRE_SIZE"] >= min_fire_size if "FIRE_SIZE" in self.df.keys() \
             else self.df["index"].apply(lambda x: True)
         conf_cond = \
-            self.df["CONFIDENCE"] >= confidence_thresh if "CONFIDENCE" in self.df \
+            self.df["CONFIDENCE"] >= confidence_thresh if "CONFIDENCE" in self.df.keys() \
             else self.df["index"].apply(lambda x: True)
         return self.df[loc_cond & date_cond & fire_cond & conf_cond].copy()
 

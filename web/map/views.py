@@ -42,12 +42,12 @@ def gee_mapserver(request, platform, sensor, product, method, z, x, y, from_date
 
 
 def fpa_fod_fire_location(request, from_date, until_date, min_fire_size):
-    df = fpa_fod_loader.get_records(from_date=from_date, until_date=until_date, min_fire_size=min_fire_size)
+    df = fpa_fod_loader.get_records_in_range(from_date=from_date, until_date=until_date, min_fire_size=min_fire_size)
     loc = [{"lat": lat, "lng": lng} for lat, lng in zip(df["LATITUDE"], df["LONGITUDE"])]
     return JsonResponse(loc, safe=False)
 
 
 def modis_fire_location(request, from_date, until_date, confidence):
-    df = modis_fire_loader.get_records(from_date=from_date, until_date=until_date, confidence_thresh=confidence)
+    df = modis_fire_loader.get_records_in_range(from_date=from_date, until_date=until_date, confidence_thresh=confidence)
     loc = [{"lat": lat, "lng": lng} for lat, lng in zip(df["LATITUDE"], df["LONGITUDE"])]
     return JsonResponse(loc, safe=False)

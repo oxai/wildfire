@@ -103,7 +103,7 @@ def vis_default(ee_product, image, vis_params):
         palette = vis_params.get('palette', None)
         out = apply_palette(image, palette)
     if vis_params.get('alpha', True):
-        if 'cloud_mask' in bands:
+        if bands and 'cloud_mask' in bands:
             out[-1] = get_band(ee_product, image, 'cloud_mask')
         else:
             out[-1] = np.where(image.sum(axis=0) > 0, 1, 0)

@@ -7,7 +7,7 @@ export class SatelliteMap {
     markers = [];
 
     constructor() {
-        const googleMapsKey = 'AIzaSyAccl3rn73OcqenWNmTNYM8-7rfBS4xKMM';
+        const googleMapsKey = 'AIzaSyD9rdeB16ByYofOMRAaTZcB60QVHP-_iAs';
         this.loader = new Loader(googleMapsKey, {});
     }
 
