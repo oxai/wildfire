@@ -168,9 +168,20 @@ def get_fire_levels(B2, B3, B4, B8, B12):
     return [R, G, B], [R, G + 0.5, B]
 
 
+def get_veg_levels(B2, B3, B4, B8, B12):
+    R = stretch((2.1 * B4 + 0.5 * B12), 0.01, 0.99)
+    G = stretch((2.2 * B3 + 0.5 * B8), 0.01, 0.99) + 0.1
+    B = stretch(3.2 * B2, 0.01, 0.99)
+    return np.array([R, G, B]), np.array([R*0.7, G*1.1, B*1.1])
+
+
 def get_fire_indicator(B11, B12, sensitivity=1.0):
     # Increase sensitivity for more possible fires and more wrong indications
     return (B11 + B12) * sensitivity
+
+
+def get_veg_indicator(B4, B8):
+    return (B4 - B8)/(B4 + B8)
 
 
 def vis_s2_fire(ee_product, image, vis_params):
@@ -182,6 +193,19 @@ def vis_s2_fire(ee_product, image, vis_params):
 
     combined_array = np.where(fire_index > 1.0, some_fire_array, no_fire_array)
     combined_array = np.where(fire_index > 2.0, lots_fire_array, combined_array)
+    return array_to_image(combined_array)
+
+
+def vis_s2_veg(ee_product, image, vis_params):
+    B2, B3, B4, B8, B11, B12 = get_bands(ee_product, image, ['B2', 'B3', 'B4', 'B8', 'B11', 'B12'])
+    veg_index = get_veg_indicator(B4, B8)
+    some_veg_array, lots_veg_array = get_veg_levels(B2, B3, B4, B8, B12)
+
+    no_veg_array = vis_natural_nirswirmix(B2, B3, B4, B8, B12)
+
+    #import pdb; pdb.set_trace()
+    combined_array = np.where(veg_index > 0.2, some_veg_array, no_veg_array)
+    combined_array = np.where(veg_index > 0.4, lots_veg_array, combined_array)
     return array_to_image(combined_array)
 
 
