@@ -1,7 +1,23 @@
+# vis_default
+#
+#
+# vis_s2_nbr - "level"
+# vis_s2_fire - get_fire_indicator
+# vis_s2_firethresh - (B11 + B12) / 4
+
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
+
+
+def get_visualisers_and_conf():
+    return vis_default, {("s2_nbr", "vis"): vis_s2_nbr,
+                         ("s2_nbr", "conf"): get_conf_s2_nbr,
+                         ("s2_fire", "vis"): vis_s2_fire,
+                         ("s2_fire", "conf"): get_conf_s2_fire,
+                         ("s2_firethresh", "vis"): vis_s2_firethresh,
+                         ("s2_firethresh", "conf"): get_conf_s2_firethresh}
 
 
 def get_empty_image(shape=(256, 256, 4)):
@@ -121,6 +137,10 @@ def vis_nbr(nir, swir, alpha):
     return array_to_image(out)
 
 
+def get_conf_s2_nbr(ee_product, image, vis_params):
+    nir, swir, mask = get_bands(ee_product, image, ['B5', 'B7', 'cloud_mask'])
+    return (nir - swir) / (nir + swir + 1e-9)
+
 def vis_s2_nbr(ee_product, image, vis_params):
     NIR, SWIR, mask = get_bands(ee_product, image, ['B8', 'B12', 'cloud_mask'])
     return vis_nbr(NIR, SWIR, mask)
@@ -173,6 +193,10 @@ def get_fire_indicator(B11, B12, sensitivity=1.0):
     return (B11 + B12) * sensitivity
 
 
+def get_conf_s2_fire(ee_product, image, vis_params):
+    B2, B3, B4, B8, B11, B12 = get_bands(ee_product, image, ['B2', 'B3', 'B4', 'B8', 'B11', 'B12'])
+    return get_fire_indicator(B11, B12)
+
 def vis_s2_fire(ee_product, image, vis_params):
     B2, B3, B4, B8, B11, B12 = get_bands(ee_product, image, ['B2', 'B3', 'B4', 'B8', 'B11', 'B12'])
     fire_index = get_fire_indicator(B11, B12)
@@ -182,8 +206,13 @@ def vis_s2_fire(ee_product, image, vis_params):
 
     combined_array = np.where(fire_index > 1.0, some_fire_array, no_fire_array)
     combined_array = np.where(fire_index > 2.0, lots_fire_array, combined_array)
+
     return array_to_image(combined_array)
 
+
+def get_conf_s2_firethresh(ee_product, image, vis_params):
+    B11, B12, mask = get_bands(ee_product, image, ['B11', 'B12', 'cloud_mask'])
+    return B11 + B12 / 4
 
 def vis_s2_firethresh(ee_product, image, vis_params):
     B11, B12, mask = get_bands(ee_product, image, ['B11', 'B12', 'cloud_mask'])
