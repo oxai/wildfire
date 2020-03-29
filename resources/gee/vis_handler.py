@@ -207,6 +207,7 @@ def get_veg_levels(B2, B3, B4, B8, B12):
     return np.array([R, G, B]), np.array([R*0.7, G*1.1, B*1.1])
 
 
+# Functions to compute masks from metrics
 def get_fire_indicator(B11, B12, sensitivity=1.0):
     # Increase sensitivity for more possible fires and more wrong indications
     return (B11 + B12) * sensitivity
@@ -219,13 +220,12 @@ def get_nbr_indicator(B8, B12):
     return (B8 - B12)/(B8 + B12 + 1e-9)
 
 def get_veg_indicator(B4, B8):
-    return (B4 - B8)/(B4 + B8)
+    raw = (B4 - B8)/(B4 + B8)
+    return raw*2 + .7 # Scale to fit 1,2 thresholds, .15-->1, .65-->2
 
+def get_nbr_indicator(B8, B12):
+    return (B8 - B12)/(B8 + B12 + 1e-9)
 
-def vis_s2_fire(ee_product, image, vis_params):
-    B2, B3, B4, B8, B11, B12 = get_bands(ee_product, image, ['B2', 'B3', 'B4', 'B8', 'B11', 'B12'])
-    fire_index = get_fire_indicator(B11, B12)
-    some_fire_array, lots_fire_array = get_fire_levels(B2, B3, B4, B8, B12)
 
 
 def vis_from_indicator(ee_product, image, vis_params, ind_func, ind_bands, l_func, comp_image):
