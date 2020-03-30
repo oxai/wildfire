@@ -1,14 +1,16 @@
 import tkinter as tk
-
 from tkinter.font import Font
+
+import ee
+import numpy as np
+import os
+import random
 from PIL import ImageTk, Image
 from tifffile import imread
-import ee, random, os
+
 from resources.gee.config import EE_CREDENTIALS
 from resources.gee.methods import get_ee_product
 from resources.gee.vis_handler import get_visualisers_and_conf
-import numpy as np
-from scipy.ndimage import binary_erosion
 
 os.chdir("..")
 
@@ -47,12 +49,12 @@ class TIF_Panel(tk.Canvas):
         out.thumbnail((self.width, self.height))
 
         self.cur_tk_img = ImageTk.PhotoImage(out)
-        self.imagesprite = self.create_image(self.width / 2, self.height / 2, image=self.cur_tk_img)
+        self.imagesprite = self.create_image(self.width // 2, self.height // 2, image=self.cur_tk_img)
 
         self.overlay_pil = self.render_binary_mask_as_PIL(self.generate_np_bin_mask(im_arr_0to1, threshold))
         self.overlay_pil.thumbnail((self.width, self.height))
         self.overlay = ImageTk.PhotoImage(self.overlay_pil)
-        self.overlaysprite = self.create_image(self.width / 2, self.height / 2, image=self.overlay)
+        self.overlaysprite = self.create_image(self.width // 2, self.height // 2, image=self.overlay)
 
     def render_binary_mask_as_PIL(self, binary_mask, colour_rgb=[255, 0, 255]):
         assert (len(binary_mask.shape) == 2)

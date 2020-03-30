@@ -18,7 +18,7 @@ def get_visualisers_and_conf():
                          ("s2_fire", "conf"): get_conf_s2_fire,
                          ("s2_firethresh", "vis"): vis_s2_firethresh,
                          ("s2_firethresh", "conf"): get_conf_s2_firethresh}
-
+    1
 
 def get_empty_image(shape=(256, 256, 4)):
     image = np.zeros(shape, dtype='uint8')
