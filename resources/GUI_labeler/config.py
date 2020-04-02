@@ -20,9 +20,16 @@ def get_ee_session() -> dict:
     return ee_product
 
 
+# The type of a Visualiser Function
 Visualiser_Func = Callable[[dict, np.ndarray, dict], Image.Image]
 
 ee_product = get_ee_session()
+
+# Paths to the directories of labelled and unlabelled data
+# paths should be relative cwd = es-wildfire and end in "/"
+# e.g. "resources/GUI_labeler/data/unlabeled/"
+unlabeled_dir = "resources/GUI_labeler/data/unlabeled/"
+labeled_dir = "resources/GUI_labeler/data/labeled/"
 
 # This should specify a function for turning an np array (from tifffle.imread) into a
 # 3 deep np array representing RGB channels
