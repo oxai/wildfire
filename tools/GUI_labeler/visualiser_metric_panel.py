@@ -1,15 +1,16 @@
-from PIL import ImageTk
-from tifffile import imread
 import tkinter as tk
 
-from resources.GUI_labeler.PIL_helpers import *
-from resources.GUI_labeler.tk_ui_helpers import make_option_menu
-from resources.GUI_labeler.config import colours, ee_product, vis_conf_dict
+from PIL import ImageTk
+from tifffile import imread
+
+from tools.GUI_labeler.mask_helpers import *
+from tools.GUI_labeler.config import colours, ee_product, vis_conf_dict
+from tools.GUI_labeler.tk_ui_helpers import make_option_menu
 
 
 class Visualiser_Panel(tk.Frame):
 
-    def __init__(self, master, total_size=(256, 256), default_filt_name=None, mask_colour=[255, 255, 255]):
+    def __init__(self, master, total_size=(256, 256), default_filt_name=None, mask_colour=None):
         """
         A panel for displaying the output on an image a visualiser/metric pair using a variable threshold
 
@@ -24,10 +25,12 @@ class Visualiser_Panel(tk.Frame):
                           highlightbackground=colours["toolbar_txt"],
                           highlightthickness=1)
 
+        if mask_colour is None:
+            mask_colour = [255, 255, 255]
         self.master = master
         self.border_width = 16
         self.im_size = (total_size[0] - self.border_width, total_size[1] - self.border_width)
-        self.filter_names = [n for (n, t) in vis_conf_dict.keys() if t == "vis"]
+        self.filter_names = vis_conf_dict.keys()
         self.cur_img_path = None
         self.cur_vis_PIL = None
         self.cur_conf_mask = None
@@ -71,11 +74,11 @@ class Visualiser_Panel(tk.Frame):
         """
         Update the attribute cur_vis_pil which stores a PIL image
 
-        Renders a new PIL image of the curent TIF file specified by cur_img_path
+        Renders a new PIL image of the current TIF file specified by cur_img_path
         Uses the current visualiser (specified by cur_filter_name) to create the image
         """
         inn = imread(self.cur_img_path)
-        visualiser = vis_conf_dict[(self.cur_filter_name.get(), "vis")]
+        visualiser = vis_conf_dict[self.cur_filter_name.get()]["vis"]
         out = visualiser(ee_product, inn, {})
         out.thumbnail(self.im_size)
         self.cur_vis_PIL = out
@@ -89,22 +92,26 @@ class Visualiser_Panel(tk.Frame):
         there is a fire at that pixel according to that metric
         """
         inn = imread(self.cur_img_path)
-        generator = vis_conf_dict[(self.cur_filter_name.get(), "conf")]
+        generator = vis_conf_dict[self.cur_filter_name.get()]["conf"]
         self.cur_conf_mask = generator(ee_product, inn, {})
 
         if self.cur_conf_mask.min() < 0 or self.cur_conf_mask.max() > 1:
-            print()
-            print("-------------------------")
-            print("ERROR confidence mask is not normalised!!!")
+            print("""
+            -------------------------
+            ERROR confidence mask is not normalised!!!
+            Confidence masks should contain values between 0 and 1 only
+            """)
+
             show_stats_about_nparray(self.cur_conf_mask)
-            print()
-            print("automagically normalising (plz fix)")
             self.cur_conf_mask -= self.cur_conf_mask.min()
             self.cur_conf_mask /= self.cur_conf_mask.max()
-            print(self.cur_conf_mask)
-            print("New range   : ({}, {})".format(str(self.cur_conf_mask.min()), str(self.cur_conf_mask.max())))
-            print("-------------------------")
-            print()
+
+            print(f"""
+            Attempting to normalise (please fix this)
+            {self.cur_conf_mask}
+            New range   : ({str(self.cur_conf_mask.min())}, {str(self.cur_conf_mask.max())})
+            -------------------------
+            """)
 
         self.update_conf_pil()
 
@@ -116,7 +123,7 @@ class Visualiser_Panel(tk.Frame):
         confidence mask. Then renders a PIL representing this binary mask.
         """
         self.cur_bin_mask = self.cur_conf_mask >= (self.cur_threshold.get())
-        self.cur_conf_pil = render_binary_mask_as_PIL(self.cur_bin_mask, colour_rgb=self.mask_colour,
+        self.cur_conf_pil = render_binary_mask_as_pil(self.cur_bin_mask, colour_rgb=self.mask_colour,
                                                       im_size=self.im_size)
 
     def update_threshold(self, *args):
@@ -133,7 +140,7 @@ class Visualiser_Panel(tk.Frame):
         To be called in the event of a change of filter
 
         Updates the visualised image and confidence mask according to a change in filter (visualiser/metric pair)
-        :param *args: - a dummy
+        :param args: - a dummy
         """
         self.update_vis_pil()
         self.update_conf_mask()

@@ -1,11 +1,11 @@
-from resources.GUI_labeler.PIL_helpers import render_binary_mask_as_PIL
 import numpy as np
+
+from tools.GUI_labeler.mask_helpers import render_binary_mask_as_pil
 
 
 def display_npy_file(path):
     arr = np.load(path)
-    print(arr)
-    pil = render_binary_mask_as_PIL(arr)
+    pil = render_binary_mask_as_pil(arr)
     pil.show()
 
 

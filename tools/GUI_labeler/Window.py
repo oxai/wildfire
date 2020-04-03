@@ -2,11 +2,11 @@ import os
 import random
 import tkinter as tk
 
-from resources.GUI_labeler.product_panel import Product_Panel
-from resources.GUI_labeler.tk_ui_helpers import make_menu_bar_button
-from resources.GUI_labeler.visualiser_metric_panel import Visualiser_Panel
-from resources.GUI_labeler.PIL_helpers import *
-from resources.GUI_labeler.config import colours, vis_conf_dict, unlabeled_dir, labeled_dir
+from tools.GUI_labeler.mask_helpers import *
+from tools.GUI_labeler.config import colours, vis_conf_dict, unlabeled_dir, labeled_dir
+from tools.GUI_labeler.product_panel import Product_Panel
+from tools.GUI_labeler.tk_ui_helpers import make_menu_bar_button
+from tools.GUI_labeler.visualiser_metric_panel import Visualiser_Panel
 
 
 class Window(tk.Frame):
@@ -18,7 +18,7 @@ class Window(tk.Frame):
         """
         tk.Frame.__init__(self, master, bg=colours["toolbar_bg"])
 
-        self.filter_names = [n for (n, t) in vis_conf_dict.keys() if t == "vis"]
+        self.filter_names = vis_conf_dict.keys()
         self.mask_colours = [[255, 255, 0], [255, 0, 255], [0, 255, 255]]
         # [[255, 0, 0], [0, 255, 0], [0, 0, 255]]
         self.main_im_size = (768, 768)
@@ -35,10 +35,13 @@ class Window(tk.Frame):
         self.initialise_vis_panels()
         self.initialise_top_bar()
 
-        self.topbar.grid(row=0, column=0, columnspan=2, sticky=[tk.W, tk.E])
+        self.update_prod_mask_button = make_menu_bar_button(self, "<", self.update_main_masks)
+
+        self.topbar.grid(row=0, column=0, columnspan=3, sticky=[tk.W, tk.E])
         self.product_panel.grid(row=1, column=0, rowspan=3)
         for a0, p in enumerate(self.vis_panels):
-            p.grid(row=(a0 % self.max_vis_rows) + 1, column=1 + (a0 // self.max_vis_rows))
+            p.grid(row=(a0 % self.max_vis_rows) + 1, column=2 + (a0 // self.max_vis_rows))
+        self.update_prod_mask_button.grid(row=2, column=1)
 
         self.load_random_pic()
 
@@ -64,7 +67,6 @@ class Window(tk.Frame):
         self.vis_panels = []
 
         for filt, mc in zip(self.filter_names, self.mask_colours):
-            print(filt)
             v = Visualiser_Panel(self,
                                  total_size=(self.main_im_size[0] // 3, self.main_im_size[1] // 3),
                                  default_filt_name=filt,
@@ -79,7 +81,8 @@ class Window(tk.Frame):
         """
         self.cur_img_path = path
         self.product_panel.update_path(path)
-        for p in self.vis_panels: p.update_path(path)
+        for p in self.vis_panels:
+            p.update_path(path)
 
     def load_random_pic(self):
         """
@@ -88,7 +91,7 @@ class Window(tk.Frame):
         Will select a TIF image from the unlabeled directory
         """
         if len(self.paths) == 0:
-            raise Exception("No images provided in the unlabeled image directory: " + unlabeled_dir)
+            raise Exception(f"No images provided in the unlabeled image directory: {unlabeled_dir}")
 
         self.cur_img_path = random.choice(self.paths)
         self.update_img_path(self.cur_img_path)
@@ -98,8 +101,8 @@ class Window(tk.Frame):
         Should be called after any changes to the image directory to update the stored list of paths
         """
         if not os.path.exists(unlabeled_dir):
-            raise Exception("The given directory for unlabeled images does not exist: " + unlabeled_dir)
-        self.paths = [unlabeled_dir + name for name in os.listdir(unlabeled_dir)]
+            raise Exception(f"The given directory for unlabeled images does not exist: {unlabeled_dir}")
+        self.paths = [os.path.join(unlabeled_dir, name) for name in os.listdir(unlabeled_dir)]
 
     def update_main_masks(self):
         """
@@ -117,12 +120,12 @@ class Window(tk.Frame):
             os.mkdir(labeled_dir)
 
         dir_name = filename.strip(".tif")
-        assert (not os.path.exists(labeled_dir + dir_name + "/"))
-        os.rename(self.cur_img_path, labeled_dir + dir_name + ".tif")
+        assert (not os.path.exists(os.path.join(labeled_dir, dir_name)))
+        os.rename(self.cur_img_path, os.path.join(labeled_dir, dir_name + ".tif"))
 
         masks = [p.cur_bin_mask for p in self.vis_panels]
         b_m = self.product_panel.get_bin_mask(masks, self.mask_colours)
-        np.save(labeled_dir + dir_name + ".firemask.npz", b_m)
+        np.save(os.path.join(labeled_dir, dir_name + ".firemask.npz"), b_m)
 
         self.update_list_of_image_paths()
         self.load_random_pic()

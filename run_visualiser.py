@@ -1,6 +1,6 @@
 # Launch tkinter application for labeling/generating masks for tiff images
 
-from resources.GUI_labeler.Window import Window
+from tools.GUI_labeler.Window import Window
 import tkinter as tk
 
 root = tk.Tk()
@@ -14,7 +14,7 @@ def b1(event):
 
 root.bind("<Key>", b1)
 
-root.iconphoto(False, tk.PhotoImage(file='resources/GUI_labeler/icon.png'))
+root.iconphoto(False, tk.PhotoImage(file='tools/GUI_labeler/icon.png'))
 
 app.pack()
 root.mainloop()

@@ -1,6 +1,7 @@
 import tkinter as tk
-from typing import Dict, List, Tuple, Callable
-from resources.GUI_labeler.config import colours
+from typing import Callable
+
+from tools.GUI_labeler.config import colours
 
 
 def make_option_menu(master,

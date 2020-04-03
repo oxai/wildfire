@@ -1,9 +1,24 @@
 from typing import Callable
+
 import ee
+
 from resources.gee.config import EE_CREDENTIALS
 from resources.gee.methods import get_ee_product
 from resources.gee.vis_handler import *
 
+
+# TODO add arg parse with (move/copy) options and allow to choose dirs
+# TODO write README
+# TODO add graphic for "<=" button OR get rid of need for manual refresh
+# TODO add zoom
+# DONE change spellings of labeled
+# DONE change structure of vis_conf_dict
+# DONE PEP8 everything
+# DONE move to tools
+# DONE get rid of need for "r" key
+# DONE change to os.path.join
+# DONE f"{}" thing
+# DONE inspect code
 
 def get_ee_session() -> dict:
     """
@@ -25,11 +40,11 @@ Visualiser_Func = Callable[[dict, np.ndarray, dict], Image.Image]
 
 ee_product = get_ee_session()
 
-# Paths to the directories of labelled and unlabelled data
+# Paths to the directories of labeled and unlabeled data
 # paths should be relative cwd = es-wildfire and end in "/"
 # e.g. "resources/GUI_labeler/data/unlabeled/"
-unlabeled_dir = "resources/GUI_labeler/data/unlabeled/"
-labeled_dir = "resources/GUI_labeler/data/labeled/"
+unlabeled_dir = "tools/GUI_labeler/data/unlabeled/"
+labeled_dir = "tools/GUI_labeler/data/labeled/"
 
 # This should specify a function for turning an np array (from tifffle.imread) into a
 # 3 deep np array representing RGB channels
@@ -41,20 +56,14 @@ rgb_vis = vis_default
 
 #    "conf" - a function which takes the same inputs as vis but return a confidence mask - an nd.array which
 #             gives pixelwise probabilities/0to1 confidence ratings as to whether there is a fire at that pixel
-vis_conf_dict = {("s2_nbr", "vis"): vis_s2_nbr,
-                 ("s2_nbr", "conf"): get_conf_s2_nbr,
-                 ("s2_fire", "vis"): vis_s2_fire,
-                 ("s2_fire", "conf"): get_conf_s2_fire,
-                 ("s2_firethresh", "vis"): vis_s2_firethresh,
-                 ("s2_firethresh", "conf"): get_conf_s2_firethresh,
-                 ("s2_nbr2", "vis"): vis_s2_nbr,
-                 ("s2_nbr2", "conf"): get_conf_s2_nbr,
-                 ("s2_fire2", "vis"): vis_s2_fire,
-                 ("s2_fire2", "conf"): get_conf_s2_fire,
-                 ("s2_firethresh2", "vis"): vis_s2_firethresh,
-                 ("s2_firethresh2", "conf"): get_conf_s2_firethresh}
-# }
-#
+vis_conf_dict = {"s2_nbr": {"vis": vis_s2_nbr,
+                            "conf": get_conf_s2_nbr},
+
+                 "s2_fire": {"vis": vis_s2_fire,
+                             "conf": get_conf_s2_fire},
+
+                 "s2_firethresh": {"vis": vis_s2_firethresh,
+                                   "conf": get_conf_s2_firethresh}}
 
 # A dictionary of colours used to keep a consistent theme
 colours = {"blank": "#FFA0A0",

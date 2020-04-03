@@ -1,11 +1,11 @@
+import tkinter as tk
+
 from PIL import ImageTk
 from tifffile import imread
-import tkinter as tk
-from typing import Dict, List, Tuple, Callable
 
-from resources.GUI_labeler.PIL_helpers import *
-from resources.GUI_labeler.tk_ui_helpers import make_option_menu, make_toolbar_label
-from resources.GUI_labeler.config import colours, rgb_vis, vis_conf_dict, ee_product
+from tools.GUI_labeler.mask_helpers import *
+from tools.GUI_labeler.config import colours, rgb_vis, vis_conf_dict, ee_product
+from tools.GUI_labeler.tk_ui_helpers import make_option_menu, make_toolbar_label
 
 
 class Product_Panel(tk.Frame):
@@ -30,17 +30,19 @@ class Product_Panel(tk.Frame):
         self.cur_bin_mask = None
         self.cur_inp_bin_masks = []
         self.cur_mask_pil = None
-        self.combi_func_dict = {"AND": self.get_AND_bin_mask,
-                                "OR": self.get_OR_bin_mask}
+        self.combi_func_dict = {"AND": get_AND_bin_mask,
+                                "OR": get_OR_bin_mask}
         self.mask_visualisers = {"OUT_ONLY": self.get_out_only_pil,
                                  "MIX_COLOURS": self.get_colour_mix_pil}
         self.overlay_sprite = None
         self.overlay = None
 
+        # vis_dict needs to be separate since RGB has no corresponding
+        #  confidence mask function
         self.vis_dict = {"RGB": rgb_vis}
         if vis_conf_dict is not None:
-            for name in [n for (n, t) in vis_conf_dict.keys() if t == "vis"]:
-                self.vis_dict[name] = vis_conf_dict[(name, "vis")]
+            for pair_name in vis_conf_dict.keys():
+                self.vis_dict[pair_name] = vis_conf_dict[pair_name]["vis"]
 
         self.init_top_bar()
 
@@ -129,7 +131,7 @@ class Product_Panel(tk.Frame):
         self.vis_im_sprite = self.canvas.create_image((x, y),
                                                       image=self.vis_im)
 
-        if self.cur_mask_pil != None:
+        if self.cur_mask_pil is not None:
             self.overlay = ImageTk.PhotoImage(self.cur_mask_pil)
             self.overlay_sprite = self.canvas.create_image(self.im_size[0] // 2,
                                                            self.im_size[1] // 2,
@@ -138,44 +140,11 @@ class Product_Panel(tk.Frame):
             self.overlay = None
             self.overlay_sprite = None
 
-    def get_AND_bin_mask(self, masks: List[np.ndarray]) -> np.ndarray:
-        """
-       One of the combi_func options: combines a list of bin_masks and using a logical pixelwise AND operation
-        :param masks: A list of binary masks of shape (w,h)
-        :return: A binary mask of shape (w,h)
-        """
-        if len(masks) > 0:
-            prod_mask = masks[0]
-        else:
-            prod_mask = None
-
-        for mask in masks[1:]:
-            prod_mask = np.bitwise_and(mask, prod_mask)
-
-        return prod_mask
-
-    def get_OR_bin_mask(self, masks: List[np.ndarray]) -> np.ndarray:
-        """
-        One of the combi_func options: combines a list of bin_masks and using a logical pixelwise OR operation
-
-        :param masks: A list of binary masks of shape (w,h)
-        :return: A binary mask of shape (w,h)
-        """
-        if len(masks) > 0:
-            prod_mask = masks[0]
-        else:
-            prod_mask = None
-
-        for mask in masks[1:]:
-            prod_mask = np.bitwise_or(mask, prod_mask)
-
-        return prod_mask
-
     def get_out_only_pil(self,
                          out_mask: np.ndarray,
                          inp_masks: List[np.ndarray],  # Needed for generality
                          inp_colours: List[np.ndarray],  # ^
-                         colour=[255, 255, 255]) -> Image.Image:
+                         colour=None) -> Image.Image:
         """
         One of the mask_visualisers options: generate a PIL depicting only the combined mask
         (and ignoring all of the masks given by the vis_panels and the combined mask)
@@ -186,7 +155,9 @@ class Product_Panel(tk.Frame):
         :param colour: a single colour to be used as desired
         :return: a PIL representing the out_mask and/or inp_masks
         """
-        return render_binary_mask_as_PIL(out_mask,
+        if colour is None:
+            colour = [255, 255, 255]
+        return render_binary_mask_as_pil(out_mask,
                                          colour,
                                          internal_alpha=0.4,
                                          im_size=self.im_size)
@@ -194,7 +165,7 @@ class Product_Panel(tk.Frame):
     def get_colour_mix_pil(self,
                            out_mask: np.ndarray,
                            inp_masks: List[np.ndarray],  # Needed for generality
-                           inp_colours: List[np.ndarray],  # ^
+                           inp_colours: List[Tuple[int, int, int]],  # ^
                            colour=None) -> Image.Image:
         """
         One of the mask_visualisers options: generate a PIL depicting the input masks mixed together
