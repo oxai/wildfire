@@ -62,6 +62,19 @@ EE_PRODUCTS = {
         },
     },
     'sentinel': {
+        'band_map':{'C/A':'B1',
+                    'Blue': 'B2',
+                    'Green': 'B3',
+                    'Red': 'B4',
+                    'VRE': 'B5',
+                    'VRE': 'B6',
+                    'VRE': 'B7',
+                    'NIR': 'B8',
+                    'NIR2': 'B8a',
+                    'WV': 'B9',
+                    'Cirrus': 'B10',
+                    'SWIR': 'B11',
+                    'SWIR2': 'B12'},
         '2': {
             'l1c': {
                 'display': 'Surface Reflectance',
@@ -145,6 +158,17 @@ EE_PRODUCTS = {
         }
     },
     'landsat': {
+        'band_map':{'C/A':'B1',
+                    'Blue': 'B2',
+                    'Green': 'B3',
+                    'Red': 'B4',
+                    'NIR': 'B5',
+                    'Cirrus': 'B9',
+                    'SWIR': 'B6',
+                    'SWIR2': 'B7',
+                    'Pan': 'B8',
+                    'TIRS': 'B10',
+                    'TIRS2': 'B11'},
         '7': {
             'surface': {
                 'display': 'Surface Reflectance',

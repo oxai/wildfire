@@ -25,7 +25,10 @@ def image_to_map_id(ee_image, vis_params=None):
 
 
 def get_ee_product(platform, sensor, product):
-    return EE_PRODUCTS[platform][sensor][product]
+    ee_product = EE_PRODUCTS[platform][sensor][product]
+    band_map = EE_PRODUCTS[platform]['band_map']
+    ee_product['band_map'] = band_map
+    return ee_product
 
 
 def get_ee_product_name(ee_product):

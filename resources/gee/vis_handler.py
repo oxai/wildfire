@@ -29,6 +29,12 @@ def get_band(ee_product, image, band):
     return image[ee_product['bands'].index(band)]
 
 
+def get_bands_by_name(ee_product, image, band_names):
+    band_map = ee_product['band_map']
+    band_numbers = [band_map[band_name] for band_name in band_names]
+    return get_bands(ee_product, image, band_numbers)
+
+
 def get_bands(ee_product, image, bands):
     return [get_band(ee_product, image, band) for band in bands]
 
@@ -190,19 +196,35 @@ def get_nbr_indicator(B8, B12):
 
 
 def vis_from_indicator(ee_product, image, vis_params, ind_func, ind_bands, l_func, comp_image):
-    B2, B3, B4, B8, B11, B12 = get_bands(ee_product, image, ['B2', 'B3', 'B4', 'B8', 'B11', 'B12'])
-    ind_arrays = get_bands(ee_product, image, ind_bands)
+    B, G, R, NIR, SWIR, SWIRa = get_bands_by_name(ee_product, image, ['Blue', 'Green', 'Red', 'NIR', 'SWIR', 'SWIR2'])
+    ind_arrays = get_bands_by_name(ee_product, image, ind_bands)
     index = ind_func(*ind_arrays)
     if comp_image != None:
-        comp_ind_arrays = get_bands(ee_product, comp_image, ind_bands)
+        comp_ind_arrays = get_bands_by_name(ee_product, comp_image, ind_bands)
         comp_index = ind_func(*comp_ind_arrays)
         index = index - comp_index
-    some_array, lots_array = l_func(B2, B3, B4, B8, B12)
-    no_array = vis_natural_nirswirmix(B2, B3, B4, B8, B12)
+    some_array, lots_array = l_func(B, G, R, NIR, SWIRa)
+    no_array = vis_natural_nirswirmix(B, G, R, NIR, SWIRa)
 
     combined_array = np.where(index > 1.0, some_array, no_array)
     combined_array = np.where(index > 2.0, lots_array, combined_array)
     return array_to_image(combined_array)
+
+
+#def vis_from_indicator(ee_product, image, vis_params, ind_func, ind_bands, l_func, comp_image):
+#    B2, B3, B4, B8, B11, B12 = get_bands(ee_product, image, ['B2', 'B3', 'B4', 'B8', 'B11', 'B12'])
+#    ind_arrays = get_bands(ee_product, image, ind_bands)
+#    index = ind_func(*ind_arrays)
+#    if comp_image != None:
+#        comp_ind_arrays = get_bands(ee_product, comp_image, ind_bands)
+#        comp_index = ind_func(*comp_ind_arrays)
+#        index = index - comp_index
+#    some_array, lots_array = l_func(B2, B3, B4, B8, B12)
+#    no_array = vis_natural_nirswirmix(B2, B3, B4, B8, B12)
+#
+#    combined_array = np.where(index > 1.0, some_array, no_array)
+#    combined_array = np.where(index > 2.0, lots_array, combined_array)
+#    return array_to_image(combined_array)
 
 
 vis_s2_veg = functools.partial(
@@ -225,6 +247,28 @@ vis_s2_dnbr = functools.partial(
     vis_from_indicator,
     ind_func=get_nbr_indicator,
     ind_bands = ['B8','B12'],
+    l_func = get_fire_levels)
+
+vis_veg = functools.partial(
+    vis_from_indicator,
+    ind_func=get_veg_indicator,
+    ind_bands = ['Red','NIR'],
+    l_func = get_veg_levels,
+    comp_image=None)
+
+
+vis_fire = functools.partial(
+    vis_from_indicator,
+    ind_func=get_fire_indicator,
+    ind_bands = ['SWIR','SWIR2'],
+    l_func = get_fire_levels,
+    comp_image=None)
+
+
+vis_dnbr = functools.partial(
+    vis_from_indicator,
+    ind_func=get_nbr_indicator,
+    ind_bands = ['SWIR','SWIR2'],
     l_func = get_fire_levels)
 
 
