@@ -76,6 +76,7 @@ EE_PRODUCTS = {
                     'SWIR': 'B11',
                     'SWIR2': 'B12',
                     'cloud_mask': 'cloud_mask'},
+                    'SWIR2': 'B12'},
         '2': {
             'l1c': {
                 'display': 'Surface Reflectance',
@@ -171,6 +172,7 @@ EE_PRODUCTS = {
                     'TIRS': 'B10',
                     'TIRS2': 'B11',
                     'cloud_mask': 'cloud_mask'},
+                    'TIRS2': 'B11'},
         '7': {
             'surface': {
                 'display': 'Surface Reflectance',

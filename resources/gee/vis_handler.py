@@ -321,6 +321,28 @@ vis_dnbr = functools.partial(
     ind_bands = ['SWIR','SWIR2'],
     l_func = get_fire_levels)
 
+vis_veg = functools.partial(
+    vis_from_indicator,
+    ind_func=get_veg_indicator,
+    ind_bands = ['Red','NIR'],
+    l_func = get_veg_levels,
+    comp_image=None)
+
+
+vis_fire = functools.partial(
+    vis_from_indicator,
+    ind_func=get_fire_indicator,
+    ind_bands = ['SWIR','SWIR2'],
+    l_func = get_fire_levels,
+    comp_image=None)
+
+
+vis_dnbr = functools.partial(
+    vis_from_indicator,
+    ind_func=get_nbr_indicator,
+    ind_bands = ['SWIR','SWIR2'],
+    l_func = get_fire_levels)
+
 
 def vis_firethresh(ee_product, image, vis_params):
     swir, swir2, mask = get_bands_by_name(ee_product, image, ['SWIR', 'SWIR2', 'cloud_mask'])
