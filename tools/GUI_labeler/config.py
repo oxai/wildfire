@@ -6,8 +6,6 @@ from resources.gee.config import EE_CREDENTIALS
 from resources.gee.methods import get_ee_product
 from resources.gee.vis_handler import *
 
-# TODO move run
-# TODO add arg parse with (move/copy) options and allow to choose dirs
 # TODO write README
 # TODO add graphic for "<=" button OR get rid of need for manual refresh
 # TODO add zoom
@@ -19,6 +17,8 @@ from resources.gee.vis_handler import *
 # DONE change to os.path.join
 # DONE f"{}" thing
 # DONE inspect code
+# DONE add arg parse with (move/copy) options and allow to choose dirs
+
 
 def get_ee_session() -> dict:
     """
@@ -57,13 +57,13 @@ rgb_vis = vis_default
 #    "conf" - a function which takes the same inputs as vis but return a confidence mask - an nd.array which
 #             gives pixelwise probabilities/0to1 confidence ratings as to whether there is a fire at that pixel
 vis_conf_dict = {"nbr": {"vis": vis_nbr,
-                            "conf": get_conf_nbr},
+                         "conf": get_conf_nbr},
 
                  "fire": {"vis": vis_fire,
-                             "conf": get_conf_fire},
+                          "conf": get_conf_fire},
 
                  "firethresh": {"vis": vis_firethresh,
-                                   "conf": get_conf_firethresh}}
+                                "conf": get_conf_firethresh}}
 
 # A dictionary of colours used to keep a consistent theme
 colours = {"blank": "#FFA0A0",

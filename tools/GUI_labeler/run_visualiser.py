@@ -11,11 +11,6 @@ parser.add_argument("--move_to", "-m", required=False)
 parser.add_argument("--copy_to", "-c", required=False)
 args = parser.parse_args()
 
-print(args.unlabeled_image_directory)
-print(args.inplace)
-print(args.move_to)
-print(args.copy_to)
-
 # Make sure only one save option has been specified
 if sum([args.inplace, args.move_to is not None, args.copy_to is not None]) != 1:
     raise Exception("You must choose exactly one of inplace, move_to and copy_to")

@@ -110,14 +110,11 @@ class Window(tk.Frame):
         def is_unlabeled_tif(name: str):
             is_a_tif = name[-4:] == ".tif"
             is_unlabeled = name[-8:-4] != "lbld"
-            print(name[-4:])
-            print(name[-8:-4])
             return (is_a_tif and is_unlabeled)
 
         self.paths = [os.path.join(self.unlabeled_dir, name)
                       for name in os.listdir(self.unlabeled_dir)
                       if is_unlabeled_tif(name)]
-        print(self.paths)
 
     def update_main_masks(self):
         """
