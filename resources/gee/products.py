@@ -75,7 +75,7 @@ EE_PRODUCTS = {
                     'Cirrus': 'B10',
                     'SWIR': 'B11',
                     'SWIR2': 'B12',
-                    'cloud_mask': 'cloud_mask'},
+                    'cloud_mask': 'cloud_mask',
                     'SWIR2': 'B12'},
         '2': {
             'l1c': {
@@ -171,7 +171,7 @@ EE_PRODUCTS = {
                     'Pan': 'B8',
                     'TIRS': 'B10',
                     'TIRS2': 'B11',
-                    'cloud_mask': 'cloud_mask'},
+                    'cloud_mask': 'cloud_mask',
                     'TIRS2': 'B11'},
         '7': {
             'surface': {

@@ -29,7 +29,6 @@ def image_to_map_id(ee_image, vis_params=None):
 def get_ee_product(platform, sensor, product):
     ee_product = EE_PRODUCTS[platform][sensor][product]
     if 'band_map' in EE_PRODUCTS[platform].keys():
-    if 'band_map' in ee_product.keys():
         band_map = EE_PRODUCTS[platform]['band_map']
         ee_product['band_map'] = band_map
     return ee_product
