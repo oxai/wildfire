@@ -4,21 +4,6 @@ import numpy
 import numpy as np
 from PIL import Image
 
-"""
-Converts a 2D NP array of 0s and 1s and to a PIL image that can be used as an overlay
-
-Args:
-    binary_mask (2D np array): an np array of shape (w,h) with 0,1 values
-
-Keyword Args:
-    colour_rgb (3-tuple or list): a 3-tuple of [0,255]^3 (or list)
-    border_alpha (float): transparency of mask border (0 for transparent, 1 for opaque)
-    internal_alpha (float): as above but for transparency of center of mask
-
-Returns:
-    a PIL image of dimensions (w,h)
-        """
-
 
 def render_binary_mask_as_pil(binary_mask: np.ndarray,
                               colour_rgb: (int, int, int) = (255, 0, 255),
@@ -165,7 +150,8 @@ def get_OR_bin_mask(masks: List[np.ndarray]) -> np.ndarray:
 
 def get_AND_bin_mask(masks: List[np.ndarray]) -> np.ndarray:
     """
-   One of the combi_func options: combines a list of bin_masks and using a logical pixelwise AND operation
+    One of the combi_func options: combines a list of bin_masks and using a logical pixelwise AND operation
+
     :param masks: A list of binary masks of shape (w,h)
     :return: A binary mask of shape (w,h)
     """

@@ -6,7 +6,7 @@ from resources.gee.config import EE_CREDENTIALS
 from resources.gee.methods import get_ee_product
 from resources.gee.vis_handler import *
 
-
+# TODO move run
 # TODO add arg parse with (move/copy) options and allow to choose dirs
 # TODO write README
 # TODO add graphic for "<=" button OR get rid of need for manual refresh

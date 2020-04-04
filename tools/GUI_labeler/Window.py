@@ -1,16 +1,17 @@
 import os
 import random
 import tkinter as tk
+import shutil
 
 from tools.GUI_labeler.mask_helpers import *
-from tools.GUI_labeler.config import colours, vis_conf_dict, unlabeled_dir, labeled_dir
+from tools.GUI_labeler.config import colours, vis_conf_dict
 from tools.GUI_labeler.product_panel import Product_Panel
 from tools.GUI_labeler.tk_ui_helpers import make_menu_bar_button
 from tools.GUI_labeler.visualiser_metric_panel import Visualiser_Panel
 
 
 class Window(tk.Frame):
-    def __init__(self, master=None):
+    def __init__(self, master, unlabeled_dir, labeled_dir, move_or_copy):
         """
         Top level class in the application, handles all components and file management
 
@@ -24,6 +25,9 @@ class Window(tk.Frame):
         self.main_im_size = (768, 768)
         self.max_vis_rows = 3
 
+        self.move_or_copy = move_or_copy
+        self.unlabeled_dir = unlabeled_dir
+        self.labeled_dir = labeled_dir
         self.paths = None
         self.cur_img_path = None
         self.update_list_of_image_paths()
@@ -91,7 +95,7 @@ class Window(tk.Frame):
         Will select a TIF image from the unlabeled directory
         """
         if len(self.paths) == 0:
-            raise Exception(f"No images provided in the unlabeled image directory: {unlabeled_dir}")
+            raise Exception(f"No images provided in the unlabeled image directory: {self.unlabeled_dir}")
 
         self.cur_img_path = random.choice(self.paths)
         self.update_img_path(self.cur_img_path)
@@ -100,9 +104,20 @@ class Window(tk.Frame):
         """
         Should be called after any changes to the image directory to update the stored list of paths
         """
-        if not os.path.exists(unlabeled_dir):
-            raise Exception(f"The given directory for unlabeled images does not exist: {unlabeled_dir}")
-        self.paths = [os.path.join(unlabeled_dir, name) for name in os.listdir(unlabeled_dir)]
+        if not os.path.exists(self.unlabeled_dir):
+            raise Exception(f"The given directory for unlabeled images does not exist: {self.unlabeled_dir}")
+
+        def is_unlabeled_tif(name: str):
+            is_a_tif = name[-4:] == ".tif"
+            is_unlabeled = name[-8:-4] != "lbld"
+            print(name[-4:])
+            print(name[-8:-4])
+            return (is_a_tif and is_unlabeled)
+
+        self.paths = [os.path.join(self.unlabeled_dir, name)
+                      for name in os.listdir(self.unlabeled_dir)
+                      if is_unlabeled_tif(name)]
+        print(self.paths)
 
     def update_main_masks(self):
         """
@@ -116,16 +131,20 @@ class Window(tk.Frame):
         Saves the original TIF image with an np-array binary mask and fetches a new image
         """
         filename = os.path.split(self.cur_img_path)[-1]
-        if not os.path.exists(labeled_dir):
-            os.mkdir(labeled_dir)
+        if not os.path.exists(self.labeled_dir):
+            os.mkdir(self.labeled_dir)
 
         dir_name = filename.strip(".tif")
-        assert (not os.path.exists(os.path.join(labeled_dir, dir_name)))
-        os.rename(self.cur_img_path, os.path.join(labeled_dir, dir_name + ".tif"))
+        dest_path = os.path.join(self.labeled_dir, dir_name + ".lbld.tif")
+        if self.move_or_copy == "move":
+            os.rename(self.cur_img_path, dest_path)
+        else:
+            assert (self.move_or_copy == "copy")
+            shutil.copy2(self.cur_img_path, dest_path)
 
         masks = [p.cur_bin_mask for p in self.vis_panels]
         b_m = self.product_panel.get_bin_mask(masks, self.mask_colours)
-        np.save(os.path.join(labeled_dir, dir_name + ".firemask.npz"), b_m)
+        np.save(os.path.join(self.labeled_dir, dir_name + ".firemask"), b_m)
 
         self.update_list_of_image_paths()
         self.load_random_pic()
