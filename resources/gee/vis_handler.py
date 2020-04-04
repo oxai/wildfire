@@ -144,17 +144,19 @@ def get_fire_levels(B2, B3, B4, B8, B12):
     B = stretch(2.1 * B2, 0.01, 0.99)
     return [R, G, B], [R, G + 0.5, B]
 
-def get_veg_levels(B2, B3, B4, B8, B12):
-    R = stretch((2.1 * B4 + 0.5 * B12), 0.01, 0.99)
-    G = stretch((2.2 * B3 + 0.5 * B8), 0.01, 0.99) + 0.1
-    B = stretch(3.2 * B2, 0.01, 0.99)
-    return np.array([R, G, B]), np.array([R*0.7, G*1.1, B*1.1])
 
 def get_veg_levels(B2, B3, B4, B8, B12):
     R = stretch((2.1 * B4 + 0.5 * B12), 0.01, 0.99)
     G = stretch((2.2 * B3 + 0.5 * B8), 0.01, 0.99) + 0.1
     B = stretch(3.2 * B2, 0.01, 0.99)
-    return np.array([R, G, B]), np.array([R*0.7, G*1.1, B*1.1])
+    return np.array([R, G, B]), np.array([R * 0.7, G * 1.1, B * 1.1])
+
+
+def get_veg_levels(B2, B3, B4, B8, B12):
+    R = stretch((2.1 * B4 + 0.5 * B12), 0.01, 0.99)
+    G = stretch((2.2 * B3 + 0.5 * B8), 0.01, 0.99) + 0.1
+    B = stretch(3.2 * B2, 0.01, 0.99)
+    return np.array([R, G, B]), np.array([R * 0.7, G * 1.1, B * 1.1])
 
 
 # Functions to compute masks from metrics
@@ -162,20 +164,23 @@ def get_fire_indicator(B11, B12, sensitivity=1.0):
     # Increase sensitivity for more possible fires and more wrong indications
     return (B11 + B12) * sensitivity
 
-def get_veg_indicator(B4, B8):
-    raw = (B4 - B8)/(B4 + B8)
-    return raw*2 + .7 # Scale to fit 1,2 thresholds, .15-->1, .65-->2
-
-def get_nbr_indicator(B8, B12):
-    return (B8 - B12)/(B8 + B12 + 1e-9)
 
 def get_veg_indicator(B4, B8):
-    raw = (B4 - B8)/(B4 + B8)
-    return raw*2 + .7 # Scale to fit 1,2 thresholds, .15-->1, .65-->2
+    raw = (B4 - B8) / (B4 + B8)
+    return raw * 2 + .7  # Scale to fit 1,2 thresholds, .15-->1, .65-->2
+
 
 def get_nbr_indicator(B8, B12):
-    return (B8 - B12)/(B8 + B12 + 1e-9)
+    return (B8 - B12) / (B8 + B12 + 1e-9)
 
+
+def get_veg_indicator(B4, B8):
+    raw = (B4 - B8) / (B4 + B8)
+    return raw * 2 + .7  # Scale to fit 1,2 thresholds, .15-->1, .65-->2
+
+
+def get_nbr_indicator(B8, B12):
+    return (B8 - B12) / (B8 + B12 + 1e-9)
 
 
 def vis_from_indicator(ee_product, image, vis_params, ind_func, ind_bands, l_func, comp_image):
@@ -198,9 +203,11 @@ def get_conf_nbr(ee_product, image, vis_params):
     nir, swir, alpha = get_bands_by_name(ee_product, image, ['NIR', 'SWIR', 'cloud_mask'])
     return (nir - swir) / (nir + swir + 1e-9)
 
+
 def get_conf_fire(ee_product, image, vis_params):
     swir, swir2 = get_bands_by_name(ee_product, image, ['SWIR', 'SWIR2'])
     return get_fire_indicator(swir, swir2)
+
 
 def get_conf_firethresh(ee_product, image, vis_params):
     swir, swir2 = get_bands_by_name(ee_product, image, ['SWIR', 'SWIR2'])
@@ -210,46 +217,42 @@ def get_conf_firethresh(ee_product, image, vis_params):
 vis_veg = functools.partial(
     vis_from_indicator,
     ind_func=get_veg_indicator,
-    ind_bands = ['Red','NIR'],
-    l_func = get_veg_levels,
+    ind_bands=['Red', 'NIR'],
+    l_func=get_veg_levels,
     comp_image=None)
-
 
 vis_fire = functools.partial(
     vis_from_indicator,
     ind_func=get_fire_indicator,
-    ind_bands = ['SWIR','SWIR2'],
-    l_func = get_fire_levels,
+    ind_bands=['SWIR', 'SWIR2'],
+    l_func=get_fire_levels,
     comp_image=None)
-
 
 vis_dnbr = functools.partial(
     vis_from_indicator,
     ind_func=get_nbr_indicator,
-    ind_bands = ['SWIR','SWIR2'],
-    l_func = get_fire_levels)
+    ind_bands=['SWIR', 'SWIR2'],
+    l_func=get_fire_levels)
 
 vis_veg = functools.partial(
     vis_from_indicator,
     ind_func=get_veg_indicator,
-    ind_bands = ['Red','NIR'],
-    l_func = get_veg_levels,
+    ind_bands=['Red', 'NIR'],
+    l_func=get_veg_levels,
     comp_image=None)
-
 
 vis_fire = functools.partial(
     vis_from_indicator,
     ind_func=get_fire_indicator,
-    ind_bands = ['SWIR','SWIR2'],
-    l_func = get_fire_levels,
+    ind_bands=['SWIR', 'SWIR2'],
+    l_func=get_fire_levels,
     comp_image=None)
-
 
 vis_dnbr = functools.partial(
     vis_from_indicator,
     ind_func=get_nbr_indicator,
-    ind_bands = ['SWIR','SWIR2'],
-    l_func = get_fire_levels)
+    ind_bands=['SWIR', 'SWIR2'],
+    l_func=get_fire_levels)
 
 
 def vis_firethresh(ee_product, image, vis_params):

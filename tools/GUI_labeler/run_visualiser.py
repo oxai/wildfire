@@ -7,8 +7,8 @@ import argparse
 parser = argparse.ArgumentParser(description="Image and metric visualiser")
 parser.add_argument("unlabeled_image_directory")
 parser.add_argument("--inplace", "-i", action='store_true')
-parser.add_argument("--move_to", "-m", required=False)
-parser.add_argument("--copy_to", "-c", required=False)
+parser.add_argument("--move_to", "-m", required=False, help="directory to which images should be moved")
+parser.add_argument("--copy_to", "-c", required=False, help="directory to which images should be copied")
 args = parser.parse_args()
 
 # Make sure only one save option has been specified
