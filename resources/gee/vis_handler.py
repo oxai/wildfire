@@ -132,62 +132,62 @@ def vis_nbr(ee_product, image, vis_params):
 def stretch(val, minval, maxval): return (val - minval) / (maxval - minval)
 
 
-def vis_natural_nirswirmix(B2, B3, B4, B8, B12):
-    return [stretch((2.1 * B4 + 0.5 * B12), 0.01, 0.99), stretch((2.2 * B3 + 0.5 * B8), 0.01, 0.99),
-            stretch(3.2 * B2, 0.01, 0.99)]
+def vis_natural_nirswirmix(blue, green, red, nir, swir2):
+    return [stretch((2.1 * red + 0.5 * swir2), 0.01, 0.99), stretch((2.2 * green + 0.5 * nir), 0.01, 0.99),
+            stretch(3.2 * blue, 0.01, 0.99)]
 
 
 # Functions to compute the changes to image for 'some' and 'lots' fire/veg etc
-def get_fire_levels(B2, B3, B4, B8, B12):
-    R = stretch((2.1 * B4 + 0.5 * B12), 0.01, 0.99) + 1.1
-    G = stretch((2.2 * B3 + 0.5 * B8), 0.01, 0.99)
-    B = stretch(2.1 * B2, 0.01, 0.99)
+def get_fire_levels(blue, green, red, nir, swir2):
+    R = stretch((2.1 * red + 0.5 * swir2), 0.01, 0.99) + 1.1
+    G = stretch((2.2 * green + 0.5 * nir), 0.01, 0.99)
+    B = stretch(2.1 * blue, 0.01, 0.99)
     return [R, G, B], [R, G + 0.5, B]
 
-def get_veg_levels(B2, B3, B4, B8, B12):
-    R = stretch((2.1 * B4 + 0.5 * B12), 0.01, 0.99)
-    G = stretch((2.2 * B3 + 0.5 * B8), 0.01, 0.99) + 0.1
-    B = stretch(3.2 * B2, 0.01, 0.99)
+def get_veg_levels(blue, green, red, nir, swir2):
+    R = stretch((2.1 * red + 0.5 * swir2), 0.01, 0.99)
+    G = stretch((2.2 * green + 0.5 * nir), 0.01, 0.99) + 0.1
+    B = stretch(3.2 * blue, 0.01, 0.99)
     return np.array([R, G, B]), np.array([R*0.7, G*1.1, B*1.1])
 
-def get_veg_levels(B2, B3, B4, B8, B12):
-    R = stretch((2.1 * B4 + 0.5 * B12), 0.01, 0.99)
-    G = stretch((2.2 * B3 + 0.5 * B8), 0.01, 0.99) + 0.1
-    B = stretch(3.2 * B2, 0.01, 0.99)
+def get_veg_levels(blue, green, red, nir, swir2):
+    R = stretch((2.1 * red + 0.5 * swir2), 0.01, 0.99)
+    G = stretch((2.2 * green + 0.5 * nir), 0.01, 0.99) + 0.1
+    B = stretch(3.2 * blue, 0.01, 0.99)
     return np.array([R, G, B]), np.array([R*0.7, G*1.1, B*1.1])
 
 
 # Functions to compute masks from metrics
-def get_fire_indicator(B11, B12, sensitivity=1.0):
+def get_fire_indicator(B11, swir2, sensitivity=1.0):
     # Increase sensitivity for more possible fires and more wrong indications
-    return (B11 + B12) * sensitivity
+    return (B11 + swir2) * sensitivity
 
-def get_veg_indicator(B4, B8):
-    raw = (B4 - B8)/(B4 + B8)
+def get_veg_indicator(red, nir):
+    raw = (red - nir)/(red + nir)
     return raw*2 + .7 # Scale to fit 1,2 thresholds, .15-->1, .65-->2
 
-def get_nbr_indicator(B8, B12):
-    return (B8 - B12)/(B8 + B12 + 1e-9)
+def get_nbr_indicator(nir, swir2):
+    return (nir - swir2)/(nir + swir2 + 1e-9)
 
-def get_veg_indicator(B4, B8):
-    raw = (B4 - B8)/(B4 + B8)
+def get_veg_indicator(red, nir):
+    raw = (red - nir)/(red + nir)
     return raw*2 + .7 # Scale to fit 1,2 thresholds, .15-->1, .65-->2
 
-def get_nbr_indicator(B8, B12):
-    return (B8 - B12)/(B8 + B12 + 1e-9)
+def get_nbr_indicator(nir, swir2):
+    return (nir - swir2)/(nir + swir2 + 1e-9)
 
 
 
 def vis_from_indicator(ee_product, image, vis_params, ind_func, ind_bands, l_func, comp_image):
-    B, G, R, NIR, SWIR, SWIRa = get_bands_by_name(ee_product, image, ['Blue', 'Green', 'Red', 'NIR', 'SWIR', 'SWIR2'])
+    B, G, R, nir, swir, swir2 = get_bands_by_name(ee_product, image, ['Blue', 'Green', 'Red', 'NIR', 'SWIR', 'SWIR2'])
     ind_arrays = get_bands_by_name(ee_product, image, ind_bands)
     index = ind_func(*ind_arrays)
     if comp_image != None:
         comp_ind_arrays = get_bands_by_name(ee_product, comp_image, ind_bands)
         comp_index = ind_func(*comp_ind_arrays)
         index = index - comp_index
-    some_array, lots_array = l_func(B, G, R, NIR, SWIRa)
-    no_array = vis_natural_nirswirmix(B, G, R, NIR, SWIRa)
+    some_array, lots_array = l_func(B, G, R, nir, swir2)
+    no_array = vis_natural_nirswirmix(B, G, R, nir, swir2)
 
     combined_array = np.where(index > 1.0, some_array, no_array)
     combined_array = np.where(index > 2.0, lots_array, combined_array)
