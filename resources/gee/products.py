@@ -1,4 +1,4 @@
-from .vis_handler import vis_s2_nbr, vis_l8_nbr, vis_s2_fire, vis_s2_firethresh
+from .vis_handler import vis_nbr, vis_fire, vis_firethresh
 
 EE_PRODUCTS = {
     'modis': {
@@ -74,7 +74,8 @@ EE_PRODUCTS = {
                     'WV': 'B9',
                     'Cirrus': 'B10',
                     'SWIR': 'B11',
-                    'SWIR2': 'B12'},
+                    'SWIR2': 'B12',
+                    'cloud_mask': 'cloud_mask'},
         '2': {
             'l1c': {
                 'display': 'Surface Reflectance',
@@ -86,9 +87,9 @@ EE_PRODUCTS = {
                     'max': 0.3,
                     'bands': ['B4', 'B3', 'B2'],
                     'handler': {
-                        'nbr': vis_s2_nbr,
-                        'vis_fire': vis_s2_fire,
-                        'fire_thresh': vis_s2_firethresh
+                        'nbr': vis_nbr,
+                        'vis_fire': vis_fire,
+                        'fire_thresh': vis_firethresh
                     }
                 },
                 'cloud_mask': 'mask_s2_clouds'
@@ -168,7 +169,8 @@ EE_PRODUCTS = {
                     'SWIR2': 'B7',
                     'Pan': 'B8',
                     'TIRS': 'B10',
-                    'TIRS2': 'B11'},
+                    'TIRS2': 'B11',
+                    'cloud_mask': 'cloud_mask'},
         '7': {
             'surface': {
                 'display': 'Surface Reflectance',
@@ -224,7 +226,7 @@ EE_PRODUCTS = {
                     'min': 0.0,
                     'max': 30000.0,
                     'handler': {
-                        'nbr': vis_l8_nbr,
+                        'nbr': vis_nbr,
                     }
                 },
                 'cloud_mask': 'mask_l8_raw',
@@ -242,7 +244,7 @@ EE_PRODUCTS = {
                     'max': 3000,
                     'gamma': 1.4,
                     'handler': {
-                        'nbr': vis_l8_nbr
+                        'nbr': vis_nbr
                     }
                 },
                 'cloud_mask': 'mask_l8_sr',

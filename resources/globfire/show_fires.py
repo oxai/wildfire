@@ -4,7 +4,7 @@ import ee
 import argparse
 from resources.gee.config import EE_CREDENTIALS
 from resources.gee.methods import get_ee_product
-from resources.gee.vis_handler import vis_s2_fire, vis_s2_firethresh, vis_s2_nbr, vis_default
+from resources.gee.vis_handler import vs_fire, vs_firethresh, vs_nbr, vis_default
 import matplotlib.pyplot as plt
 
 
@@ -32,7 +32,7 @@ for root, dirs, files in os.walk(data_dir, topdown=False):
 
         ax = axs[0]
         image = imread(os.path.join(root, name))
-        out = vis_s2_fire(ee_product, image, {})
+        out = vs_fire(ee_product, image, {})
         ax.imshow(out)
         ax.set_title("fire vis applied")
 
@@ -42,7 +42,7 @@ for root, dirs, files in os.walk(data_dir, topdown=False):
         ax.set_title("original RGB")
 
         ax = axs[2]
-        out = vis_s2_firethresh(ee_product, image, {})
+        out = vs_firethresh(ee_product, image, {})
         ax.imshow(out)
         ax.set_title("fire vis")
 

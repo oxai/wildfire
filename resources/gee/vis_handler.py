@@ -135,7 +135,10 @@ def vis_default(ee_product, image, vis_params):
     return array_to_image(out)
 
 
-def vis_nbr(nir, swir, alpha):
+def vis_nbr(ee_product, image, vis_params):
+    nir_band = ee_product['band_map']['NIR']
+    swir_band = ee_product['band_map']['SWIR']
+    nir, swir, alpha = get_bands(ee_product, image, [nir_band, swir_band, 'cloud_mask'])
     level = (nir - swir) / (nir + swir + 1e-9)
     out = apply_palette(level, [
         'black', 'red', 'yellow'
@@ -144,19 +147,17 @@ def vis_nbr(nir, swir, alpha):
     return array_to_image(out)
 
 
-def get_conf_s2_nbr(ee_product, image, vis_params):
-    nir, swir, mask = get_bands(ee_product, image, ['B5', 'B7', 'cloud_mask'])
-    return (nir - swir) / (nir + swir + 1e-9)
-
-def vis_s2_nbr(ee_product, image, vis_params):
-    NIR, SWIR, mask = get_bands(ee_product, image, ['B8', 'B12', 'cloud_mask'])
-    return vis_nbr(NIR, SWIR, mask)
-
-
-def vis_l8_nbr(ee_product, image, vis_params):
-    NIR, SWIR, mask = get_bands(ee_product, image, ['B5', 'B7', 'cloud_mask'])
-    return vis_nbr(NIR, SWIR, mask)
-
+#def vis_s2_nbr(ee_product, image, vis_params):
+#    nir_band = ee_product['band_map']['NIR']
+#    swir_band = ee_product['band_map']['SWIR']
+#    nir, swir, mask = get_bands(ee_product, image, [nir_band, swir_band, 'cloud_mask'])
+#    return vis_nbr(NIR, SWIR, mask)
+#
+#
+#def vis_l8_nbr(ee_product, image, vis_params):
+#    NIR, SWIR, mask = get_bands(ee_product, image, ['B5', 'B7', 'cloud_mask'])
+#    return vis_nbr(NIR, SWIR, mask)
+#
 
 # Functions to visualize wildfire, adapted from https://pierre-markuse.net/2017/08/07/visualizing-wildfires-sentinel-2-imagery-eo-browser/
 def stretch(val, minval, maxval): return (val - minval) / (maxval - minval)
@@ -231,18 +232,23 @@ def vis_from_indicator(ee_product, image, vis_params, ind_func, ind_bands, l_fun
     return array_to_image(combined_array)
 
 
-def get_conf_s2_fire(ee_product, image, vis_params):
-    B2, B3, B4, B8, B11, B12 = get_bands(ee_product, image, ['B2', 'B3', 'B4', 'B8', 'B11', 'B12'])
-    return get_fire_indicator(B11, B12)
+def get_conf_nbr(ee_product, image, vis_params):
+    nir, swir, alpha = get_bands_by_name(ee_product, image, ['NIR', 'SWIR', 'cloud_mask'])
+    return (nir - swir) / (nir + swir + 1e-9)
 
-def vis_s2_fire(ee_product, image, vis_params):
-    B2, B3, B4, B8, B11, B12 = get_bands(ee_product, image, ['B2', 'B3', 'B4', 'B8', 'B11', 'B12'])
-    fire_index = get_fire_indicator(B11, B12)
-    some_fire_array, lots_fire_array = get_fire_levels(B2, B3, B4, B8, B12)
-def get_conf_s2_firethresh(ee_product, image, vis_params):
+def get_conf_fire(ee_product, image, vis_params):
+    swir, swir2 = get_bands_by_name(ee_product, image, ['SWIR', 'SWIR2'])
+    return get_fire_indicator(swir, swir2)
 
-    B11, B12, mask = get_bands(ee_product, image, ['B11', 'B12', 'cloud_mask'])
-    return B11 + B12 / 4
+def get_conf_firethresh(ee_product, image, vis_params):
+    swir, swir2, mask = get_bands_by_name(ee_product, image, ['SWIR', 'SWIR2'])
+    return swir + swir2 / 4
+
+#def vis_s2_fire(ee_product, image, vis_params):
+#    B2, B3, B4, B8, B11, B12 = get_bands(ee_product, image, ['B2', 'B3', 'B4', 'B8', 'B11', 'B12'])
+#    fire_index = get_fire_indicator(B11, B12)
+#    some_fire_array, lots_fire_array = get_fire_levels(B2, B3, B4, B8, B12)
+#
 #def vis_from_indicator(ee_product, image, vis_params, ind_func, ind_bands, l_func, comp_image):
 #    B2, B3, B4, B8, B11, B12 = get_bands(ee_product, image, ['B2', 'B3', 'B4', 'B8', 'B11', 'B12'])
 #    ind_arrays = get_bands(ee_product, image, ind_bands)
@@ -257,29 +263,29 @@ def get_conf_s2_firethresh(ee_product, image, vis_params):
 #    combined_array = np.where(index > 1.0, some_array, no_array)
 #    combined_array = np.where(index > 2.0, lots_array, combined_array)
 #    return array_to_image(combined_array)
+#
+#
+#vis_s2_veg = functools.partial(
+#    vis_from_indicator,
+#    ind_func=get_veg_indicator,
+#    ind_bands = ['B4','B8'],
+#    l_func = get_veg_levels,
+#    comp_image=None)
+#
+#
+#vis_s2_fire = functools.partial(
+#    vis_from_indicator,
+##    ind_func=get_fire_indicator,
+##    ind_bands = ['B11','B12'],
+##    l_func = get_fire_levels,
+#    comp_image=None)
+#
 
-
-vis_s2_veg = functools.partial(
-    vis_from_indicator,
-    ind_func=get_veg_indicator,
-    ind_bands = ['B4','B8'],
-    l_func = get_veg_levels,
-    comp_image=None)
-
-
-vis_s2_fire = functools.partial(
-    vis_from_indicator,
-    ind_func=get_fire_indicator,
-    ind_bands = ['B11','B12'],
-    l_func = get_fire_levels,
-    comp_image=None)
-
-
-vis_s2_dnbr = functools.partial(
-    vis_from_indicator,
-    ind_func=get_nbr_indicator,
-    ind_bands = ['B8','B12'],
-    l_func = get_fire_levels)
+#vis_s2_dnbr = functools.partial(
+#    vis_from_indicator,
+#    ind_func=get_nbr_indicator,
+#    ind_bands = ['B8','B12'],
+#    l_func = get_fire_levels)
 
 vis_veg = functools.partial(
     vis_from_indicator,
@@ -304,9 +310,9 @@ vis_dnbr = functools.partial(
     l_func = get_fire_levels)
 
 
-def vis_s2_firethresh(ee_product, image, vis_params):
-    B11, B12, mask = get_bands(ee_product, image, ['B11', 'B12', 'cloud_mask'])
-    out = apply_palette((B11 + B12) / 4, [
+def vis_firethresh(ee_product, image, vis_params):
+    swir, swir2, mask = get_bands_by_name(ee_product, image, ['SWIR', 'SWIR2', 'cloud_mask'])
+    out = apply_palette((swir + swir2) / 4, [
         'black', 'red', 'yellow'
     ])
     out[-1] = mask
