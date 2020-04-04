@@ -14,19 +14,15 @@ parser.add_argument('sensor', help="sensor type (landsat '8', sentinel '2', modi
 parser.add_argument('product', help="product name ('surface', 'ndvi', 'snow', 'temperature', etc.)")
 parser.add_argument("dir", help="tiff file directory")
 
-
 args = parser.parse_args()
-
-data_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), "..", "..", args.dir)
-
-ee.Initialize(EE_CREDENTIALS)
 
 ee_product = get_ee_product(
     platform=args.platform,
     sensor=args.sensor,
     product=args.product
 )
-for root, dirs, files in os.walk(data_dir, topdown=False):
+
+for root, dirs, files in os.walk(args.dir):
     for name in files:
         fig, axs = plt.subplots(1, 3)
 
