@@ -9,6 +9,7 @@ import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
+import functools
 
 
 def get_visualisers_and_conf():
@@ -42,6 +43,12 @@ def get_vis_handler(ee_product, method='default'):
 
 def get_band(ee_product, image, band):
     return image[ee_product['bands'].index(band)]
+
+
+def get_bands_by_name(ee_product, image, band_names):
+    band_map = ee_product['band_map']
+    band_numbers = [band_map[band_name] for band_name in band_names]
+    return get_bands(ee_product, image, band_numbers)
 
 
 def get_bands(ee_product, image, bands):
@@ -181,16 +188,47 @@ def vis_natural_nirswirmix(B2, B3, B4, B8, B12):
             stretch(3.2 * B2, 0.01, 0.99)]
 
 
+# Functions to compute the changes to image for 'some' and 'lots' fire/veg etc
 def get_fire_levels(B2, B3, B4, B8, B12):
     R = stretch((2.1 * B4 + 0.5 * B12), 0.01, 0.99) + 1.1
     G = stretch((2.2 * B3 + 0.5 * B8), 0.01, 0.99)
     B = stretch(2.1 * B2, 0.01, 0.99)
     return [R, G, B], [R, G + 0.5, B]
 
+def get_veg_levels(B2, B3, B4, B8, B12):
+    R = stretch((2.1 * B4 + 0.5 * B12), 0.01, 0.99)
+    G = stretch((2.2 * B3 + 0.5 * B8), 0.01, 0.99) + 0.1
+    B = stretch(3.2 * B2, 0.01, 0.99)
+    return np.array([R, G, B]), np.array([R*0.7, G*1.1, B*1.1])
 
+
+# Functions to compute masks from metrics
 def get_fire_indicator(B11, B12, sensitivity=1.0):
     # Increase sensitivity for more possible fires and more wrong indications
     return (B11 + B12) * sensitivity
+
+def get_veg_indicator(B4, B8):
+    raw = (B4 - B8)/(B4 + B8)
+    return raw*2 + .7 # Scale to fit 1,2 thresholds, .15-->1, .65-->2
+
+def get_nbr_indicator(B8, B12):
+    return (B8 - B12)/(B8 + B12 + 1e-9)
+
+
+def vis_from_indicator(ee_product, image, vis_params, ind_func, ind_bands, l_func, comp_image):
+    B, G, R, NIR, SWIR, SWIRa = get_bands_by_name(ee_product, image, ['Blue', 'Green', 'Red', 'NIR', 'SWIR', 'SWIR2'])
+    ind_arrays = get_bands_by_name(ee_product, image, ind_bands)
+    index = ind_func(*ind_arrays)
+    if comp_image != None:
+        comp_ind_arrays = get_bands_by_name(ee_product, comp_image, ind_bands)
+        comp_index = ind_func(*comp_ind_arrays)
+        index = index - comp_index
+    some_array, lots_array = l_func(B, G, R, NIR, SWIRa)
+    no_array = vis_natural_nirswirmix(B, G, R, NIR, SWIRa)
+
+    combined_array = np.where(index > 1.0, some_array, no_array)
+    combined_array = np.where(index > 2.0, lots_array, combined_array)
+    return array_to_image(combined_array)
 
 
 def get_conf_s2_fire(ee_product, image, vis_params):
@@ -201,18 +239,70 @@ def vis_s2_fire(ee_product, image, vis_params):
     B2, B3, B4, B8, B11, B12 = get_bands(ee_product, image, ['B2', 'B3', 'B4', 'B8', 'B11', 'B12'])
     fire_index = get_fire_indicator(B11, B12)
     some_fire_array, lots_fire_array = get_fire_levels(B2, B3, B4, B8, B12)
-
-    no_fire_array = vis_natural_nirswirmix(B2, B3, B4, B8, B12)
-
-    combined_array = np.where(fire_index > 1.0, some_fire_array, no_fire_array)
-    combined_array = np.where(fire_index > 2.0, lots_fire_array, combined_array)
-
-    return array_to_image(combined_array)
-
-
 def get_conf_s2_firethresh(ee_product, image, vis_params):
+
     B11, B12, mask = get_bands(ee_product, image, ['B11', 'B12', 'cloud_mask'])
     return B11 + B12 / 4
+#def vis_from_indicator(ee_product, image, vis_params, ind_func, ind_bands, l_func, comp_image):
+#    B2, B3, B4, B8, B11, B12 = get_bands(ee_product, image, ['B2', 'B3', 'B4', 'B8', 'B11', 'B12'])
+#    ind_arrays = get_bands(ee_product, image, ind_bands)
+#    index = ind_func(*ind_arrays)
+#    if comp_image != None:
+#        comp_ind_arrays = get_bands(ee_product, comp_image, ind_bands)
+#        comp_index = ind_func(*comp_ind_arrays)
+#        index = index - comp_index
+#    some_array, lots_array = l_func(B2, B3, B4, B8, B12)
+#    no_array = vis_natural_nirswirmix(B2, B3, B4, B8, B12)
+#
+#    combined_array = np.where(index > 1.0, some_array, no_array)
+#    combined_array = np.where(index > 2.0, lots_array, combined_array)
+#    return array_to_image(combined_array)
+
+
+vis_s2_veg = functools.partial(
+    vis_from_indicator,
+    ind_func=get_veg_indicator,
+    ind_bands = ['B4','B8'],
+    l_func = get_veg_levels,
+    comp_image=None)
+
+
+vis_s2_fire = functools.partial(
+    vis_from_indicator,
+    ind_func=get_fire_indicator,
+    ind_bands = ['B11','B12'],
+    l_func = get_fire_levels,
+    comp_image=None)
+
+
+vis_s2_dnbr = functools.partial(
+    vis_from_indicator,
+    ind_func=get_nbr_indicator,
+    ind_bands = ['B8','B12'],
+    l_func = get_fire_levels)
+
+vis_veg = functools.partial(
+    vis_from_indicator,
+    ind_func=get_veg_indicator,
+    ind_bands = ['Red','NIR'],
+    l_func = get_veg_levels,
+    comp_image=None)
+
+
+vis_fire = functools.partial(
+    vis_from_indicator,
+    ind_func=get_fire_indicator,
+    ind_bands = ['SWIR','SWIR2'],
+    l_func = get_fire_levels,
+    comp_image=None)
+
+
+vis_dnbr = functools.partial(
+    vis_from_indicator,
+    ind_func=get_nbr_indicator,
+    ind_bands = ['SWIR','SWIR2'],
+    l_func = get_fire_levels)
+
 
 def vis_s2_firethresh(ee_product, image, vis_params):
     B11, B12, mask = get_bands(ee_product, image, ['B11', 'B12', 'cloud_mask'])
