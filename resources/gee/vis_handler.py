@@ -136,9 +136,7 @@ def vis_default(ee_product, image, vis_params):
 
 
 def vis_nbr(ee_product, image, vis_params):
-    nir_band = ee_product['band_map']['NIR']
-    swir_band = ee_product['band_map']['SWIR']
-    nir, swir, alpha = get_bands(ee_product, image, [nir_band, swir_band, 'cloud_mask'])
+    nir, swir, alpha = get_bands_by_name(ee_product, image, ['NIR', 'SWIR2', 'cloud_mask'])
     level = (nir - swir) / (nir + swir + 1e-9)
     out = apply_palette(level, [
         'black', 'red', 'yellow'
@@ -241,7 +239,7 @@ def get_conf_fire(ee_product, image, vis_params):
     return get_fire_indicator(swir, swir2)
 
 def get_conf_firethresh(ee_product, image, vis_params):
-    swir, swir2, mask = get_bands_by_name(ee_product, image, ['SWIR', 'SWIR2'])
+    swir, swir2 = get_bands_by_name(ee_product, image, ['SWIR', 'SWIR2'])
     return swir + swir2 / 4
 
 #def vis_s2_fire(ee_product, image, vis_params):
