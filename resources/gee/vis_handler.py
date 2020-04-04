@@ -1,24 +1,8 @@
-# vis_default
-#
-#
-# vis_s2_nbr - "level"
-# vis_s2_fire - get_fire_indicator
-# vis_s2_firethresh - (B11 + B12) / 4
-
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 import functools
-
-
-def get_visualisers_and_conf():
-    return vis_default, {("s2_nbr", "vis"): vis_s2_nbr,
-                         ("s2_nbr", "conf"): get_conf_s2_nbr,
-                         ("s2_fire", "vis"): vis_s2_fire,
-                         ("s2_fire", "conf"): get_conf_s2_fire,
-                         ("s2_firethresh", "vis"): vis_s2_firethresh,
-                         ("s2_firethresh", "conf"): get_conf_s2_firethresh}
 
 
 def get_empty_image(shape=(256, 256, 4)):
@@ -145,41 +129,7 @@ def vis_nbr(ee_product, image, vis_params):
     return array_to_image(out)
 
 
-#def vis_s2_nbr(ee_product, image, vis_params):
-#    nir_band = ee_product['band_map']['NIR']
-#    swir_band = ee_product['band_map']['SWIR']
-#    nir, swir, mask = get_bands(ee_product, image, [nir_band, swir_band, 'cloud_mask'])
-#    return vis_nbr(NIR, SWIR, mask)
-#
-#
-#def vis_l8_nbr(ee_product, image, vis_params):
-#    NIR, SWIR, mask = get_bands(ee_product, image, ['B5', 'B7', 'cloud_mask'])
-#    return vis_nbr(NIR, SWIR, mask)
-#
-
-# Functions to visualize wildfire, adapted from https://pierre-markuse.net/2017/08/07/visualizing-wildfires-sentinel-2-imagery-eo-browser/
 def stretch(val, minval, maxval): return (val - minval) / (maxval - minval)
-
-
-# def vis_natural_colors(B2, B3, B4):
-#     return [stretch(3.1 * B4, 0.05, 0.9), stretch(3 * B3, 0.05, 0.9), stretch(3.0 * B2, 0.05, 0.9)];
-#
-#
-# def vis_enhanced_natural_colors(B2, B3, B4, B5, B8):
-#     return [stretch((3.1 * B4 + 0.1 * B5), 0.05, 0.9), stretch((3 * B3 + 0.15 * B8), 0.05, 0.9),
-#             stretch(3 * B2, 0.05, 0.9)];
-#
-#
-# def vis_nirswir_color(B2, B8, B12):
-#     return [stretch(2.6 * B12, 0.05, 0.9), stretch(1.9 * B8, 0.05, 0.9), stretch(2.7 * B2, 0.05, 0.9)]
-#
-#
-# def vis_panband(B8):
-#     return [stretch(B8, 0.01, 0.99), stretch(B8, 0.01, 0.99), stretch(B8, 0.01, 0.99)]
-#
-#
-# def vis_pan_tinted_green(B8):
-#     return [B8 * 0.2, B8, B8 * 0.2]
 
 
 def vis_natural_nirswirmix(B2, B3, B4, B8, B12):
@@ -256,48 +206,6 @@ def get_conf_firethresh(ee_product, image, vis_params):
     swir, swir2 = get_bands_by_name(ee_product, image, ['SWIR', 'SWIR2'])
     return swir + swir2 / 4
 
-#def vis_s2_fire(ee_product, image, vis_params):
-#    B2, B3, B4, B8, B11, B12 = get_bands(ee_product, image, ['B2', 'B3', 'B4', 'B8', 'B11', 'B12'])
-#    fire_index = get_fire_indicator(B11, B12)
-#    some_fire_array, lots_fire_array = get_fire_levels(B2, B3, B4, B8, B12)
-#
-#def vis_from_indicator(ee_product, image, vis_params, ind_func, ind_bands, l_func, comp_image):
-#    B2, B3, B4, B8, B11, B12 = get_bands(ee_product, image, ['B2', 'B3', 'B4', 'B8', 'B11', 'B12'])
-#    ind_arrays = get_bands(ee_product, image, ind_bands)
-#    index = ind_func(*ind_arrays)
-#    if comp_image != None:
-#        comp_ind_arrays = get_bands(ee_product, comp_image, ind_bands)
-#        comp_index = ind_func(*comp_ind_arrays)
-#        index = index - comp_index
-#    some_array, lots_array = l_func(B2, B3, B4, B8, B12)
-#    no_array = vis_natural_nirswirmix(B2, B3, B4, B8, B12)
-#
-#    combined_array = np.where(index > 1.0, some_array, no_array)
-#    combined_array = np.where(index > 2.0, lots_array, combined_array)
-#    return array_to_image(combined_array)
-#
-#
-#vis_s2_veg = functools.partial(
-#    vis_from_indicator,
-#    ind_func=get_veg_indicator,
-#    ind_bands = ['B4','B8'],
-#    l_func = get_veg_levels,
-#    comp_image=None)
-#
-#
-#vis_s2_fire = functools.partial(
-#    vis_from_indicator,
-##    ind_func=get_fire_indicator,
-##    ind_bands = ['B11','B12'],
-##    l_func = get_fire_levels,
-#    comp_image=None)
-#
-
-#vis_s2_dnbr = functools.partial(
-#    vis_from_indicator,
-#    ind_func=get_nbr_indicator,
-#    ind_bands = ['B8','B12'],
-#    l_func = get_fire_levels)
 
 vis_veg = functools.partial(
     vis_from_indicator,
