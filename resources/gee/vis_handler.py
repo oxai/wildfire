@@ -1,12 +1,12 @@
 import numpy as np
-import functools
 from inspect import signature
 
 from resources.gee.vis_handler_utils import get_band, get_bands_by_name, apply_palette, normalise_image, array_to_image, \
     stretch
 
 
-def process_image(handler):
+# decorator for any vis_handler
+def vis_handler_wrapper(handler):
     def process(ee_product, image, vis_params=None):
         if not vis_params:
             vis_params = ee_product.get('vis_params', {})
@@ -28,7 +28,7 @@ def get_vis_handler(ee_product, method='default'):
     return vis_params['handler'][method]
 
 
-@process_image
+@vis_handler_wrapper
 def vis_default(ee_product, image, vis_params):
     bands = vis_params.get('bands', None)
     if bands:
@@ -49,7 +49,7 @@ def vis_default(ee_product, image, vis_params):
     return out
 
 
-@process_image
+@vis_handler_wrapper
 def vis_nbr(ee_product, image):
     nir, swir, alpha = get_bands_by_name(ee_product, image, ['NIR', 'SWIR2', 'cloud_mask'])
     level = (nir - swir) / (nir + swir + 1e-9)
@@ -96,7 +96,7 @@ def get_nbr_indicator(nir, swir2):
 
 
 def vis_from_indicator(ind_func, ind_bands, l_func, comp_image):
-    @process_image
+    @vis_handler_wrapper
     def handler(ee_product, image):
         B, G, R, nir, swir, swir2 = get_bands_by_name(ee_product, image,
                                                       ['Blue', 'Green', 'Red', 'NIR', 'SWIR', 'SWIR2'])
@@ -146,7 +146,7 @@ vis_dnbr = vis_from_indicator(ind_func=get_nbr_indicator,
                               l_func=get_fire_levels)
 
 
-@process_image
+@vis_handler_wrapper
 def vis_firethresh(ee_product, image):
     swir, swir2, mask = get_bands_by_name(ee_product, image, ['SWIR', 'SWIR2', 'cloud_mask'])
     out = apply_palette((swir + swir2) / 4, [
