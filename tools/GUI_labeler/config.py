@@ -5,6 +5,7 @@ import ee
 from resources.gee.config import EE_CREDENTIALS
 from resources.gee.methods import get_ee_product
 from resources.gee.vis_handler import *
+from PIL import Image
 
 # TODO write README
 # TODO add graphic for "<=" button OR get rid of need for manual refresh
