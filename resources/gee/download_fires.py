@@ -1,6 +1,6 @@
 import argparse
 from resources.gee.methods import TileDateRangeQuery
-from resources.gee.vis_handler import visualise_image
+from resources.gee.vis_handler import vis_default
 from resources.manual_fire.data_loader import ManualFireDataLoader
 from resources.modis_fire.data_loader import ModisFireDataLoader
 from .tile_loader import GeeProductTileSeriesLoader
@@ -148,7 +148,7 @@ def download_from_df(df, ee_product, zoom, subdir, img_size=256, display=False, 
         if display:
             images = [img for img in out if img is not None]
             if images:
-                image = visualise_image(images[0], ee_product)
+                image = vis_default(ee_product, images[0])
                 print(f'Displaying {i + 1}th downloaded image')
                 plt.imshow(image)
                 plt.show()

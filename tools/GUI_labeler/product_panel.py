@@ -3,7 +3,6 @@ import tkinter as tk
 from PIL import ImageTk
 from tifffile import imread
 
-from resources.gee.vis_handler import visualise_image
 from tools.GUI_labeler.mask_helpers import *
 from tools.GUI_labeler.config import colours, rgb_vis, vis_conf_dict, ee_product
 from tools.GUI_labeler.tk_ui_helpers import make_option_menu, make_toolbar_label
@@ -107,7 +106,7 @@ class Product_Panel(tk.Frame):
         """
         inn = imread(self.cur_img_path)
         vis_f = self.vis_dict[self.cur_filter_name.get()]
-        out = visualise_image(inn, ee_product, handler=vis_f)
+        out = vis_f(ee_product, inn)
         out.thumbnail(self.im_size)
         self.cur_vis_PIL = out
 

@@ -6,18 +6,19 @@ from resources.gee.vis_handler_utils import get_band, get_bands_by_name, apply_p
     stretch
 
 
-def visualise_image(image: np.ndarray, ee_product, vis_params=None, handler=None, method="default"):
-    if handler is None:
-        handler = get_vis_handler(ee_product, method=method)
-    if not vis_params:
-        vis_params = ee_product.get('vis_params', {})
-    norm_image = normalise_image(image, vis_params)
-    sig = signature(handler)
-    if 'vis_params' in sig.parameters:
-        out = handler(ee_product, norm_image, vis_params)
-    else:
-        out = handler(ee_product, norm_image)
-    return array_to_image(out)
+def process_image(handler):
+    def process(ee_product, image, vis_params=None):
+        if not vis_params:
+            vis_params = ee_product.get('vis_params', {})
+        norm_image = normalise_image(image, vis_params)
+        sig = signature(handler)
+        if 'vis_params' in sig.parameters:
+            out = handler(ee_product, norm_image, vis_params)
+        else:
+            out = handler(ee_product, norm_image)
+        return array_to_image(out)
+
+    return process
 
 
 def get_vis_handler(ee_product, method='default'):
@@ -27,6 +28,7 @@ def get_vis_handler(ee_product, method='default'):
     return vis_params['handler'][method]
 
 
+@process_image
 def vis_default(ee_product, image, vis_params):
     bands = vis_params.get('bands', None)
     if bands:
@@ -47,6 +49,7 @@ def vis_default(ee_product, image, vis_params):
     return out
 
 
+@process_image
 def vis_nbr(ee_product, image):
     nir, swir, alpha = get_bands_by_name(ee_product, image, ['NIR', 'SWIR2', 'cloud_mask'])
     level = (nir - swir) / (nir + swir + 1e-9)
@@ -92,20 +95,25 @@ def get_nbr_indicator(nir, swir2):
     return (nir - swir2) / (nir + swir2 + 1e-9)
 
 
-def vis_from_indicator(ee_product, image, ind_func, ind_bands, l_func, comp_image):
-    B, G, R, nir, swir, swir2 = get_bands_by_name(ee_product, image, ['Blue', 'Green', 'Red', 'NIR', 'SWIR', 'SWIR2'])
-    ind_arrays = get_bands_by_name(ee_product, image, ind_bands)
-    index = ind_func(*ind_arrays)
-    if comp_image != None:
-        comp_ind_arrays = get_bands_by_name(ee_product, comp_image, ind_bands)
-        comp_index = ind_func(*comp_ind_arrays)
-        index = index - comp_index
-    some_array, lots_array = l_func(B, G, R, nir, swir2)
-    no_array = get_natural_nirswirmix(B, G, R, nir, swir2)
+def vis_from_indicator(ind_func, ind_bands, l_func, comp_image):
+    @process_image
+    def handler(ee_product, image):
+        B, G, R, nir, swir, swir2 = get_bands_by_name(ee_product, image,
+                                                      ['Blue', 'Green', 'Red', 'NIR', 'SWIR', 'SWIR2'])
+        ind_arrays = get_bands_by_name(ee_product, image, ind_bands)
+        index = ind_func(*ind_arrays)
+        if comp_image != None:
+            comp_ind_arrays = get_bands_by_name(ee_product, comp_image, ind_bands)
+            comp_index = ind_func(*comp_ind_arrays)
+            index = index - comp_index
+        some_array, lots_array = l_func(B, G, R, nir, swir2)
+        no_array = get_natural_nirswirmix(B, G, R, nir, swir2)
 
-    combined_array = np.where(index > 1.0, some_array, no_array)
-    combined_array = np.where(index > 2.0, lots_array, combined_array)
-    return combined_array
+        combined_array = np.where(index > 1.0, some_array, no_array)
+        combined_array = np.where(index > 2.0, lots_array, combined_array)
+        return combined_array
+
+    return handler
 
 
 def get_conf_nbr(ee_product, image):
@@ -123,27 +131,22 @@ def get_conf_firethresh(ee_product, image):
     return swir + swir2 / 4
 
 
-vis_veg = functools.partial(
-    vis_from_indicator,
-    ind_func=get_veg_indicator,
-    ind_bands=['Red', 'NIR'],
-    l_func=get_veg_levels,
-    comp_image=None)
+vis_veg = vis_from_indicator(ind_func=get_veg_indicator,
+                             ind_bands=['Red', 'NIR'],
+                             l_func=get_veg_levels,
+                             comp_image=None)
 
-vis_fire = functools.partial(
-    vis_from_indicator,
-    ind_func=get_fire_indicator,
-    ind_bands=['SWIR', 'SWIR2'],
-    l_func=get_fire_levels,
-    comp_image=None)
+vis_fire = vis_from_indicator(ind_func=get_fire_indicator,
+                              ind_bands=['SWIR', 'SWIR2'],
+                              l_func=get_fire_levels,
+                              comp_image=None)
 
-vis_dnbr = functools.partial(
-    vis_from_indicator,
-    ind_func=get_nbr_indicator,
-    ind_bands=['SWIR', 'SWIR2'],
-    l_func=get_fire_levels)
+vis_dnbr = vis_from_indicator(ind_func=get_nbr_indicator,
+                              ind_bands=['SWIR', 'SWIR2'],
+                              l_func=get_fire_levels)
 
 
+@process_image
 def vis_firethresh(ee_product, image):
     swir, swir2, mask = get_bands_by_name(ee_product, image, ['SWIR', 'SWIR2', 'cloud_mask'])
     out = apply_palette((swir + swir2) / 4, [
