@@ -7,7 +7,7 @@ from resources.gee.vis_handler_utils import get_band, get_bands_by_name, apply_p
 
 # decorator for any vis_handler
 def vis_handler_wrapper(handler):
-    def process(ee_product, image, vis_params=None):
+    def process(ee_product, image, vis_params=None, comp_image=None):
         if not vis_params:
             vis_params = ee_product.get('vis_params', {})
         norm_image = normalise_image(image, vis_params)
@@ -95,9 +95,9 @@ def get_nbr_indicator(nir, swir2):
     return (nir - swir2) / (nir + swir2 + 1e-9)
 
 
-def vis_from_indicator(ind_func, ind_bands, l_func, comp_image):
+def vis_from_indicator(ind_func, ind_bands, l_func, comp_image=None):
     @vis_handler_wrapper
-    def handler(ee_product, image):
+    def handler(ee_product, image, comp_image=comp_image):
         B, G, R, nir, swir, swir2 = get_bands_by_name(ee_product, image,
                                                       ['Blue', 'Green', 'Red', 'NIR', 'SWIR', 'SWIR2'])
         ind_arrays = get_bands_by_name(ee_product, image, ind_bands)
