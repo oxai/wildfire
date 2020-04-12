@@ -91,8 +91,8 @@ def get_veg_indicator(red, nir):
     return raw * 2 + .7  # Scale to fit 1,2 thresholds, .15-->1, .65-->2
 
 
-def get_nbr_indicator(nir, swir2):
-    return (nir - swir2) / (nir + swir2 + 1e-9)
+def get_nbr_indicator(nir, swir2, sensitivity):
+    return sensitivity*(nir - swir2)/(nir + swir2 + 1e-9)
 
 
 def vis_from_indicator(ind_func, ind_bands, l_func, comp_image=None):
