@@ -1,6 +1,6 @@
 from .config import EE_CREDENTIALS
 from .methods import get_ee_product
-from .vis_handler import vis_dnbr
+from .vis_handler import vis_dnbr, vis_dndvi
 import ee
 import matplotlib.pyplot as plt
 import numpy as np
@@ -44,18 +44,27 @@ def days_between_fnames(fname1, fname2):
     date2 = fname_to_date(fname2)
     return days_between(date1, date2)
 
-def fpaths_to_dnbr(fpath1, fpath2, out_fpath):
+def fpaths_to_diff_vis(fpath1, fpath2, out_fpath, diff_vis):
     img1 = tifffile.imread(fpath1)
     img2 = tifffile.imread(fpath2)
     arr1 = np.array(img1)
     arr2 = np.array(img2)
-    dnbr_img = vis_dnbr(ee_product, arr1, vis_params=None,comp_image=arr2)
+    dnbr_img = diff_vis(ee_product, arr1, vis_params=None,comp_image=arr2)
     dnbr_img.save(out_fpath)
     
 
-def compute_dnbrs_for_dir(fire_dir):
-    fname_list = [fname for fname in os.listdir(fire_dir) if not
-    os.path.isdir(os.path.join(fire_dir,fname))]
+def compute_diff_vis_for_dir(image_dir, diff_vis, diff_vis_name):
+    """Compute and save diff vis images for all files in directory.
+
+    ARGS:
+        image_dir: the directory containing images and .tif files
+        diff_vis: the function that computes a visualizer by comparing to a past
+            image
+        diff_vis_name: the name of the new directory where files will be written
+            and the suffix to all written files
+    """
+    fname_list = [fname for fname in os.listdir(image_dir) if not
+    os.path.isdir(os.path.join(image_dir,fname))]
     fire_ids = set([fname_to_fire_id(fname) for fname in fname_list])
     fnames_by_fire_id = {fire_id: [fname for fname in fname_list if
     fname_to_fire_id(fname) == fire_id] for fire_id in fire_ids}
@@ -71,13 +80,17 @@ def compute_dnbrs_for_dir(fire_dir):
             if days_since > 10:
                 continue
             date = fname_to_date(fname)
-            fpath1 = os.path.join(fire_dir,fname)
-            fpath2 = os.path.join(fire_dir,fname_prev)
-            out_fpath = os.path.join(fire_dir,'dnbrs',f'{fire_id}-{date}-dnbr.png')
+            fpath1 = os.path.join(image_dir,fname)
+            fpath2 = os.path.join(image_dir,fname_prev)
+            out_fpath = os.path.join(image_dir, f'{diff_vis_name}s',
+            f'{fire_id}_{date}_{diff_vis_name}.png')
             try:
-                fpaths_to_dnbr(fpath1, fpath2, out_fpath)
+                fpaths_to_diff_vis(fpath1, fpath2, out_fpath, diff_vis)
             except KeyboardInterrupt: sys.exit(0)
-            except: print("Can't load", fname)
+            except Exception as e: print("Can't load", fname, e)
 
-FIRE_DIR = '/home/oxai/GlobFire/images/sentinel-2_l1c_globfire_2015-01-01_2019-12-31_13_w_fire'
-compute_dnbrs_for_dir(FIRE_DIR)
+
+if __name__ == "__main__":
+    FIRE_DIR = '/home/oxai/GlobFire/images/sentinel-2_l1c_globfire_2015-01-01_2019-12-31_13_w_fire'
+    #compute_diff_vis_for_dir(FIRE_DIR,vis_dnbr,'dnbr')
+    compute_diff_vis_for_dir(FIRE_DIR,vis_dndvi,'dndvi')

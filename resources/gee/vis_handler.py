@@ -88,7 +88,7 @@ def get_fire_indicator(B11, swir2, sensitivity=1.0):
 
 
 def get_veg_indicator(red, nir):
-    raw = (red - nir) / (red + nir)
+    raw = (red - nir) / (red + nir + 1e-9)
     return raw * 2 + .7  # Scale to fit 1,2 thresholds, .15-->1, .65-->2
 
 
@@ -136,6 +136,10 @@ vis_veg = vis_from_indicator(ind_func=get_veg_indicator,
                              ind_bands=['Red', 'NIR'],
                              l_func=get_veg_levels,
                              comp_image=None)
+
+vis_dndvi = vis_from_indicator(ind_func=get_veg_indicator,
+                             ind_bands=['Red', 'NIR'],
+                             l_func=get_veg_levels)
 
 vis_fire = vis_from_indicator(ind_func=get_fire_indicator,
                               ind_bands=['SWIR', 'SWIR2'],
