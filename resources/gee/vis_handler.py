@@ -1,5 +1,6 @@
-import numpy as np
+from functools import partial
 from inspect import signature
+import numpy as np
 
 from resources.gee.vis_handler_utils import get_band, get_bands_by_name, apply_palette, normalise_image, array_to_image, \
     stretch
@@ -141,7 +142,7 @@ vis_fire = vis_from_indicator(ind_func=get_fire_indicator,
                               l_func=get_fire_levels,
                               comp_image=None)
 
-vis_dnbr = vis_from_indicator(ind_func=get_nbr_indicator,
+vis_dnbr = vis_from_indicator(ind_func=partial(get_nbr_indicator,sensitivity=50),
                               ind_bands=['SWIR', 'SWIR2'],
                               l_func=get_fire_levels)
 
