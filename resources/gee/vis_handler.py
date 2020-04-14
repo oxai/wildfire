@@ -82,30 +82,33 @@ def get_veg_levels(blue, green, red, nir, swir2):
 
 
 # Functions to compute masks from metrics
-def get_fire_indicator(B11, swir2, sensitivity=1.0):
+def get_fire_indicator(ee_product, image, sensitivity=1.0):
+    swir, swir2 = get_bands_by_name(ee_product, image, ['SWIR', 'SWIR2'])
     # Increase sensitivity for more possible fires and more wrong indications
-    return (B11 + swir2) * sensitivity
+    return (swir + swir2) * sensitivity
 
 
-def get_veg_indicator(red, nir):
+def get_veg_indicator(ee_product, image, sensitivity=1.0):
+    red, nir= get_bands_by_name(ee_product, image, ['Red', 'NIR'])
     raw = (red - nir) / (red + nir + 1e-9)
     return raw * 2 + .7  # Scale to fit 1,2 thresholds, .15-->1, .65-->2
 
 
-def get_nbr_indicator(nir, swir2, sensitivity):
+def get_nbr_indicator(ee_product, image, sensitivity=1.0):
+    nir, swir2 = get_bands_by_name(ee_product, image, ['NIR', 'SWIR2'])
     return sensitivity*(nir - swir2)/(nir + swir2 + 1e-9)
 
 
-def vis_from_indicator(ind_func, ind_bands, l_func, comp_image=None):
+def vis_from_indicator(ind_func, l_func, comp_image=None):
     @vis_handler_wrapper
     def handler(ee_product, image, comp_image=comp_image):
         B, G, R, nir, swir, swir2 = get_bands_by_name(ee_product, image,
                                                       ['Blue', 'Green', 'Red', 'NIR', 'SWIR', 'SWIR2'])
-        ind_arrays = get_bands_by_name(ee_product, image, ind_bands)
-        index = ind_func(*ind_arrays)
+        #ind_arrays = get_bands_by_name(ee_product, image, ind_bands)
+        index = ind_func(ee_product,image)
         if comp_image != None:
-            comp_ind_arrays = get_bands_by_name(ee_product, comp_image, ind_bands)
-            comp_index = ind_func(*comp_ind_arrays)
+            #comp_ind_arrays = get_bands_by_name(ee_product, comp_image, ind_bands)
+            comp_index = ind_func(ee_product, comp_image)
             index = index - comp_index
         some_array, lots_array = l_func(B, G, R, nir, swir2)
         no_array = get_natural_nirswirmix(B, G, R, nir, swir2)
@@ -133,21 +136,17 @@ def get_conf_firethresh(ee_product, image):
 
 
 vis_veg = vis_from_indicator(ind_func=get_veg_indicator,
-                             ind_bands=['Red', 'NIR'],
                              l_func=get_veg_levels,
                              comp_image=None)
 
 vis_dndvi = vis_from_indicator(ind_func=get_veg_indicator,
-                             ind_bands=['Red', 'NIR'],
                              l_func=get_veg_levels)
 
 vis_fire = vis_from_indicator(ind_func=get_fire_indicator,
-                              ind_bands=['SWIR', 'SWIR2'],
                               l_func=get_fire_levels,
                               comp_image=None)
 
 vis_dnbr = vis_from_indicator(ind_func=partial(get_nbr_indicator,sensitivity=50),
-                              ind_bands=['SWIR', 'SWIR2'],
                               l_func=get_fire_levels)
 
 
