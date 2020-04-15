@@ -55,18 +55,20 @@ def compute_diff_vis_for_dir(image_dir, diff_vis_func, diff_ind_func, diff_vis_n
                 if days_since > 10:
                     continue
 
-                out_path_base = os.path.join(out_vis_dir, f'{image_info["name"]}__{days_since}__{diff_vis_name}')
+                out_file_base = f'{image_info["name"]}__{days_since}__{diff_vis_name}'
+                out_vis_fpath = os.path.join(out_vis_dir, f"{out_file_base}.png")
+                out_ind_fpath = os.path.join(out_ind_dir, f"{out_file_base}.png")
 
                 arr_curr = image_info["data"]
                 arr_prev = image_info_prev["data"]
                 if diff_vis_func is not None:
                     diff_img = diff_vis_func(ee_product, arr_curr, vis_params=None, comp_image=arr_prev)
-                    diff_img.save(f"{out_path_base}.png")
+                    diff_img.save(out_vis_fpath)
                 if diff_ind_func is not None:
                     ind_curr = diff_ind_func(ee_product, arr_curr)
                     ind_prev = diff_ind_func(ee_product, arr_prev)
                     diff_ind = ind_curr - ind_prev
-                    np.save(out_path_base, diff_ind)
+                    np.save(out_ind_fpath, diff_ind)
 
 
 if __name__ == "__main__":

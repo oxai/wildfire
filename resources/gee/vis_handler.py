@@ -8,15 +8,17 @@ from resources.gee.vis_handler_utils import get_band, get_bands_by_name, apply_p
 
 # decorator for any vis_handler
 def vis_handler_wrapper(handler):
-    def process(ee_product, image, vis_params=None, **kwargs):
+    def process(ee_product, image, vis_params=None, comp_image=None, **kwargs):
+        sig = signature(handler)
         if not vis_params:
             vis_params = ee_product.get('vis_params', {})
+            if 'vis_params' in sig.parameters:
+                kwargs = {**kwargs, "vis_params": vis_params}
         norm_image = normalise_image(image, vis_params)
-        sig = signature(handler)
-        if 'vis_params' in sig.parameters:
-            out = handler(ee_product, norm_image, vis_params=vis_params, **kwargs)
-        else:
-            out = handler(ee_product, norm_image, **kwargs)
+        if comp_image is not None:
+            norm_comp_image = normalise_image(comp_image, vis_params)
+            kwargs = {**kwargs, "comp_image": norm_comp_image}
+        out = handler(ee_product, norm_image, **kwargs)
         return array_to_image(out)
 
     return process
@@ -30,7 +32,7 @@ def get_vis_handler(ee_product, method='default'):
 
 
 @vis_handler_wrapper
-def vis_default(ee_product, image, vis_params):
+def vis_default(ee_product, image, vis_params=None):
     bands = vis_params.get('bands', None)
     if bands:
         _, h, w = image.shape
