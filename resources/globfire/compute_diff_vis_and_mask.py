@@ -6,6 +6,7 @@ import tifffile
 from collections import defaultdict
 from pathlib import Path
 from resources.globfire.data_loader import GlobFireDataLoader
+import argparse
 
 
 def load_fire_images_from_dir(image_dir):
@@ -23,7 +24,7 @@ def load_fire_images_from_dir(image_dir):
     return images_by_fire_id
 
 
-def compute_diff_vis_for_dir(image_dir, diff_vis_func, diff_mask_func, diff_vis_name):
+def compute_diff_vis_for_dir(image_dir, diff_vis_func, diff_ind_func, diff_vis_name):
     """Compute and save diff vis images for all files in directory.
 
     ARGS:
@@ -35,8 +36,8 @@ def compute_diff_vis_for_dir(image_dir, diff_vis_func, diff_mask_func, diff_vis_
     """
     out_vis_dir = os.path.join(image_dir, f'{diff_vis_name}_visualizations')
     if not os.path.exists(out_vis_dir): os.mkdir(out_vis_dir)
-    out_mask_dir = os.path.join(image_dir, f'{diff_vis_name}_masks')
-    if not os.path.exists(out_mask_dir): os.mkdir(out_mask_dir)
+    out_ind_dir = os.path.join(image_dir, f'{diff_vis_name}_indicators')
+    if not os.path.exists(out_ind_dir): os.mkdir(out_ind_dir)
 
     images_by_fire_id = load_fire_images_from_dir(image_dir)
 
@@ -61,14 +62,30 @@ def compute_diff_vis_for_dir(image_dir, diff_vis_func, diff_mask_func, diff_vis_
                 if diff_vis_func is not None:
                     diff_img = diff_vis_func(ee_product, arr_curr, vis_params=None, comp_image=arr_prev)
                     diff_img.save(f"{out_path_base}.png")
-                if diff_mask_func is not None:
-                    mask1 = diff_mask_func(ee_product, arr_curr)
-                    mask2 = diff_mask_func(ee_product, arr_prev)
-                    diff_mask = mask1 - mask2
-                    np.save(out_path_base, diff_mask)
+                if diff_ind_func is not None:
+                    ind_curr = diff_ind_func(ee_product, arr_curr)
+                    ind_prev = diff_ind_func(ee_product, arr_prev)
+                    diff_ind = ind_curr - ind_prev
+                    np.save(out_path_base, diff_ind)
 
 
 if __name__ == "__main__":
-    FIRE_DIR = 'resources/globfire/data_dir/sentinel-2_l1c_globfire_2015-01-01_2019-12-31_13_w_fire/'
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dir",
+                        default="/home/oxai/GlobFire/images/sentinel-2_l1c_globfire_2015-01-01_2019-12-31_13_w_fire",
+                        help="directory where images are stored for processing")
+    parser.add_argument("--name",
+                        default="dnbr",
+                        help="name of the indicator")
+
+    args = parser.parse_args()
+
+    vis_ind_dict = {
+        "dnbr": {"vis": vis_dnbr, "ind": get_nbr_indicator}
+    }
+
+    vis_ind = vis_ind_dict[args.name]
+
     # compute_diff_vis_for_dir(FIRE_DIR,ee_product,diff_vis_func=None,diff_mask_func=get_veg_indicator,diff_vis_name='dndvi')
-    compute_diff_vis_for_dir(FIRE_DIR, diff_vis_func=vis_dnbr, diff_mask_func=get_nbr_indicator, diff_vis_name='dnbr')
+    compute_diff_vis_for_dir(args.dir,
+                             diff_vis_func=vis_ind["vis"], diff_ind_func=vis_ind["ind"], diff_vis_name=args.name)
