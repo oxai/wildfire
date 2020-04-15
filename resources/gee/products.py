@@ -62,21 +62,6 @@ EE_PRODUCTS = {
         },
     },
     'sentinel': {
-        'band_map': {'C/A': 'B1',
-                     'Blue': 'B2',
-                     'Green': 'B3',
-                     'Red': 'B4',
-                     'VRE': 'B5',
-                     'VRE': 'B6',
-                     'VRE': 'B7',
-                     'NIR': 'B8',
-                     'NIR2': 'B8a',
-                     'WV': 'B9',
-                     'Cirrus': 'B10',
-                     'SWIR': 'B11',
-                     'SWIR2': 'B12',
-                     'cloud_mask': 'cloud_mask',
-                     'SWIR2': 'B12'},
         '2': {
             'l1c': {
                 'display': 'Surface Reflectance',
@@ -93,6 +78,23 @@ EE_PRODUCTS = {
                         'vis_fire': vis_fire,
                         'fire_thresh': vis_firethresh
                     }
+                },
+                'band_map': {
+                    'C/A': 'B1',
+                    'Blue': 'B2',
+                    'Green': 'B3',
+                    'Red': 'B4',
+                    'VRE': 'B5',
+                    'VRE': 'B6',
+                    'VRE': 'B7',
+                    'NIR': 'B8',
+                    'NIR2': 'B8a',
+                    'WV': 'B9',
+                    'Cirrus': 'B10',
+                    'SWIR': 'B11',
+                    'SWIR2': 'B12',
+                    'cloud_mask': 'cloud_mask',
+                    'SWIR2': 'B12'
                 },
                 'cloud_mask': 'mask_s2_clouds'
             },
@@ -161,19 +163,6 @@ EE_PRODUCTS = {
         }
     },
     'landsat': {
-        'band_map': {'C/A': 'B1',
-                     'Blue': 'B2',
-                     'Green': 'B3',
-                     'Red': 'B4',
-                     'NIR': 'B5',
-                     'Cirrus': 'B9',
-                     'SWIR': 'B6',
-                     'SWIR2': 'B7',
-                     'Pan': 'B8',
-                     'TIRS': 'B10',
-                     'TIRS2': 'B11',
-                     'cloud_mask': 'cloud_mask',
-                     'TIRS2': 'B11'},
         '7': {
             'surface': {
                 'display': 'Surface Reflectance',
@@ -249,6 +238,21 @@ EE_PRODUCTS = {
                     'handler': {
                         'nbr': vis_nbr
                     }
+                },
+                'band_map': {
+                    'C/A': 'B1',
+                    'Blue': 'B2',
+                    'Green': 'B3',
+                    'Red': 'B4',
+                    'NIR': 'B5',
+                    'Cirrus': 'B9',
+                    'SWIR': 'B6',
+                    'SWIR2': 'B7',
+                    'Pan': 'B8',
+                    'TIRS': 'B10',
+                    'TIRS2': 'B11',
+                    'cloud_mask': 'cloud_mask',
+                    'TIRS2': 'B11'
                 },
                 'cloud_mask': 'mask_l8_sr',
                 'start_date': '2013-04-01',

@@ -6,8 +6,8 @@ import time
 from datetime import datetime, timedelta
 from resources.base.data_loader import DataLoader
 from resources.gee.config import EE_CREDENTIALS
-from resources.gee.methods import get_ee_product_name, get_ee_collection_from_product, \
-    get_ee_image_list_from_collection, get_ee_image_date
+from resources.gee.methods import get_ee_product_name, get_ee_collection_from_product
+from pathlib import Path
 from resources.gee.tile_loader_helper import save_ee_image
 from resources.globfire.data_loader_helper import get_arguments
 import pickle
@@ -93,9 +93,17 @@ class GlobFireDataLoader(DataLoader):
                         return None
                     time.sleep(sleep * 2 ** i)  # Sometimes request works on second try
 
-    def image_id(self, globfire_id, ee_product, date: str):
+    @staticmethod
+    def image_id(globfire_id, ee_product, date: str):
         product_name = get_ee_product_name(ee_product)
         return f"{globfire_id}__{product_name}__{date}"
+
+    @staticmethod
+    def parse_filename(filename: str):
+        filename = Path(filename).stem
+        globfire_id, product_name, date = filename.split('__')
+        date = datetime.strptime(date, "%Y-%m-%d")
+        return globfire_id, product_name, date
 
 
 if __name__ == "__main__":

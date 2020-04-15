@@ -8,15 +8,15 @@ from resources.gee.vis_handler_utils import get_band, get_bands_by_name, apply_p
 
 # decorator for any vis_handler
 def vis_handler_wrapper(handler):
-    def process(ee_product, image, vis_params=None, comp_image=None):
+    def process(ee_product, image, vis_params=None, **kwargs):
         if not vis_params:
             vis_params = ee_product.get('vis_params', {})
         norm_image = normalise_image(image, vis_params)
         sig = signature(handler)
         if 'vis_params' in sig.parameters:
-            out = handler(ee_product, norm_image, vis_params)
+            out = handler(ee_product, norm_image, vis_params=vis_params, **kwargs)
         else:
-            out = handler(ee_product, norm_image)
+            out = handler(ee_product, norm_image, **kwargs)
         return array_to_image(out)
 
     return process
@@ -106,7 +106,7 @@ def vis_from_indicator(ind_func, l_func, comp_image=None):
                                                       ['Blue', 'Green', 'Red', 'NIR', 'SWIR', 'SWIR2'])
         #ind_arrays = get_bands_by_name(ee_product, image, ind_bands)
         index = ind_func(ee_product,image)
-        if comp_image != None:
+        if comp_image is not None:
             #comp_ind_arrays = get_bands_by_name(ee_product, comp_image, ind_bands)
             comp_index = ind_func(ee_product, comp_image)
             index = index - comp_index
