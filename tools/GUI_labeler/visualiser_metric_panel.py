@@ -6,7 +6,7 @@ from tifffile import imread
 from tools.GUI_labeler.mask_helpers import *
 from tools.GUI_labeler.config import colours, ee_product, vis_conf_dict
 from tools.GUI_labeler.tk_ui_helpers import make_option_menu
-
+from tools.GUI_labeler.dnbr_handlers import get_conf_mask, visualise_dnbr
 
 class Visualiser_Panel(tk.Frame):
 
@@ -30,7 +30,7 @@ class Visualiser_Panel(tk.Frame):
         self.master = master
         self.border_width = 16
         self.im_size = (total_size[0] - self.border_width, total_size[1] - self.border_width)
-        self.filter_names = vis_conf_dict.keys()
+        self.filter_names = list(vis_conf_dict.keys()) + ["dnbr"]
         self.cur_img_path = None
         self.cur_vis_PIL = None
         self.cur_conf_mask = None
@@ -78,8 +78,12 @@ class Visualiser_Panel(tk.Frame):
         Uses the current visualiser (specified by cur_filter_name) to create the image
         """
         inn = imread(self.cur_img_path)
-        visualiser = vis_conf_dict[self.cur_filter_name.get()]["vis"]
-        out = visualiser(ee_product, inn)
+        vis_name = self.cur_filter_name.get()
+        if vis_name == "dnbr":
+            out = visualise_dnbr(self.cur_img_path)
+        else:
+            visualiser = vis_conf_dict[vis_name]["vis"]
+            out = visualiser(ee_product, inn)
         out.thumbnail(self.im_size)
         self.cur_vis_PIL = out
 
@@ -92,8 +96,12 @@ class Visualiser_Panel(tk.Frame):
         there is a fire at that pixel according to that metric
         """
         inn = imread(self.cur_img_path)
-        generator = vis_conf_dict[self.cur_filter_name.get()]["conf"]
-        self.cur_conf_mask = generator(ee_product, inn, {})
+        vis_name = self.cur_filter_name.get()
+        if vis_name == "dnbr":
+            self.cur_conf_mask = get_conf_mask(self.cur_img_path)
+        else:
+            generator = vis_conf_dict[vis_name]["conf"]
+            self.cur_conf_mask = generator(ee_product, inn)
 
         if self.cur_conf_mask.min() < 0 or self.cur_conf_mask.max() > 1:
             print("""

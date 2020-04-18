@@ -30,7 +30,7 @@ else:
     raise Exception("This should not occur!")
 
 root = tk.Tk()
-app = Window(master=None,
+app = Window(master=root,
              unlabeled_dir=unlabeled_dir,
              labeled_dir=labeled_dir,
              move_or_copy=move_or_copy)

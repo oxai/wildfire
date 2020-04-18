@@ -84,6 +84,7 @@ class Window(tk.Frame):
         :param path: A path ending in ".tif
         """
         self.cur_img_path = path
+        self.master.title(path)
         self.product_panel.update_path(path)
         for p in self.vis_panels:
             p.update_path(path)
