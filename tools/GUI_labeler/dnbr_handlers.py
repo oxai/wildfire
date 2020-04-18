@@ -13,8 +13,7 @@ def get_npy_path(tif_path):
     :param tif_path: the relative path to a .tif file
     :return: the path to the .dnbr.npy file corresponding to that .tif
     """
-    return tif_path.replace(".tif", "_dnbr.npy").replace("__COPERNICUS-S2__", "_")
-
+    return tif_path.replace(".tif", ".dnbr.npy")
 
 def visualise_dnbr(tif_path, error_size=(512, 512)):
     """
@@ -35,7 +34,6 @@ def visualise_dnbr(tif_path, error_size=(512, 512)):
     RGBA = [1, 0.5, 0, 1]
     ar = np.array([conf_mask * band for band in RGBA])
     return array_to_image(ar)
-
 
 def get_conf_mask(tif_path):
     """
