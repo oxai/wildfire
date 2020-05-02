@@ -19,11 +19,11 @@ class Window(tk.Frame):
         """
         tk.Frame.__init__(self, master, bg=colours["toolbar_bg"])
 
-        self.filter_names = vis_conf_dict.keys()
-        self.mask_colours = [[255, 255, 0], [255, 0, 255], [0, 255, 255]]
-        # [[255, 0, 0], [0, 255, 0], [0, 0, 255]]
+        self.filter_names = list(vis_conf_dict.keys()) + ["dnbr"]
+        self.mask_colours = [[158, 152, 255], [255, 110, 226], [252, 255, 22], [138, 251, 45]]
+        # [[255, 255, 0], [255, 0, 255], [0, 255, 255]]
         self.main_im_size = (768, 768)
-        self.max_vis_rows = 3
+        self.max_vis_rows = 2
 
         self.move_or_copy = move_or_copy
         self.unlabeled_dir = unlabeled_dir
@@ -41,11 +41,12 @@ class Window(tk.Frame):
 
         self.update_prod_mask_button = make_menu_bar_button(self, "<", self.update_main_masks)
 
-        self.topbar.grid(row=0, column=0, columnspan=3, sticky=[tk.W, tk.E])
+        self.topbar.grid(row=0, column=0, columnspan=4, sticky=[tk.W, tk.E])
         self.product_panel.grid(row=1, column=0, rowspan=3)
         for a0, p in enumerate(self.vis_panels):
+            print(a0)
             p.grid(row=(a0 % self.max_vis_rows) + 1, column=2 + (a0 // self.max_vis_rows))
-        self.update_prod_mask_button.grid(row=2, column=1)
+        self.update_prod_mask_button.grid(row=1, column=1, rowspan=2)
 
         self.load_random_pic()
 
@@ -72,7 +73,7 @@ class Window(tk.Frame):
 
         for filt, mc in zip(self.filter_names, self.mask_colours):
             v = Visualiser_Panel(self,
-                                 total_size=(self.main_im_size[0] // 3, self.main_im_size[1] // 3),
+                                 total_size=(self.main_im_size[0] // 2, self.main_im_size[1] // 2),
                                  default_filt_name=filt,
                                  mask_colour=mc)
             self.vis_panels.append(v)
@@ -84,6 +85,7 @@ class Window(tk.Frame):
         :param path: A path ending in ".tif
         """
         self.cur_img_path = path
+        self.master.title(path)
         self.product_panel.update_path(path)
         for p in self.vis_panels:
             p.update_path(path)

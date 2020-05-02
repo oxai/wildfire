@@ -1,8 +1,14 @@
 # Launch tkinter application for labeling/generating masks for tiff images
 
-from tools.GUI_labeler.Window import Window
 import tkinter as tk
 import argparse
+import sys
+
+sys.path.append('.')
+
+from tools.GUI_labeler.Window import Window
+
+sys.path.remove('.')
 
 parser = argparse.ArgumentParser(description="Image and metric visualiser")
 parser.add_argument("unlabeled_image_directory")
@@ -30,7 +36,7 @@ else:
     raise Exception("This should not occur!")
 
 root = tk.Tk()
-app = Window(master=None,
+app = Window(master=root,
              unlabeled_dir=unlabeled_dir,
              labeled_dir=labeled_dir,
              move_or_copy=move_or_copy)

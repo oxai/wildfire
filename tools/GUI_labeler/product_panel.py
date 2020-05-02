@@ -6,7 +6,7 @@ from tifffile import imread
 from tools.GUI_labeler.mask_helpers import *
 from tools.GUI_labeler.config import colours, rgb_vis, vis_conf_dict, ee_product
 from tools.GUI_labeler.tk_ui_helpers import make_option_menu, make_toolbar_label
-
+from tools.GUI_labeler.dnbr_handlers import visualise_dnbr
 
 class Product_Panel(tk.Frame):
 
@@ -57,7 +57,7 @@ class Product_Panel(tk.Frame):
                                bg=colours["toolbar_bg"],
                                highlightbackground=colours["toolbar_txt"],
                                highlightthickness=2)
-        self.filter_names = self.vis_dict.keys()
+        self.filter_names = list(self.vis_dict.keys()) + ["dnbr"]
 
         self.cur_filter_name = tk.StringVar(self)
         self.cur_filter_name.set("RGB")
@@ -105,8 +105,12 @@ class Product_Panel(tk.Frame):
         Update the PIL visualising the TIF image (usually in RGB)
         """
         inn = imread(self.cur_img_path)
-        vis_f = self.vis_dict[self.cur_filter_name.get()]
-        out = vis_f(ee_product, inn)
+        vis_name = self.cur_filter_name.get()
+        if vis_name == "dnbr":
+            out = visualise_dnbr(self.cur_img_path)
+        else:
+            visualiser = self.vis_dict[vis_name]
+            out = visualiser(ee_product, inn)
         out.thumbnail(self.im_size)
         self.cur_vis_PIL = out
 

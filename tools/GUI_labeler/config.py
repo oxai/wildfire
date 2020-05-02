@@ -53,7 +53,7 @@ rgb_vis = vis_default
 
 # Each pair of (name, "vis") and (name, "conf") should give:
 #    "vis" - a function which somehow visualises a metric as an RGB image. Like rgb_vis it takes
-#            an np array (from tifffle.imread) and gives a 3 deep np array representing RGB channels
+#            an np array (from tifffle.imread) and returns a PIL
 
 #    "conf" - a function which takes the same inputs as vis but return a confidence mask - an nd.array which
 #             gives pixelwise probabilities/0to1 confidence ratings as to whether there is a fire at that pixel
