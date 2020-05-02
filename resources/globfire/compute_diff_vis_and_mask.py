@@ -83,7 +83,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     vis_ind_dict = {
-        "dnbr": {"vis": vis_dnbr, "ind": get_nbr_indicator}
+        "dnbr": {"vis": vis_dnbr, "ind": get_nbr_indicator},
+        "dndvi": {"vis": vis_dndvi, "ind": get_veg_indicator},
     }
 
     vis_ind = vis_ind_dict[args.name]
