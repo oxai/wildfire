@@ -1,8 +1,14 @@
 # Launch tkinter application for labeling/generating masks for tiff images
 
-from tools.GUI_labeler.Window import Window
 import tkinter as tk
 import argparse
+import sys
+
+sys.path.append('.')
+
+from tools.GUI_labeler.Window import Window
+
+sys.path.remove('.')
 
 parser = argparse.ArgumentParser(description="Image and metric visualiser")
 parser.add_argument("unlabeled_image_directory")
