@@ -57,7 +57,7 @@ def compute_diff_vis_for_dir(image_dir, diff_vis_func, diff_ind_func, diff_vis_n
 
                 out_file_base = f'{image_info["name"]}__{days_since}__{diff_vis_name}'
                 out_vis_fpath = os.path.join(out_vis_dir, f"{out_file_base}.png")
-                out_ind_fpath = os.path.join(out_ind_dir, f"{out_file_base}.png")
+                out_ind_fpath = os.path.join(out_ind_dir, f"{out_file_base}")
 
                 arr_curr = image_info["data"]
                 arr_prev = image_info_prev["data"]
