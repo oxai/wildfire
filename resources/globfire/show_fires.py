@@ -1,10 +1,8 @@
 from tifffile import imread
 import os
-import ee
 import argparse
-from resources.gee.config import EE_CREDENTIALS
 from resources.gee.methods import get_ee_product
-from resources.gee.vis_handler import vs_fire, vs_firethresh, vs_nbr, vis_default
+from resources.gee.vis_handler import vis_nbr, vis_firethresh, vis_fire, vis_default
 import matplotlib.pyplot as plt
 
 
@@ -28,7 +26,7 @@ for root, dirs, files in os.walk(args.dir):
 
         ax = axs[0]
         image = imread(os.path.join(root, name))
-        out = vs_fire(ee_product, image, {})
+        out = vis_fire(ee_product, image, {})
         ax.imshow(out)
         ax.set_title("fire vis applied")
 
@@ -38,7 +36,7 @@ for root, dirs, files in os.walk(args.dir):
         ax.set_title("original RGB")
 
         ax = axs[2]
-        out = vs_firethresh(ee_product, image, {})
+        out = vis_firethresh(ee_product, image, {})
         ax.imshow(out)
         ax.set_title("fire vis")
 

@@ -1,3 +1,7 @@
+import sys
+
+sys.path.append('.')
+
 import argparse
 from resources.gee.methods import TileDateRangeQuery
 from resources.gee.vis_handler import vis_default
@@ -6,7 +10,6 @@ from resources.modis_fire.data_loader import ModisFireDataLoader
 from .tile_loader import GeeProductTileSeriesLoader
 from resources.utils.gis import deg2tile
 import matplotlib.pyplot as plt
-import sys
 import pandas as pd
 from resources.gee.methods import get_ee_product
 from resources.fpa_fod.data_loader import FpaFodDataLoader
@@ -14,6 +17,8 @@ import ee
 import numpy as np
 from .config import EE_CREDENTIALS
 from datetime import timedelta
+
+sys.path.remove('.')
 
 
 def get_parser(globfire=False):

@@ -3,8 +3,14 @@ import numpy as np
 from .vis_handler import vis_fire, vis_veg, vis_dnbr
 import matplotlib.pyplot as plt
 import ee
+import sys
+
+sys.path.append('.')
+
 from .config import EE_CREDENTIALS
 from .methods import get_ee_product
+
+sys.path.remove('.')
 
 ee.Initialize(EE_CREDENTIALS)
 

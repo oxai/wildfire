@@ -1,3 +1,7 @@
+import sys
+
+sys.path.append('.')
+
 import ee
 import geopandas as gpd
 import pandas as pd
@@ -11,6 +15,8 @@ from pathlib import Path
 from resources.gee.tile_loader_helper import save_ee_image
 from resources.globfire.data_loader_helper import get_arguments
 import pickle
+
+sys.path.remove('.')
 
 
 class GlobFireDataLoader(DataLoader):

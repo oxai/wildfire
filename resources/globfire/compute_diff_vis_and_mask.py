@@ -1,3 +1,7 @@
+import sys
+
+sys.path.append('.')
+
 from resources.gee.methods import get_ee_product_from_name
 from resources.gee.vis_handler import *
 import numpy as np
@@ -7,6 +11,8 @@ from collections import defaultdict
 from pathlib import Path
 from resources.globfire.data_loader import GlobFireDataLoader
 import argparse
+
+sys.path.remove('.')
 
 
 def load_fire_images_from_dir(image_dir):
