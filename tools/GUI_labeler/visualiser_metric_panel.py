@@ -97,6 +97,7 @@ class Visualiser_Panel(tk.Frame):
         """
         inn = imread(self.cur_img_path)
         vis_name = self.cur_filter_name.get()
+        print(ee_product)
         if vis_name == "dnbr":
             self.cur_conf_mask = get_conf_mask(self.cur_img_path)
         else:

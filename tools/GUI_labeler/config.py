@@ -61,10 +61,8 @@ vis_conf_dict = {"nbr": {"vis": vis_nbr,
                          "conf": get_nbr_indicator},
 
                  "fire": {"vis": vis_fire,
-                          "conf": get_fire_indicator},
-
-                 "firethresh": {"vis": vis_firethresh,
-                                "conf": get_firethresh_indicator}}
+                          "conf": get_fire_indicator}
+                 }
 
 # A dictionary of colours used to keep a consistent theme
 colours = {"blank": "#FFA0A0",
