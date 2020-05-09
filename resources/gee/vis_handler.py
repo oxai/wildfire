@@ -8,17 +8,19 @@ from resources.gee.vis_handler_utils import get_band, get_bands_by_name, apply_p
 
 # decorator for any vis_handler
 def vis_handler_wrapper(handler):
-    def process(ee_product, image, vis_params=None, comp_image=None, **kwargs):
+    def process(ee_product, image, already_normalised=False, vis_params=None, comp_image=None, **kwargs):
         sig = signature(handler)
         if not vis_params:
             vis_params = ee_product.get('vis_params', {})
             if 'vis_params' in sig.parameters:
                 kwargs = {**kwargs, "vis_params": vis_params}
-        norm_image = normalise_image(image, vis_params)
+        if not already_normalised:
+            image = normalise_image(image, vis_params)
         if comp_image is not None:
-            norm_comp_image = normalise_image(comp_image, vis_params)
-            kwargs = {**kwargs, "comp_image": norm_comp_image}
-        out = handler(ee_product, norm_image, **kwargs)
+            if not already_normalised:
+                comp_image = normalise_image(comp_image, vis_params)
+            kwargs = {**kwargs, "comp_image": comp_image}
+        out = handler(ee_product, image, **kwargs)
         return array_to_image(out)
 
     return process
@@ -29,6 +31,17 @@ def get_vis_handler(ee_product, method='default'):
     if method == 'default':
         return vis_default
     return vis_params['handler'][method]
+
+
+# decorator for any get_indicator
+def indicator_wrapper(get_indicator):
+    def process(ee_product, image, already_normalised=False, **kwargs):
+        if not already_normalised:
+            vis_params = ee_product.get('vis_params', {})
+            image = normalise_image(image, vis_params)
+        return get_indicator(ee_product, image, **kwargs)
+
+    return process
 
 
 @vis_handler_wrapper
@@ -94,48 +107,31 @@ def get_veg_levels(blue, green, red, nir, swir2):
 
 
 # Functions to compute masks from metrics
-def get_fire_indicator(ee_product, image, already_normalized, sensitivity=1.0):
-    if not already_normalized:
-        return get_fire_indictor_unnnormalized_(ee_product, image, sensitivity)
+@indicator_wrapper
+def get_fire_indicator(ee_product, image, sensitivity=1.0):
     swir, swir2 = get_bands_by_name(ee_product, image, ['SWIR', 'SWIR2'])
     # Increase sensitivity for more possible fires and more wrong indications
     return (swir + swir2) * sensitivity
 
 
-@vis_handler_wrapper
-def get_fire_indicator_unnormalized_(ee_product, image, sensitivity=1.0):
-    swir, swir2 = get_bands_by_name(ee_product, image, ['SWIR', 'SWIR2'])
-    # Increase sensitivity for more possible fires and more wrong indications
-    return (swir + swir2) * sensitivity
-
-
-def get_veg_indicator(ee_product, image, already_normalized, sensitivity=1.0):
-    if not already_normalized:
-        return get_veg_indictor_unnnormalized_(ee_product, image, sensitivity)
-    red, nir= get_bands_by_name(ee_product, image, ['Red', 'NIR'])
+@indicator_wrapper
+def get_veg_indicator(ee_product, image):
+    red, nir = get_bands_by_name(ee_product, image, ['Red', 'NIR'])
     raw = (red - nir) / (red + nir + 1e-9)
     return raw * 2 + .7  # Scale to fit 1,2 thresholds, .15-->1, .65-->2
 
 
 @vis_handler_wrapper
-def get_veg_indicator_unnormalized_(ee_product, image, sensitivity=1.0):
-    red, nir= get_bands_by_name(ee_product, image, ['Red', 'NIR'])
+def get_veg_indicator_unnormalized_(ee_product, image):
+    red, nir = get_bands_by_name(ee_product, image, ['Red', 'NIR'])
     raw = (red - nir) / (red + nir + 1e-9)
     return raw * 2 + .7  # Scale to fit 1,2 thresholds, .15-->1, .65-->2
 
 
-def get_nbr_indicator(ee_product, image, already_normalized, sensitivity=1.0):
-    if not already_normalized:
-        return get_nbr_indictor_unnnormalized_(ee_product, image, sensitivity)
+@indicator_wrapper
+def get_nbr_indicator(ee_product, image, sensitivity=1.0):
     nir, swir2 = get_bands_by_name(ee_product, image, ['NIR', 'SWIR2'])
-    return sensitivity*(nir - swir2)/(nir + swir2 + 1e-9)
-
-
-@vis_handler_wrapper
-def get_nbr_indicator_unnormalized_(ee_product, image, sensitivity=1.0):
-    red, nir= get_bands_by_name(ee_product, image, ['Red', 'NIR'])
-    nir, swir2 = get_bands_by_name(ee_product, image, ['NIR', 'SWIR2'])
-    return sensitivity*(nir - swir2)/(nir + swir2 + 1e-9)
+    return sensitivity * (nir - swir2) / (nir + swir2 + 1e-9)
 
 
 def vis_from_indicator(ind_func, l_func, comp_image=None):
@@ -143,9 +139,9 @@ def vis_from_indicator(ind_func, l_func, comp_image=None):
     def handler(ee_product, image, comp_image=comp_image):
         B, G, R, nir, swir, swir2 = get_bands_by_name(ee_product, image,
                                                       ['Blue', 'Green', 'Red', 'NIR', 'SWIR', 'SWIR2'])
-        index = ind_func(ee_product,image,already_normalized=True)
+        index = ind_func(ee_product, image, already_normalized=True)
         if comp_image is not None:
-            comp_index = ind_func(ee_product,comp_image,already_normalized=True)
+            comp_index = ind_func(ee_product, comp_image, already_normalized=True)
             index = index - comp_index
         some_array, lots_array = l_func(B, G, R, nir, swir2)
         no_array = get_natural_nirswirmix(B, G, R, nir, swir2)
@@ -162,12 +158,11 @@ vis_veg = vis_from_indicator(ind_func=get_veg_indicator,
                              comp_image=None)
 
 vis_dndvi = vis_from_indicator(ind_func=get_veg_indicator,
-                             l_func=get_veg_levels)
+                               l_func=get_veg_levels)
 
 vis_fire = vis_from_indicator(ind_func=get_fire_indicator,
                               l_func=get_fire_levels,
                               comp_image=None)
 
-vis_dnbr = vis_from_indicator(ind_func=partial(get_nbr_indicator,sensitivity=50),
+vis_dnbr = vis_from_indicator(ind_func=partial(get_nbr_indicator, sensitivity=50),
                               l_func=get_fire_levels)
-
