@@ -139,9 +139,9 @@ def vis_from_indicator(ind_func, l_func, comp_image=None):
     def handler(ee_product, image, comp_image=comp_image):
         B, G, R, nir, swir, swir2 = get_bands_by_name(ee_product, image,
                                                       ['Blue', 'Green', 'Red', 'NIR', 'SWIR', 'SWIR2'])
-        index = ind_func(ee_product, image, already_normalized=True)
+        index = ind_func(ee_product, image, already_normalised=True)
         if comp_image is not None:
-            comp_index = ind_func(ee_product, comp_image, already_normalized=True)
+            comp_index = ind_func(ee_product, comp_image, already_normalised=True)
             index = index - comp_index
         some_array, lots_array = l_func(B, G, R, nir, swir2)
         no_array = get_natural_nirswirmix(B, G, R, nir, swir2)
