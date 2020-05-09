@@ -42,7 +42,7 @@ def compute_diff_vis_for_dir(image_dir, diff_vis_func, diff_ind_func, diff_vis_n
     """
     out_vis_dir = os.path.join(image_dir, f'{diff_vis_name}_visualizations')
     if not os.path.exists(out_vis_dir): os.mkdir(out_vis_dir)
-    out_ind_dir = os.path.join(image_dir, f'{diff_vis_name}_indicators')
+    out_ind_dir = os.path.join(image_dir, f'{diff_vis_name}')
     if not os.path.exists(out_ind_dir): os.mkdir(out_ind_dir)
 
     images_by_fire_id = load_fire_images_from_dir(image_dir)
@@ -61,7 +61,7 @@ def compute_diff_vis_for_dir(image_dir, diff_vis_func, diff_ind_func, diff_vis_n
                 if days_since > 10:
                     continue
 
-                out_file_base = f'{image_info["name"]}__{days_since}__{diff_vis_name}'
+                out_file_base = f'{image_info["name"]}.{days_since}.{diff_vis_name}'
                 out_vis_fpath = os.path.join(out_vis_dir, f"{out_file_base}.png")
                 out_ind_fpath = os.path.join(out_ind_dir, f"{out_file_base}")
 

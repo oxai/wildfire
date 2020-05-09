@@ -35,6 +35,7 @@ def visualise_dnbr(tif_path, error_size=(512, 512)):
     ar = np.array([conf_mask * band for band in RGBA])
     return array_to_image(ar)
 
+
 def get_conf_mask(tif_path):
     """
     Loads a saved dnbr confidence mask as a PIL
