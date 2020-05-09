@@ -121,13 +121,6 @@ def get_veg_indicator(ee_product, image):
     return raw * 2 + .7  # Scale to fit 1,2 thresholds, .15-->1, .65-->2
 
 
-@vis_handler_wrapper
-def get_veg_indicator_unnormalized_(ee_product, image):
-    red, nir = get_bands_by_name(ee_product, image, ['Red', 'NIR'])
-    raw = (red - nir) / (red + nir + 1e-9)
-    return raw * 2 + .7  # Scale to fit 1,2 thresholds, .15-->1, .65-->2
-
-
 @indicator_wrapper
 def get_nbr_indicator(ee_product, image, sensitivity=1.0):
     nir, swir2 = get_bands_by_name(ee_product, image, ['NIR', 'SWIR2'])
