@@ -58,13 +58,13 @@ rgb_vis = vis_default
 #    "conf" - a function which takes the same inputs as vis but return a confidence mask - an nd.array which
 #             gives pixelwise probabilities/0to1 confidence ratings as to whether there is a fire at that pixel
 vis_conf_dict = {"nbr": {"vis": vis_nbr,
-                         "conf": get_conf_nbr},
+                         "conf": get_nbr_indicator},
 
                  "fire": {"vis": vis_fire,
-                          "conf": get_conf_fire},
+                          "conf": get_fire_indicator},
 
                  "firethresh": {"vis": vis_firethresh,
-                                "conf": get_conf_firethresh}}
+                                "conf": get_firethresh_indicator}}
 
 # A dictionary of colours used to keep a consistent theme
 colours = {"blank": "#FFA0A0",

@@ -127,6 +127,11 @@ def get_nbr_indicator(ee_product, image, sensitivity=1.0):
     return sensitivity * (nir - swir2) / (nir + swir2 + 1e-9)
 
 
+@indicator_wrapper
+def get_firethresh_indicator(ee_product, image):
+    swir, swir2 = get_bands_by_name(ee_product, image, ['SWIR', 'SWIR2'])
+    return get_fire_indicator(swir, swir2)
+
 def vis_from_indicator(ind_func, l_func, comp_image=None):
     @vis_handler_wrapper
     def handler(ee_product, image, comp_image=comp_image):
