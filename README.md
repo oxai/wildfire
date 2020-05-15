@@ -21,6 +21,7 @@ numpy
 pillow
 matplotlib
 scikit-image
+geopandas
 `
 
 Alternatively, run
@@ -59,5 +60,9 @@ Attempting to bind to HOST environment variable
 ```
 [this medium article](https://medium.com/@choy/fixing-create-react-app-when-npm-fails-to-start-because-your-host-environment-variable-is-being-4c8a9fa0b461) might help you solve the problem. Set your `HOST` variable to `localhost` in bash.
 
+You may encounter installation issues with GeoPandas on Windows. Try
+`conda install -c conda-forge geopandas`
+If that doesn't work, follow [this instruction for Windows](https://geoffboeing.com/2014/09/using-geopandas-windows/) 
+and install GDAL, Fiona, pyproj, rtree, and shapely from [Gohlke (unofficial repository for Windows binaries)](https://www.lfd.uci.edu/~gohlke/pythonlibs/).
 ### Using Sentinelhub
 Please refer to `/resources/sentinelhub/README.md`

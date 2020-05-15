@@ -37,3 +37,5 @@ def save_ee_image(base_path, ee_image, bands: list, image_id: str, bbox: tuple o
         out = resize(out, (out.shape[0], img_size, img_size))
     imsave(f"{base_path}.tif", out)
     shutil.rmtree(base_path)
+
+    return out

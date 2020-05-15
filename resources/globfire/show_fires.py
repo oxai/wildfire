@@ -1,9 +1,14 @@
 from tifffile import imread
 import os
 import argparse
+import matplotlib.pyplot as plt
+import sys
+sys.path.append('.')
+
 from resources.gee.methods import get_ee_product
 from resources.gee.vis_handler import vis_nbr, vis_firethresh, vis_fire, vis_default
-import matplotlib.pyplot as plt
+
+sys.path.remove('.')
 
 
 parser = argparse.ArgumentParser()
