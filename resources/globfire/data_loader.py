@@ -1,4 +1,6 @@
 import sys
+import traceback
+
 import ee
 import geopandas as gpd
 import pandas as pd
@@ -86,21 +88,25 @@ class GlobFireDataLoader(DataLoader):
                     ee_image = ee_collection_for_date.median()
                     bands = ee_product.get('bands', [ee_product['index']])
                     image_id = self.image_id(id, ee_product, date.strftime("%Y-%m-%d"))
-                    save_dir = self.data_subdir(subdir) if save_dir is None else os.path.join(save_dir, subdir)
-                    base_path = os.path.join(save_dir, image_id)
+                    save_sub_dir = self.data_subdir(subdir) if save_dir is None else os.path.join(save_dir, subdir)
+                    base_path = os.path.join(save_sub_dir, image_id)
                     out = self.save(image_id, ee_image, bands, bbox, base_path=base_path, zoom=zoom)
-                    self.save_binary_mask(key, image_id, id, bbox, date, save_dir=save_dir, img_size=(out.shape[0], out.shape[1]))
+                    self.save_binary_mask(key, image_id, id, bbox, date, save_dir=save_sub_dir, img_size=(out.shape[0], out.shape[1]))
 
     def save_binary_mask(self, key, image_id, fire_id, bbox, date, save_dir, img_size):
-        active = self.active[key]
-        geometry = active.loc[fire_id, date.strftime("%Y-%m-%d")]['geometry'][0]
-        if isinstance(geometry, Polygon): geometry = [geometry]
-        mask = rasterize(shapes=geometry, out_shape=img_size,
-                         transform=rasterio.transform.from_bounds(*bbox, *img_size))
-        subdir_path = os.path.join(save_dir, "modis")
-        if not os.path.exists(subdir_path): os.makedirs(subdir_path)
-        save_path = os.path.join(subdir_path, f"{image_id}.modis.npy")
-        np.save(save_path, mask)
+        try:
+            active = self.active[key]
+            geometry = active.loc[fire_id, date.strftime("%Y-%m-%d")]['geometry']
+            if isinstance(geometry, Polygon):
+                geometry = [geometry]
+            mask = rasterize(shapes=geometry, out_shape=img_size,
+                             transform=rasterio.transform.from_bounds(*bbox, *img_size))
+            subdir_path = os.path.join(save_dir, "modis")
+            if not os.path.exists(subdir_path): os.makedirs(subdir_path)
+            save_path = os.path.join(subdir_path, f"{image_id}.modis.npy")
+            np.save(save_path, mask)
+        except Exception as e:
+            print(e)
 
     def save(self, image_id, ee_image, bands, bbox, base_path, zoom=13,
              n_trials=3, sleep=1):
