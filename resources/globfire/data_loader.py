@@ -100,7 +100,7 @@ class GlobFireDataLoader(DataLoader):
         subdir_path = os.path.join(save_dir, "modis")
         if not os.path.exists(subdir_path): os.makedirs(subdir_path)
         save_path = os.path.join(subdir_path, f"{image_id}.modis.npy")
-        np.save(os.path.join(save_path, f"{image_id}.modis.npy"), mask)
+        np.save(save_path, mask)
 
     def save(self, image_id, ee_image, bands, bbox, base_path, zoom=13,
              n_trials=3, sleep=1):
