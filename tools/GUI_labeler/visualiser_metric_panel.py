@@ -1,12 +1,11 @@
 import tkinter as tk
-
 from PIL import ImageTk
 from tifffile import imread
 
+from tools.GUI_labeler.load_precomputed_features import load_precomputed_vis, load_precomputed_ind
 from tools.GUI_labeler.mask_helpers import *
-from tools.GUI_labeler.config import colours, ee_product, vis_conf_dict
+from tools.GUI_labeler.config import colours, ee_product, vis_conf_dict, precomputed_features
 from tools.GUI_labeler.tk_ui_helpers import make_option_menu
-from tools.GUI_labeler.dnbr_handlers import get_conf_mask, visualise_dnbr
 
 class Visualiser_Panel(tk.Frame):
 
@@ -79,8 +78,8 @@ class Visualiser_Panel(tk.Frame):
         """
         inn = imread(self.cur_img_path)
         vis_name = self.cur_filter_name.get()
-        if vis_name == "dnbr":
-            out = visualise_dnbr(self.cur_img_path)
+        if vis_name in precomputed_features:
+            out = load_precomputed_vis(vis_name, self.cur_img_path)
         else:
             visualiser = vis_conf_dict[vis_name]["vis"]
             out = visualiser(ee_product, inn)
@@ -95,12 +94,11 @@ class Visualiser_Panel(tk.Frame):
         create an np array of values from 0-1, each element of the array represents the confidence that
         there is a fire at that pixel according to that metric
         """
-        inn = imread(self.cur_img_path)
         vis_name = self.cur_filter_name.get()
-        print(ee_product)
-        if vis_name == "dnbr":
-            self.cur_conf_mask = get_conf_mask(self.cur_img_path)
+        if vis_name in precomputed_features:
+            self.cur_conf_mask = load_precomputed_ind(vis_name, self.cur_img_path)
         else:
+            inn = imread(self.cur_img_path)
             generator = vis_conf_dict[vis_name]["conf"]
             self.cur_conf_mask = generator(ee_product, inn)
 

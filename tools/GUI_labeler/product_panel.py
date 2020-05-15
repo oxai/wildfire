@@ -3,10 +3,11 @@ import tkinter as tk
 from PIL import ImageTk
 from tifffile import imread
 
+from tools.GUI_labeler.load_precomputed_features import load_precomputed_vis
 from tools.GUI_labeler.mask_helpers import *
-from tools.GUI_labeler.config import colours, rgb_vis, vis_conf_dict, ee_product
+from tools.GUI_labeler.config import colours, rgb_vis, vis_conf_dict, ee_product, precomputed_features
 from tools.GUI_labeler.tk_ui_helpers import make_option_menu, make_toolbar_label
-from tools.GUI_labeler.dnbr_handlers import visualise_dnbr
+
 
 class Product_Panel(tk.Frame):
 
@@ -106,8 +107,8 @@ class Product_Panel(tk.Frame):
         """
         inn = imread(self.cur_img_path)
         vis_name = self.cur_filter_name.get()
-        if vis_name == "dnbr":
-            out = visualise_dnbr(self.cur_img_path)
+        if vis_name in precomputed_features:
+            out = load_precomputed_vis(vis_name, self.cur_img_path)
         else:
             visualiser = self.vis_dict[vis_name]
             out = visualiser(ee_product, inn)

@@ -40,9 +40,9 @@ def compute_diff_vis_for_dir(image_dir, diff_vis_func, diff_ind_func, diff_vis_n
         diff_vis_name: the name of the new directory where files will be written
             and the suffix to all written files
     """
-    out_vis_dir = os.path.join(image_dir, f'{diff_vis_name}_visualizations')
+    out_vis_dir = os.path.join(image_dir, f'{diff_vis_name}_vis')
     if not os.path.exists(out_vis_dir): os.mkdir(out_vis_dir)
-    out_ind_dir = os.path.join(image_dir, f'{diff_vis_name}')
+    out_ind_dir = os.path.join(image_dir, f'{diff_vis_name}_ind')
     if not os.path.exists(out_ind_dir): os.mkdir(out_ind_dir)
 
     images_by_fire_id = load_fire_images_from_dir(image_dir)

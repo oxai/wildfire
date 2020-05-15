@@ -64,6 +64,8 @@ vis_conf_dict = {"nbr": {"vis": vis_nbr,
                           "conf": get_fire_indicator}
                  }
 
+precomputed_features = ["dnbr", "dndvi"]
+
 # A dictionary of colours used to keep a consistent theme
 colours = {"blank": "#FFA0A0",
            "canvas_bg": "#222230",
