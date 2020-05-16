@@ -58,7 +58,7 @@ class Product_Panel(tk.Frame):
                                bg=colours["toolbar_bg"],
                                highlightbackground=colours["toolbar_txt"],
                                highlightthickness=2)
-        self.filter_names = list(self.vis_dict.keys()) + ["dnbr"]
+        self.filter_names = list(self.vis_dict.keys()) + precomputed_features
 
         self.cur_filter_name = tk.StringVar(self)
         self.cur_filter_name.set("RGB")

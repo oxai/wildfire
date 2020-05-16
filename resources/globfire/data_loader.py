@@ -100,8 +100,8 @@ class GlobFireDataLoader(DataLoader):
             if isinstance(geometry, Polygon):
                 geometry = [geometry]
             mask = rasterize(shapes=geometry, out_shape=img_size,
-                             transform=rasterio.transform.from_bounds(*bbox, *img_size))
-            subdir_path = os.path.join(save_dir, "modis")
+                             transform=rasterio.transform.from_bounds(*bbox, img_size[1], img_size[0]))
+            subdir_path = os.path.join(save_dir, "modis_ind")
             if not os.path.exists(subdir_path): os.makedirs(subdir_path)
             save_path = os.path.join(subdir_path, f"{image_id}.modis.npy")
             np.save(save_path, mask)

@@ -29,7 +29,7 @@ class Visualiser_Panel(tk.Frame):
         self.master = master
         self.border_width = 16
         self.im_size = (total_size[0] - self.border_width, total_size[1] - self.border_width)
-        self.filter_names = list(vis_conf_dict.keys()) + ["dnbr"]
+        self.filter_names = list(vis_conf_dict.keys()) + precomputed_features
         self.cur_img_path = None
         self.cur_vis_PIL = None
         self.cur_conf_mask = None

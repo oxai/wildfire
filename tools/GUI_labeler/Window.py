@@ -4,7 +4,7 @@ import tkinter as tk
 import shutil
 
 from tools.GUI_labeler.mask_helpers import *
-from tools.GUI_labeler.config import colours, vis_conf_dict
+from tools.GUI_labeler.config import colours, vis_conf_dict, precomputed_features
 from tools.GUI_labeler.product_panel import Product_Panel
 from tools.GUI_labeler.tk_ui_helpers import make_menu_bar_button
 from tools.GUI_labeler.visualiser_metric_panel import Visualiser_Panel
@@ -19,7 +19,7 @@ class Window(tk.Frame):
         """
         tk.Frame.__init__(self, master, bg=colours["toolbar_bg"])
 
-        self.filter_names = list(vis_conf_dict.keys()) + ["dnbr"]
+        self.filter_names = list(vis_conf_dict.keys()) + precomputed_features
         self.mask_colours = [[158, 152, 255], [255, 110, 226], [252, 255, 22], [138, 251, 45]]
         # [[255, 255, 0], [255, 0, 255], [0, 255, 255]]
         self.main_im_size = (768, 768)
