@@ -55,11 +55,11 @@ class Visualiser_Panel(tk.Frame):
         self.filter_chooser.pack(side=tk.BOTTOM)
 
         self.cur_threshold = tk.DoubleVar(self)
-        self.cur_threshold.set("100")
+        self.cur_threshold.set("1")
         self.threshold_slider = tk.Scale(self,
                                          variable=self.cur_threshold,
                                          from_=1,
-                                         to_=0,
+                                         to_=-1,
                                          resolution=0.01,
                                          length=self.im_size[1],
                                          showvalue=0,
