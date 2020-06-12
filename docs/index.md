@@ -1,4 +1,4 @@
-# OxAI Labs - Earth and Space Project
+# OxAI Labs - Wildfire Project
 
 ## About OxAI Labs
 OxAI Labs is an independent and community-driven research team within the [Oxford Artificial Intelligence Society](http://oxai.org), 
