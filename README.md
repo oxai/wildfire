@@ -31,6 +31,8 @@ Alternatively, run
 The frontend React framework is developed in Node.js. Download and install the latest stable version from https://nodejs.org/en/download/.
 
 #### Set up Google Earth Engine
+You need to [sign up to use Google Earth Engine](https://earthengine.google.com/signup/) in order to use this free API.
+Once you have signed up, you should 
 Download `gee_key.json` from Google Drive and place it at `resources/gee/gee_key.json`, which contains Google Earth Engine server login credentials (do not commit to git!).
 
 #### Set up Django
