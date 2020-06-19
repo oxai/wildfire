@@ -62,7 +62,7 @@ There is a registration form that you need to fill out. The registration process
 ### 3. Download json key
 Once you have registered your service account, you should be able to [create and download your service account key](https://console.developers.google.com/iam-admin/serviceaccounts/details/).
 The JSON key file is called `privatekey.json` by default. If you want to use our code, rename your json key file to `gee_key.json` and place it under `resources/gee/`.
-An example of such as JSON file can be found at `resources/gee/gee_key_example.json`.
+An example of a JSON key file can be found at `resources/gee/gee_key_example.json`.
 
 ### 4. Resources and Documentation
 More resources can be found in the official documentation:

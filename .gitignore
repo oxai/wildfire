@@ -15,3 +15,6 @@ tags
 db.sqlite3
 sandbox
 .DS_Store
+
+data
+!data/FpaFodDataLoader/.gitkeep

@@ -2,30 +2,17 @@
 OxAI Labs Earth and Space Project
 
 ## Initial setup
-### Initial Setup Required for Web App with Google Earth Engine
-The web app in `web` uses `Django` as its backend framework, and `React` as its frontend framework. 
-
 #### Conda environment
 We recommend installing `conda` to manage the python environment. 
 
 `conda create --name <your-env-name> python=3.7`
 `conda activate <your-env-name>`
 
-#### Dependencies
-`pip install 
-django
-earthengine-api
-django-cors-headers
-djangorestframework
-numpy
-pillow
-matplotlib
-scikit-image
-geopandas
-`
-
-Alternatively, run
+#### Install Dependencies
 `pip install -r requirements_minimum.txt`
+
+### Initial Setup Required for Web App with Google Earth Engine
+The web app in `web` uses `Django` as its backend framework, and `React` as its frontend framework. 
 
 #### Install Node.js
 The frontend React framework is developed in Node.js. Download and install the latest stable version from https://nodejs.org/en/download/.
@@ -39,7 +26,7 @@ Download `gee_key.json` from Google Drive and place it at `resources/gee/gee_key
 Download `app_key.json` from Google Drive and place it at `web/app_key.json`, which contains Django secret key (do not commit to git!).
 
 ### Running the web servers
-In one terminal, run the following to start up the Django backend server:
+In one terminal, run the following to start up the InDjango backend server:
 ```
 cd web
 python manage.py runserver
