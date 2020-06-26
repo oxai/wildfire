@@ -7,19 +7,6 @@ from resources.gee.methods import get_ee_product
 from resources.gee.vis_handler import *
 from PIL import Image
 
-# TODO write README
-# TODO add graphic for "<=" button OR get rid of need for manual refresh
-# TODO add zoom
-# DONE change spellings of labeled
-# DONE change structure of vis_conf_dict
-# DONE PEP8 everything
-# DONE move to tools
-# DONE get rid of need for "r" key
-# DONE change to os.path.join
-# DONE f"{}" thing
-# DONE inspect code
-# DONE add arg parse with (move/copy) options and allow to choose dirs
-
 
 def get_ee_session() -> dict:
     """
@@ -41,11 +28,6 @@ Visualiser_Func = Callable[[dict, np.ndarray, dict], Image.Image]
 
 ee_product = get_ee_session()
 
-# Paths to the directories of labeled and unlabeled data
-# paths should be relative cwd = es-wildfire and end in "/"
-# e.g. "resources/GUI_labeler/data/unlabeled/"
-unlabeled_dir = "tools/GUI_labeler/data/unlabeled/"
-labeled_dir = "tools/GUI_labeler/data/labeled/"
 
 # This should specify a function for turning an np array (from tifffle.imread) into a
 # 3 deep np array representing RGB channels
