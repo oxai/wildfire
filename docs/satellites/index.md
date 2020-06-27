@@ -31,7 +31,9 @@ Each satellite carries one or more instrumenets to detect electromagnetic
 radition from the earth. The detected radiation is divided into bands of
 different frequency (or wavelength) ranges. 
 
+
 **Instruments**
+
 | Instrument    | Satellite it's on | Bands and resolutions     | Life              |
 | ----------    | ----------------- | ---------------------     | ----              |
 | VIIRS         | NOAA-20           | 16@750m, 6@375m           | 11/2017-present   |
