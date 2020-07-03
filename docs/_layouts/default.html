@@ -22,16 +22,26 @@
     <meta name="theme-color" content="#157878">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
+    <style>
+        .headerbox {
+            display: inline-flex;
+            flex-direction: row;
+            align-items: center;
+        }
+        @media screen and (max-width: 400px) {
+            .headerbox {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
 <body>
 <header class="page-header" role="banner">
-    <div style="display: inline-flex; flex-direction: row; align-items: center; @media screen and (max-width: 400px) {
-        flex-direction: column;
-    }">
-        <a href="http://oxai.org"><img src="http://oxai.org/img/logo.png" width="300"/></a>
-        <h1 class="project-name">{{site.title | default: site.github.repository_name}}</h1>
+    <div class="headerbox">
+        <a href="http://oxai.org"><img src="https://github.com/oxai/wildfire/tree/master/docs/assets/img/logo.png" width="300"/></a>
+        <h1 class="project-name" style="margin: 0 20px">{{site.title | default: site.github.repository_name}}</h1>
     </div>
-    <h2 class="project-tagline" style="margin: 0 20px">{{ page.description | default: site.description | default: site.github.project_tagline }}</h2>
+    <h2 class="project-tagline">{{ page.description | default: site.description | default: site.github.project_tagline }}</h2>
     <nav>
         <a href="/wildfire" class="btn">Home</a>
         <a href="/wildfire/challenges" class="btn">Challenges</a>
