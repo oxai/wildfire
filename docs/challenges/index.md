@@ -16,7 +16,7 @@ we hope that any future endeavours will be mindful about the impact and potentia
 and hope that this page may serve as a starting point for such future pursuits.
 
 ### Quality and availability of data source
-- Consider what kind of data is available
+- *Consider what kind of data is available*
 
     One of the biggest challenges we faced during the project was finding ground truth training data. 
 There are seemingly many wildfire datasets out there (see [list of public wildfire datasets](/wildfire/datasets)).
@@ -26,7 +26,7 @@ If you directly train a wildfire detection model on these datasets, it will most
     Datasets compiled from wildfire records reported by local authorities are limited, and the ones we found either covered only a small region (e.g. Calfire) or was outdated (FPA FOD). 
 
 
-- Assess the quality and accuracy of datasets before trusting them
+- *Assess the quality and accuracy of datasets before trusting them*
 
     When we made a comparison between MODIS Fire Archive (detected by remote sensing) and FPA FOD (reported by local authorities), 
 we found that they do not seem to align well with each other. The reason for this is unclear.
