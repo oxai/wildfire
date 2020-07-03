@@ -46,9 +46,9 @@ When we do not have reliable ground truths in the first place, it is difficult t
 Similar to cancer detection, frequency of occurrences of fire and non-fire images must be balanced, as well as balancing 
 the sample frequency of hard and easy examples. 
 
-- **Identify the metric you need to optimize for**
+- **Identify the metric you need to optimise for**
 
-    The metric you want to optimize over will depend on whether your specific application requires low false-positives or low false-negatives.
+    The metric you want to optimise over will depend on whether your specific application requires low false-positives or low false-negatives.
 
 ### Pitfalls your model may fall into
 
@@ -65,7 +65,7 @@ If the model sees a red truck in the satellite image, it might predict that the 
 If the fire is detected near a urban area, the model may expect that the fire magically disappears.
 However, what we want to know is the behaviour of the spread of the fire if humans didn’t intervene, which may not always be the case in your training data.
 
-### Consequences of wrong prediction
+### Consequences of wrong predictions
 It is important to consider the social impact of the model you deploy or the dataset you are going to release.
 If your dataset or model is biased or is not accurate, there may be real-world consequences.
 Below are some examples of questions that should be considered before deploying your model.
