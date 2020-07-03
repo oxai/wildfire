@@ -1,4 +1,4 @@
-## Satellites
+## Satellite Imagery
 
 **Organizations**
 NASA (National Aeronautics and Space Admistration
