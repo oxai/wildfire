@@ -26,15 +26,15 @@ We list a few alternatives below:
 - **[Copernicus](https://scihub.copernicus.eu/)**
     
     Provides APIs for Sentinel products.
+    
 - **[Earth Explorer](https://earthexplorer.usgs.gov/)**
     
     Visualises satellite images. There isn't an official public API for bulk-downloading images.
 
 Out of the above, we implemented downloading functionalities for both Google Earth Engine and Sentinel Hub. 
-Below, we describe how you can use our download tools.
 
 ## Google Earth Engine
-Google Earth Engine (GEE) is probably the best platform to use for projects involving satellite image analysis. 
+Google Earth Engine (GEE) is probably the most comprehensive platform to use for projects involving satellite image analysis. 
 They provide an [interactive coding environment](https://code.earthengine.google.com/) where you can filter and preprocess images, 
 and see the visualisation results immediately overlaid on top of Google Maps.
 
@@ -53,26 +53,17 @@ Google can do all the computational steps for us and just provide us the final r
 This makes it rather complicated to download image tiles compared to other APIs (e.g. Sentinel Hub).
 However we have written some scripts that do this, which we hope would be helpful for your purpose as well.
 
-Here are the steps required to start using Google Earth Engine API.
+Please refer to the [README.md in the repo](https://github.com/oxai/wildfire/tree/master/resources/gee/README.md)
+to find out about the steps required to start using Google Earth Engine API and using our code.
 
-### 1. Sign up for the API
-[Sign up](https://earthengine.google.com/signup/) to start using the API and the [interactive coding environment](https://code.earthengine.google.com/).
+## Sentinel Hub API
+[Sentinel Hub](https://www.sentinel-hub.com/) is another API that can be useful for downloading sentinel, landsat and MODIS products.
+Unlike Google Earth Engine, the free trial only lasts for 30 days, and the quota for the amount of download is tighter.
+Compared to GEE, Sentinel Hub is easier to get started with since it focusses on a set of APIs that can meet most common use cases, 
+whereas GEE gives you far more customisability in the preprocessing step, but also adds complexity to the process.
 
-### 2. Register your service account to use GEE
-By completing step 1 you can authenticate yourself to use the API. 
-The problem is that, when you have a script you want to run, you don't want to be manually authenticating it every time.
-Also, if you are developing a RESTful API, you need a way of not requiring the user to sign up for GEE but use your server-side credentials instead.
-This is why registering a service account can be useful. The steps are described in the [service accounts documentation](https://developers.google.com/earth-engine/service_account).
-There is a registration form that you need to fill out. The registration process may take a couple of days.
-
-### 3. Download json key
-Once you have registered your service account, you should be able to [create and download your service account key](https://console.developers.google.com/iam-admin/serviceaccounts/details/).
-The JSON key file is called `privatekey.json` by default. If you want to use our code, rename your json key file to `gee_key.json` and place it under `resources/gee/`.
-An example of a JSON key file can be found at `resources/gee/gee_key_example.json`.
-
-### 4. Resources and Documentation
-More resources can be found in the official documentation:
-- [Google Earth Engine - Python Install](https://developers.google.com/earth-engine/python_install)
+Please refer to the [README.md in the repo](https://github.com/oxai/wildfire/tree/master/resources/sentinelhub/README.md)
+for set up instructions.
 
 ## Glossary
 
