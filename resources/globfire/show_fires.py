@@ -31,17 +31,17 @@ for root, dirs, files in os.walk(args.dir):
 
         ax = axs[0]
         image = imread(os.path.join(root, name))
-        out = vis_fire(ee_product, image, {})
+        out = vis_fire(ee_product, image)
         ax.imshow(out)
         ax.set_title("fire vis applied")
 
         ax = axs[1]
-        out = vis_default(ee_product, image, ee_product['vis_params'])
+        out = vis_default(ee_product, image)
         ax.imshow(out)
         ax.set_title("original RGB")
 
         ax = axs[2]
-        out = vis_firethresh(ee_product, image, {})
+        out = vis_firethresh(ee_product, image)
         ax.imshow(out)
         ax.set_title("fire vis")
 
