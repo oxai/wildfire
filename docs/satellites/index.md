@@ -87,7 +87,7 @@ for set up instructions.
 - Sentinel 2[B] (ESA) (identical to Sentinel2A but with orbit shifted 180°)
 - Terra (NASA)
 - Aqua (NASA)
-- Himiwari-8 (JMA)
+- Himawari-8 (JMA)
 - NOAA-20 (NOAA)
 
 Each satellite carries one or more instrumenets to detect electromagnetic
