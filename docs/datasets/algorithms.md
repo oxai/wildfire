@@ -1,11 +1,12 @@
-**Remote Sensing Datasets**
+**Remote Sensing Algorithms**
+
 Remote sensings datasets are those formed by automatically processing satellite images to detect fires. The two most commonly used algorithms for automatically detection are called MODIS and VIIRS algorithms, named after the satellite instruments on which they were designed to work. (See (/wildfire/satellites).) The MODIS instrument (and, hence, algorithm) is much older and served as the basis for many following developments in heuristic-based fire detection, including VIIRS. Both are based on successively applying a number of heuristics to various bands to classify the type of land under each pixel. The list of possible output classes are shown in the following tables:
 
 
 **MODIS classes**
 
 |Pixel	Class | Definition |
--------------------------------
+|--|--------------------|------
 |0 |    not processed   |
 |1 |    cloud           |
 |2 |    fire            |
@@ -16,7 +17,7 @@ Remote sensings datasets are those formed by automatically processing satellite 
 **VIIRS classes**
 
 |Pixel	Class | Definition |
--------------------------------
+|--|--------------------------|
 |0 |    not	processed                   |
 |1 |    bowtie deletion                 |
 |2 |    sun	glint                       |
