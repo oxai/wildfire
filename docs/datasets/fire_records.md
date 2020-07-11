@@ -24,10 +24,10 @@ It contains a lot of data about each fire including date of discovery, date of c
 The original data was collected from a variety of "federal, state, and local" reporting systems within the US. Because of the nature of their collection, we expect the reported wildfires in this database to have a much loewr false positive rate than sattelite and heuristic based methods.
 
 
-[### Cal Fire]()
+### Cal Fire
 
-The California Department of Forestry and Fire Protection provides a database of fires in California[(find a csv at the bottom of this page)] ().
-
-**Where does the data come from?**
+The California Department of Forestry and Fire Protection provides a database of fires in California.
 
 The database gives locations as Zip codes and provides other data (acres burned, cause, fire type).
+
+A dataset is available [here](https://www.fire.ca.gov/incidents/) but more detailed data can be aquired by contacting the authors.
