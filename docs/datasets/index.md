@@ -1,6 +1,6 @@
 # Ground Truth / Label Datasets
 
-To label sattelite images as positive or negative (containing or not containing a wildfire) we needed a dataset detailing the occurence of wildfires.
+To label satellite images as positive or negative (containing or not containing a wildfire) we needed a dataset detailing the occurrence of wildfires.
 At a minimum, such a dataset must give a time and a place at which there is a wildfire, but some datasets include shape files and more.
 
 Below I outline some of the datasets we have considered, and whether or not they were suitable.
@@ -17,7 +17,7 @@ We also requested data from the fire archives, to cross reference against the fo
 
 ## FPA FOD - 1.88 Million Wildfires - Kaggle.com https://www.kaggle.com/rtatman/188-million-us-wildfires
 
-The Fire Program Analysis fire-occurence database (FPA FOD) records US wildfires from 1992 to 2015 and is [available to download on kaggle.com](https://www.kaggle.com/rtatman/188-million-us-wildfires).
+The Fire Program Analysis fire-occurrence database (FPA FOD) records US wildfires from 1992 to 2015 and is [available to download on kaggle.com](https://www.kaggle.com/rtatman/188-million-us-wildfires).
 
 It contains a lot of data about each fire including date of discovery, date of containment, location (lat/long), prediction of fires cause and the size of the fire. 
 
@@ -30,7 +30,7 @@ The California Department of Forestry and Fire Protection provides a database of
 
 The database gives locations as Zip codes and provides other data (acres burned, cause, fire type).
 
-A dataset is available [here](https://www.fire.ca.gov/incidents/) but more detailed data can be aquired by contacting the authors.
+A dataset is available [here](https://www.fire.ca.gov/incidents/) but more detailed data can be acquired by contacting the authors.
 
 **Remote Sensing Datasets**
 Remote sensings datasets are those formed by automatically processing satellite images to detect fires. The two most commonly used algorithms for automatically detection are called MODIS and VIIRS algorithms, named after the satellite instruments on which they were designed to work. (See (/wildfire/satellites).) The MODIS instrument (and, hence, algorithm) is much older and served as the basis for many following developments in heuristic-based fire detection, including VIIRS. Both are based on successively applying a number of heuristics to various bands to classify the type of land under each pixel. The list of possible output classes are shown in the following tables:
