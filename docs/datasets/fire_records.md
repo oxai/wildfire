@@ -23,3 +23,7 @@ It contains a lot of data about each fire including date of discovery, date of c
 
 #### Source
 The original data was collected from a variety of "federal, state, and local" reporting systems within the US. Because of the nature of their collection, we expect the reported wildfires in this database to have a much loewr false positive rate than sattelite and heuristic based methods
+
+
+### Cal Fire
+
