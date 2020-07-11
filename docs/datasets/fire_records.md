@@ -15,7 +15,7 @@ Recent data is displayed on an interactive map: https://firms.modaps.eosdis.nasa
 We also requested data from the fire archives, to cross reference against the following source.
 
 
-[## FPA FOD - 1.88 Million Wildfires - Kaggle.com] (https://www.kaggle.com/rtatman/188-million-us-wildfires)
+## FPA FOD - 1.88 Million Wildfires - Kaggle.com https://www.kaggle.com/rtatman/188-million-us-wildfires
 
 The Fire Program Analysis fire-occurence database (FPA FOD) records US wildfires from 1992 to 2015 and is [available to download on kaggle.com](https://www.kaggle.com/rtatman/188-million-us-wildfires).
 
