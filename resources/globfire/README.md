@@ -4,7 +4,6 @@
 Artés Vivancos, Tomàs; San-Miguel-Ayanz, Jesús (2018): Global Wildfire Database for GWIS. PANGAEA, https://doi.org/10.1594/PANGAEA.895835, 
 	Supplement to: Artés Vivancos, Tomàs; Oom, Duarte; de Rigo, Daniele; Houston Durrant, Tracy; Maianti, Pieralberto; Libertá, Giorgio; San-Miguel-Ayanz, Jesús (2019): A global wildfire dataset for the analysis of fire regimes and fire behaviour. Scientific Data, 6(1), https://doi.org/10.1038/s41597-019-0312-2
 
-
 ## Setup
 
 To use the GlobFire downloader, download shape files containing GlobFire records for a given year and month from the urls listed in

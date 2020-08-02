@@ -11,47 +11,34 @@ We recommend installing `conda` to manage the python environment.
 #### Install Dependencies
 `pip install -r requirements_minimum.txt`
 
-#### Set up Google Earth Engine
+## Set up Google Earth Engine
 You need to [sign up to use Google Earth Engine](https://earthengine.google.com/signup/) in order to use this free API.
 Please refer to the [README for Google Earth Engine](https://github.com/oxai/wildfire/blob/master/resources/gee/README.md)
 for more details.
 
----
+## Set up Sentinelhub
+This is optional, and you may not require it if you are able to set up Google Earth Engine.
+Please refer to `/resources/sentinelhub/README.md`.
 
-Below are optional setup required only if you want to try out our Django webapp to visualise the map.
+## Datasets
+### FPA-FOD Dataset
+Download [FPA_FOD_20170508.sqlite](https://www.kaggle.com/rtatman/188-million-us-wildfires) and place it in the ```resources/fpa_fod/data_dir/``` directory.
 
----
+### MODIS fire archive
+Follow the [instructions in the MODIS Fire directory](https://github.com/oxai/wildfire/blob/master/resources/modis_fire/README.md).
 
-### Initial Setup Required for Web App with Google Earth Engine
-The web app in `web` uses `Django` as its backend framework, and `React` as its frontend framework. 
+### GlobFire Dataset
+Follow the [instructions in the GlobFire directory](https://github.com/oxai/wildfire/blob/master/resources/globfire/README.md).
 
-#### Install Node.js
-The frontend React framework is developed in Node.js. Download and install the latest stable version from https://nodejs.org/en/download/.
+## Models
+The code in the `models` directory is at an experimental stage, and is not intended to be used at its current state.
+We developed this code to test a simple CNN model to classify images that capture wildfire and those which don't.
+While the result was promising, we were only able to demonstrate this for a small dataset with obvious wildfire images.
 
-#### Set up Django
-Create a file called `app_key.json` at `web/app_key.json`, which contains Django secret key.
-```
-{
-  "django_secret": "some-random-string"
-}
-```
+Please see here for more discussion on [the challenges of approaches that use machine learning for wildfire identification](https://oxai.github.io/wildfire/challenges/).
 
-### Running the web servers
-In one terminal, run the following to start up the Django backend server:
-```
-cd web
-python manage.py runserver
-```
-
-In another terminal, run the following to start up a development server for React frontend:
-
-```
-cd web/frontend
-npm install   # just after updating your branch
-npm start
-```
-
-Navigate to http://localhost:3000/
+## Web app
+There are [optional setup instructions](https://github.com/oxai/wildfire/tree/master/web/README.md) required only if you want to try out our Django webapp to visualise the map.
 
 #### Errors
 If you are encountering errors on Mac such as
@@ -64,6 +51,3 @@ You may encounter installation issues with GeoPandas on Windows. Try
 `conda install -c conda-forge geopandas`
 If that doesn't work, follow [this instruction for Windows](https://geoffboeing.com/2014/09/using-geopandas-windows/) 
 and install GDAL, Fiona, pyproj, rtree, and shapely from [Gohlke (unofficial repository for Windows binaries)](https://www.lfd.uci.edu/~gohlke/pythonlibs/).
-
-### Using Sentinelhub
-Please refer to `/resources/sentinelhub/README.md`
