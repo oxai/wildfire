@@ -14,9 +14,9 @@ To use the GlobFire downloader, download shape files containing GlobFire records
 Place the unzipped shape file folders under `resources/globfire/data_dir/MODIS_BA_GLOBAL` so that the `GlobFireDataLoader` will be able to find them.
 
 ## Download satellite images corresponding to GlobFire records
-```python -m resources.globfire.data_loader sentinel 2 l1c -z 13 --min <min fire duration to download> --max <max fire duration to download> --dir <directory to store the downloaded images> -lim```
+```python resources/globfire/data_loader.py sentinel 2 l1c -z 13 -min <min fire duration to download> -max <max fire duration to download> --dir <directory to store the downloaded images> -lim```
 
 If you want to download evolution of the fire, remove the `-lim` option.
 
 ## Show the downloaded images
-```python -m resources.globfire.show_fires sentinel 2 l1c <directory containing the downloaded tiff files>```
+```python resources/globfire/show_fires.py sentinel 2 l1c <directory containing the downloaded tiff files>```

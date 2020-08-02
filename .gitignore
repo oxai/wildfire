@@ -14,3 +14,6 @@ tags
 **key.json
 db.sqlite3
 sandbox
+.DS_Store
+
+data

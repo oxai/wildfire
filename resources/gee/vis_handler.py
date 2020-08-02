@@ -1,20 +1,29 @@
+from functools import partial
+from inspect import signature
 import numpy as np
-from PIL import Image
-import matplotlib.pyplot as plt
-from matplotlib.colors import LinearSegmentedColormap
+
+from resources.gee.vis_handler_utils import get_band, get_bands_by_name, apply_palette, normalise_image, array_to_image, \
+    stretch
 
 
-def get_empty_image(shape=(256, 256, 4)):
-    image = np.zeros(shape, dtype='uint8')
-    return Image.fromarray(image, 'RGBA')
+# decorator for any vis_handler
+def vis_handler_wrapper(handler):
+    def process(ee_product, image, already_normalised=False, vis_params=None, comp_image=None, **kwargs):
+        sig = signature(handler)
+        if not vis_params:
+            vis_params = ee_product.get('vis_params', {})
+            if 'vis_params' in sig.parameters:
+                kwargs = {**kwargs, "vis_params": vis_params}
+        if not already_normalised:
+            image = normalise_image(image, vis_params)
+        if comp_image is not None:
+            if not already_normalised:
+                comp_image = normalise_image(comp_image, vis_params)
+            kwargs = {**kwargs, "comp_image": comp_image}
+        out = handler(ee_product, image, **kwargs)
+        return array_to_image(out)
 
-
-def visualise_image_from_ee_product(image: np.ndarray, ee_product, vis_params=None, method='default'):
-    handler = get_vis_handler(ee_product, method=method)
-    if not vis_params:
-        vis_params = ee_product.get('vis_params', {})
-    out = handler(ee_product, image, vis_params)
-    return out
+    return process
 
 
 def get_vis_handler(ee_product, method='default'):
@@ -24,75 +33,19 @@ def get_vis_handler(ee_product, method='default'):
     return vis_params['handler'][method]
 
 
-def get_band(ee_product, image, band):
-    return image[ee_product['bands'].index(band)]
+# decorator for any get_indicator
+def indicator_wrapper(get_indicator):
+    def process(ee_product, image, already_normalised=False, **kwargs):
+        if not already_normalised:
+            vis_params = ee_product.get('vis_params', {})
+            image = normalise_image(image, vis_params)
+        return get_indicator(ee_product, image, **kwargs)
+
+    return process
 
 
-def get_bands(ee_product, image, bands):
-    return [get_band(ee_product, image, band) for band in bands]
-
-
-def hex_color_to_num(hex):
-    return tuple(int(hex[i:i + 2], 16) / 255 for i in (0, 2, 4))
-
-
-popular_colors = {
-    'black': "000000",
-    'blue': "0000FF",
-    'purple': "9F00C5",
-    'cyan': "00B7EB",
-    'green': "00FF00",
-    'yellow': "FFFF00",
-    'orange': "FFA500",
-    'red': "FF0000"
-}
-
-
-def create_cdict(palette):
-    cmap = []
-    for val, color in zip(np.linspace(0, 1, len(palette)), palette):
-        if color in popular_colors.keys():
-            color = popular_colors[color]
-        R, G, B = hex_color_to_num(color)
-        cmap.append(
-            ((val, R, R), (val, G, G), (val, B, B))
-        )
-    return dict(zip(['red', 'green', 'blue'], zip(*cmap)))
-
-
-def apply_palette(image, palette):
-    if image.ndim == 3:
-        image = image[0]
-    if isinstance(palette, list):
-        cm = LinearSegmentedColormap('custom', create_cdict(palette))
-    else:
-        # Get the color map by name:
-        cm = plt.get_cmap(palette)
-    # Apply the colormap like a function to any array:
-    out = cm(image)
-    return out.transpose(2, 0, 1)
-
-
-def normalise_image(image, vis_params):
-    min_val = vis_params.get('min', 0)
-    max_val = vis_params.get('max', 1)
-    gamma = vis_params.get('gamma', 1)
-    img = np.where(image > min_val, image, min_val)
-    img = np.where(img < max_val, img, max_val)
-    img = (img - min_val) / (max_val - min_val)
-    img = img ** (1 / gamma)
-    return img
-
-
-def array_to_image(image):
-    if image.shape[0] == 3:
-        image = np.concatenate([image, np.ones((1, image.shape[1], image.shape[2]))], axis=0)
-    image = (image.clip(0, 1) * 255).astype('uint8').transpose(1, 2, 0)
-    return Image.fromarray(image, 'RGBA')
-
-
-def vis_default(ee_product, image, vis_params):
-    image = normalise_image(image, vis_params)
+@vis_handler_wrapper
+def vis_default(ee_product, image, vis_params=None):
     bands = vis_params.get('bands', None)
     if bands:
         _, h, w = image.shape
@@ -109,86 +62,100 @@ def vis_default(ee_product, image, vis_params):
             out[-1] = np.where(image.sum(axis=0) > 0, 1, 0)
     else:
         out[-1] = 1
-    return array_to_image(out)
+    return out
 
 
-def vis_nbr(nir, swir, alpha):
+@vis_handler_wrapper
+def vis_nbr(ee_product, image):
+    nir, swir, alpha = get_bands_by_name(ee_product, image, ['NIR', 'SWIR2', 'cloud_mask'])
     level = (nir - swir) / (nir + swir + 1e-9)
     out = apply_palette(level, [
         'black', 'red', 'yellow'
     ])
     out[-1] = alpha
-    return array_to_image(out)
+    return out
 
 
-def vis_s2_nbr(ee_product, image, vis_params):
-    NIR, SWIR, mask = get_bands(ee_product, image, ['B8', 'B12', 'cloud_mask'])
-    return vis_nbr(NIR, SWIR, mask)
-
-
-def vis_l8_nbr(ee_product, image, vis_params):
-    NIR, SWIR, mask = get_bands(ee_product, image, ['B5', 'B7', 'cloud_mask'])
-    return vis_nbr(NIR, SWIR, mask)
-
-
-# Functions to visualize wildfire, adapted from https://pierre-markuse.net/2017/08/07/visualizing-wildfires-sentinel-2-imagery-eo-browser/
-def stretch(val, minval, maxval): return (val - minval) / (maxval - minval)
-
-
-# def vis_natural_colors(B2, B3, B4):
-#     return [stretch(3.1 * B4, 0.05, 0.9), stretch(3 * B3, 0.05, 0.9), stretch(3.0 * B2, 0.05, 0.9)];
-#
-#
-# def vis_enhanced_natural_colors(B2, B3, B4, B5, B8):
-#     return [stretch((3.1 * B4 + 0.1 * B5), 0.05, 0.9), stretch((3 * B3 + 0.15 * B8), 0.05, 0.9),
-#             stretch(3 * B2, 0.05, 0.9)];
-#
-#
-# def vis_nirswir_color(B2, B8, B12):
-#     return [stretch(2.6 * B12, 0.05, 0.9), stretch(1.9 * B8, 0.05, 0.9), stretch(2.7 * B2, 0.05, 0.9)]
-#
-#
-# def vis_panband(B8):
-#     return [stretch(B8, 0.01, 0.99), stretch(B8, 0.01, 0.99), stretch(B8, 0.01, 0.99)]
-#
-#
-# def vis_pan_tinted_green(B8):
-#     return [B8 * 0.2, B8, B8 * 0.2]
-
-
-def vis_natural_nirswirmix(B2, B3, B4, B8, B12):
-    return [stretch((2.1 * B4 + 0.5 * B12), 0.01, 0.99), stretch((2.2 * B3 + 0.5 * B8), 0.01, 0.99),
-            stretch(3.2 * B2, 0.01, 0.99)]
-
-
-def get_fire_levels(B2, B3, B4, B8, B12):
-    R = stretch((2.1 * B4 + 0.5 * B12), 0.01, 0.99) + 1.1
-    G = stretch((2.2 * B3 + 0.5 * B8), 0.01, 0.99)
-    B = stretch(2.1 * B2, 0.01, 0.99)
-    return [R, G, B], [R, G + 0.5, B]
-
-
-def get_fire_indicator(B11, B12, sensitivity=1.0):
-    # Increase sensitivity for more possible fires and more wrong indications
-    return (B11 + B12) * sensitivity
-
-
-def vis_s2_fire(ee_product, image, vis_params):
-    B2, B3, B4, B8, B11, B12 = get_bands(ee_product, image, ['B2', 'B3', 'B4', 'B8', 'B11', 'B12'])
-    fire_index = get_fire_indicator(B11, B12)
-    some_fire_array, lots_fire_array = get_fire_levels(B2, B3, B4, B8, B12)
-
-    no_fire_array = vis_natural_nirswirmix(B2, B3, B4, B8, B12)
-
-    combined_array = np.where(fire_index > 1.0, some_fire_array, no_fire_array)
-    combined_array = np.where(fire_index > 2.0, lots_fire_array, combined_array)
-    return array_to_image(combined_array)
-
-
-def vis_s2_firethresh(ee_product, image, vis_params):
-    B11, B12, mask = get_bands(ee_product, image, ['B11', 'B12', 'cloud_mask'])
-    out = apply_palette((B11 + B12) / 4, [
+@vis_handler_wrapper
+def vis_firethresh(ee_product, image):
+    swir, swir2, mask = get_bands_by_name(ee_product, image, ['SWIR', 'SWIR2', 'cloud_mask'])
+    out = apply_palette((swir + swir2) / 4, [
         'black', 'red', 'yellow'
     ])
     out[-1] = mask
-    return array_to_image(out)
+    return out
+
+
+def get_natural_nirswirmix(blue, green, red, nir, swir2):
+    return [stretch((2.1 * red + 0.5 * swir2), 0.01, 0.99), stretch((2.2 * green + 0.5 * nir), 0.01, 0.99),
+            stretch(3.2 * blue, 0.01, 0.99)]
+
+
+# Functions to compute the changes to image for 'some' and 'lots' fire/veg etc
+def get_fire_levels(blue, green, red, nir, swir2):
+    R = stretch((2.1 * red + 0.5 * swir2), 0.01, 0.99) + 1.1
+    G = stretch((2.2 * green + 0.5 * nir), 0.01, 0.99)
+    B = stretch(2.1 * blue, 0.01, 0.99)
+    return [R, G, B], [R, G + 0.5, B]
+
+
+def get_veg_levels(blue, green, red, nir, swir2):
+    R = stretch((2.1 * red + 0.5 * swir2), 0.01, 0.99)
+    G = stretch((2.2 * green + 0.5 * nir), 0.01, 0.99) + 0.1
+    B = stretch(3.2 * blue, 0.01, 0.99)
+    return np.array([R, G, B]), np.array([R * 0.7, G * 1.1, B * 1.1])
+
+
+# Functions to compute masks from metrics
+@indicator_wrapper
+def get_fire_indicator(ee_product, image, sensitivity=1.0):
+    swir, swir2 = get_bands_by_name(ee_product, image, ['SWIR', 'SWIR2'])
+    # Increase sensitivity for more possible fires and more wrong indications
+    return (swir + swir2) * sensitivity
+
+
+@indicator_wrapper
+def get_veg_indicator(ee_product, image):
+    red, nir = get_bands_by_name(ee_product, image, ['Red', 'NIR'])
+    raw = (red - nir) / (red + nir + 1e-9)
+    return raw * 2 + .7  # Scale to fit 1,2 thresholds, .15-->1, .65-->2
+
+
+@indicator_wrapper
+def get_nbr_indicator(ee_product, image, sensitivity=1.0):
+    nir, swir2 = get_bands_by_name(ee_product, image, ['NIR', 'SWIR2'])
+    return sensitivity * (nir - swir2) / (nir + swir2 + 1e-9)
+
+
+def vis_from_indicator(ind_func, l_func, comp_image=None):
+    @vis_handler_wrapper
+    def handler(ee_product, image, comp_image=comp_image):
+        B, G, R, nir, swir, swir2 = get_bands_by_name(ee_product, image,
+                                                      ['Blue', 'Green', 'Red', 'NIR', 'SWIR', 'SWIR2'])
+        index = ind_func(ee_product, image, already_normalised=True)
+        if comp_image is not None:
+            comp_index = ind_func(ee_product, comp_image, already_normalised=True)
+            index = index - comp_index
+        some_array, lots_array = l_func(B, G, R, nir, swir2)
+        no_array = get_natural_nirswirmix(B, G, R, nir, swir2)
+
+        combined_array = np.where(index > 1.0, some_array, no_array)
+        combined_array = np.where(index > 2.0, lots_array, combined_array)
+        return combined_array
+
+    return handler
+
+
+vis_veg = vis_from_indicator(ind_func=get_veg_indicator,
+                             l_func=get_veg_levels,
+                             comp_image=None)
+
+vis_dndvi = vis_from_indicator(ind_func=get_veg_indicator,
+                               l_func=get_veg_levels)
+
+vis_fire = vis_from_indicator(ind_func=get_fire_indicator,
+                              l_func=get_fire_levels,
+                              comp_image=None)
+
+vis_dnbr = vis_from_indicator(ind_func=partial(get_nbr_indicator, sensitivity=50),
+                              l_func=get_fire_levels)

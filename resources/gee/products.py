@@ -1,4 +1,4 @@
-from .vis_handler import vis_s2_nbr, vis_l8_nbr, vis_s2_fire, vis_s2_firethresh
+from .vis_handler import vis_nbr, vis_fire, vis_firethresh
 
 EE_PRODUCTS = {
     'modis': {
@@ -9,9 +9,9 @@ EE_PRODUCTS = {
                 'index': None,
                 'bands': ['sur_refl_b01', 'sur_refl_b04', 'sur_refl_b03'],
                 'vis_params': {
-                  'min': -100.0,
-                  'max': 8000.0,
-                  'bands': ['sur_refl_b01', 'sur_refl_b04', 'sur_refl_b03'],
+                    'min': -100.0,
+                    'max': 8000.0,
+                    'bands': ['sur_refl_b01', 'sur_refl_b04', 'sur_refl_b03'],
                 },
                 'start_date': '2000-02-24',
                 'end_date': None  # to present
@@ -67,16 +67,34 @@ EE_PRODUCTS = {
                 'display': 'Surface Reflectance',
                 'collection': 'COPERNICUS/S2',
                 'index': None,
-                'bands': ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B9', 'B10', 'B11', 'B12', 'cloud_mask'],
+                'bands': ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B9', 'B10', 'B11', 'B12',
+                          'cloud_mask'],
                 'vis_params': {
                     'min': 0.0,
                     'max': 0.3,
                     'bands': ['B4', 'B3', 'B2'],
                     'handler': {
-                        'nbr': vis_s2_nbr,
-                        'vis_fire': vis_s2_fire,
-                        'fire_thresh': vis_s2_firethresh
+                        'nbr': vis_nbr,
+                        'vis_fire': vis_fire,
+                        'fire_thresh': vis_firethresh
                     }
+                },
+                'band_map': {
+                    'C/A': 'B1',
+                    'Blue': 'B2',
+                    'Green': 'B3',
+                    'Red': 'B4',
+                    'VRE': 'B5',
+                    'VRE': 'B6',
+                    'VRE': 'B7',
+                    'NIR': 'B8',
+                    'NIR2': 'B8a',
+                    'WV': 'B9',
+                    'Cirrus': 'B10',
+                    'SWIR': 'B11',
+                    'SWIR2': 'B12',
+                    'cloud_mask': 'cloud_mask',
+                    'SWIR2': 'B12'
                 },
                 'cloud_mask': 'mask_s2_clouds'
             },
@@ -200,7 +218,7 @@ EE_PRODUCTS = {
                     'min': 0.0,
                     'max': 30000.0,
                     'handler': {
-                        'nbr': vis_l8_nbr,
+                        'nbr': vis_nbr,
                     }
                 },
                 'cloud_mask': 'mask_l8_raw',
@@ -218,8 +236,23 @@ EE_PRODUCTS = {
                     'max': 3000,
                     'gamma': 1.4,
                     'handler': {
-                        'nbr': vis_l8_nbr
+                        'nbr': vis_nbr
                     }
+                },
+                'band_map': {
+                    'C/A': 'B1',
+                    'Blue': 'B2',
+                    'Green': 'B3',
+                    'Red': 'B4',
+                    'NIR': 'B5',
+                    'Cirrus': 'B9',
+                    'SWIR': 'B6',
+                    'SWIR2': 'B7',
+                    'Pan': 'B8',
+                    'TIRS': 'B10',
+                    'TIRS2': 'B11',
+                    'cloud_mask': 'cloud_mask',
+                    'TIRS2': 'B11'
                 },
                 'cloud_mask': 'mask_l8_sr',
                 'start_date': '2013-04-01',

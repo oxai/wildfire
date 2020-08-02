@@ -23,13 +23,26 @@ def image_to_map_id(ee_image, vis_params=None):
     }
     return map_id_params
 
-
+# platform :: string - keys from products.py
+# sensor :: as above
+# product :: as above
 def get_ee_product(platform, sensor, product):
-    return EE_PRODUCTS[platform][sensor][product]
+    ee_product = EE_PRODUCTS[platform][sensor][product]
+    return ee_product
 
 
 def get_ee_product_name(ee_product):
     return ee_product['collection'].replace('/', '-')
+
+
+def get_ee_product_from_name(product_name):
+    collection_name = product_name.replace('-', '/')
+    for platform_info in EE_PRODUCTS.values():
+        for sensor_info in platform_info.values():
+            for ee_product in sensor_info.values():
+                if ee_product["collection"] == collection_name:
+                    return ee_product
+    raise Exception("couldn't find ee product with matching collection name")
 
 
 def get_ee_collection_from_product(ee_product, bbox: tuple or list, from_date: str, until_date: str):

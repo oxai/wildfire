@@ -18,7 +18,7 @@ def get_arguments():
     subdir = args.subdir
     if not subdir:
         dir_name_base = f"{args.platform}-{args.sensor}_{args.product}_globfire_" \
-                        f"{args.from_date}_{args.until_date}_{zoom}"
+                        f"{args.from_date}_{args.until_date}_{zoom}_{args.min_period}-{args.max_period}"
         subdir = dir_name_base + ("_no_fire" if args.neg else "_w_fire")
 
     return args, ee_product, subdir, zoom

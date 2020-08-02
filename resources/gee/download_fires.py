@@ -1,12 +1,15 @@
+import sys
+
+sys.path.append('.')
+
 import argparse
 from resources.gee.methods import TileDateRangeQuery
-from resources.gee.vis_handler import visualise_image_from_ee_product
+from resources.gee.vis_handler import vis_default
 from resources.manual_fire.data_loader import ManualFireDataLoader
 from resources.modis_fire.data_loader import ModisFireDataLoader
 from .tile_loader import GeeProductTileSeriesLoader
 from resources.utils.gis import deg2tile
 import matplotlib.pyplot as plt
-import sys
 import pandas as pd
 from resources.gee.methods import get_ee_product
 from resources.fpa_fod.data_loader import FpaFodDataLoader
@@ -14,6 +17,8 @@ import ee
 import numpy as np
 from .config import EE_CREDENTIALS
 from datetime import timedelta
+
+sys.path.remove('.')
 
 
 def get_parser(globfire=False):
@@ -88,7 +93,13 @@ def get_arguments():
 
     return args, ee_product, subdir, fire_loader
 
-
+# fire_loader :: instance of the class "base/fire_loader.py"
+# ee_product :: a dictionary (from get_ee_product())
+# bbox :: a 4-tuple/list of lng_left, lat_lower, lng_right, lat_upper
+# from_date :: string of YYYY/MM/DD
+# until_date :: as above
+# n_samples :: integer
+# sub_dir :: string - where to save the images
 def download_fire_images(fire_loader, ee_product, bbox, from_date, until_date, n_samples, subdir, pos_examples=True,
                          min_fire_size=0.0, confidence=0.0, zoom=13, img_size=256, display=True):
     if pos_examples:
@@ -142,7 +153,7 @@ def download_from_df(df, ee_product, zoom, subdir, img_size=256, display=False, 
         if display:
             images = [img for img in out if img is not None]
             if images:
-                image = visualise_image_from_ee_product(images[0], ee_product)
+                image = vis_default(ee_product, images[0])
                 print(f'Displaying {i + 1}th downloaded image')
                 plt.imshow(image)
                 plt.show()

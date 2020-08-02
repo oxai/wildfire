@@ -4,7 +4,8 @@ from django.http import JsonResponse
 from resources.fpa_fod.data_loader import FpaFodDataLoader
 from resources.gee.methods import get_ee_product
 from resources.gee.tile_loader import GeeProductTileLoader, TileDateRangeQuery
-from resources.gee.vis_handler import visualise_image_from_ee_product, get_empty_image
+from resources.gee.vis_handler import get_vis_handler
+from resources.gee.vis_handler_utils import get_empty_image
 from resources.modis_fire.data_loader import ModisFireDataLoader
 
 
@@ -34,7 +35,8 @@ def gee_mapserver(request, platform, sensor, product, method, z, x, y, from_date
     if out is None:
         image = get_empty_image()
     else:
-        image = visualise_image_from_ee_product(out, ee_product, method=method)
+        handler = get_vis_handler(ee_product, method)
+        image = handler(out, ee_product)
 
     response = HttpResponse(content_type='image/png')
     image.save(response, "PNG")
