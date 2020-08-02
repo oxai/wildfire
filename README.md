@@ -18,7 +18,8 @@ for more details.
 
 ## Set up Sentinelhub
 This is optional, and you may not require it if you are able to set up Google Earth Engine.
-Please refer to `/resources/sentinelhub/README.md`.
+Please refer to the [README for Sentinel Hub](https://github.com/oxai/wildfire/blob/master/resources/sentinelhub/README.md)
+for more details.
 
 ## Datasets
 ### FPA-FOD Dataset
