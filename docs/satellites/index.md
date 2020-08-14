@@ -136,3 +136,5 @@ different frequency (or wavelength) ranges.
 - OLCI (Ocean and Land Colour Instrument)
 - SRAL (Synthetic Aperture Radar Altimeter)
 
+---
+Written by Louis Mahon, Shu Ishida

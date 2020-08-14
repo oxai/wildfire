@@ -108,3 +108,6 @@ Below are some examples of questions that should be considered before deploying 
 - **Other types of false predictions**
 
     For forecasting spread (segmentation): if the forecast is wrong, the consequences of not being able to distribute resources correctly might cause more harm than not having the forecast.
+
+---
+Written by Shu Ishida

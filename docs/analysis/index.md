@@ -47,5 +47,5 @@ The main panel also allows users to combine the masks from the visualiser panels
 #### The Tool Bar
 The toolbar contains few features but allows you to move between images. The __"Roll"__ button allows you to select an image at random from your unlabeled directory. The __"Save mask"__ button allows you to save the binary mask/label currently in the main panel. 
 
-
-
+---
+Written by Charlie Griffin

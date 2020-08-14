@@ -16,3 +16,16 @@ An example of a JSON key file can be found at `resources/gee/gee_key_example.jso
 ### 4. Resources and Documentation
 More resources can be found in the official documentation:
 - [Google Earth Engine - Python Install](https://developers.google.com/earth-engine/python_install)
+
+
+### How to run the script:
+Positive example:
+```
+python ./resources/gee/download_fires.py landsat 8 surface fpa_fod -n 1000 -fs 10.0 -c 0.0 -sz 16
+```
+Negative example:
+```
+python ./resources/gee/download_fires.py landsat 8 surface fpa_fod -n 1000 --neg -sz 16
+```
+
+To use MODIS Fire Archive as the fire record, replace `modis` with `fpa_fod`.

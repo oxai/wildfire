@@ -68,3 +68,6 @@ Generally, these heuristics work by converting the information in a satellite im
 **GlobFire**
 
 GlobFire begins with the MODIS detection algorithm and then applies a second step of clustering high-confidence fire pixels. This clustering stage takes place of a number of successive time steps, with each time-step corresponding to a set of satellite images taken at the same time on the same day. It also uses the concept of a fire event, defined as a set of fire-classified pixels that are touching spatially and separated by no more than 5 days temporally. At each time-step, an r-tree is computed for all fire events (a type of 2d hierarchical clustering). Then a distance matrix is computed, specifying the distance from each fire-event at this time-step with each fire-event of the previous time-step. After all time-steps, all of these distance matrix are combined into a single distance matrix, which specifies the distance between all pairs of fire-events that are one time step apart. This distance matrix is then fed to a clustering algorithm (DBSCAN), and the resulting clusters are stored as wildfires in the GlobFire dataset. The paper describing the dataset is available [here](https://www.nature.com/articles/s41597-019-0312-2).
+
+---
+Written by Charlie Griffin, Louis Mahon
